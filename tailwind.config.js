@@ -14,6 +14,7 @@ module.exports = {
         title: "#041926",
         text: "#333333",
         muted: "#B9B9B9",
+        red:""
       },
       borderRadius: {
         theme: "20px",

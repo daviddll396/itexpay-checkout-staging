@@ -13,7 +13,7 @@ const BankTransfer = () => {
             <p className="text-theme font-extrabold text-2xl ">78747574675</p>
             <CopyIcon className=" text-theme" />
           </div>
-          <div className="bg-[#B9B9B9]/10 rounded-[10px] grid grid-cols-2 divide-x divide-[#B1B1B1]/50 py-3 my-4">
+          <div className="bg-[#B9B9B9]/[0.13] rounded-[10px] grid grid-cols-2 divide-x divide-[#B1B1B1]/50 py-3 my-4">
             <div className="col-span-1 px-3">
               <p className="text-[10px] text-center mb-1">Bank Name</p>
               <h5 className="text-center font-medium">Sterling Bank</h5>

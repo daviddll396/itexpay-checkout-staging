@@ -67,14 +67,14 @@ code {
 }
 
 .input {
-  @apply bg-white border border-[#DDDDDD] rounded p-3;
+  @apply bg-white border border-[#B9B9B9] rounded p-3;
 }
 .input_icon {
   @apply bg-white border border-[#B9B9B9] rounded py-3 pr-3 pl-11 placeholder:text-muted focus:outline-dark/50 focus:outline-[0.5px];
 }
 
 .icon {
-  @apply absolute top-3 w-6 left-3;
+  @apply absolute top-1/4 w-6 left-3;
 }
 .button{
   @apply  bg-theme text-white text-base font-extrabold text-center rounded-theme py-2.5;

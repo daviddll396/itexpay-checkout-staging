@@ -8,7 +8,7 @@ const QRPayment = () => {
         Scan the QR Code below on your Bank’s mobile app to complete the payment
       </p>
 
-      <div className="max-w-[200px] max-h-[200px] w-[200px] h-[200px] mx-auto bg-theme/5 rounded-theme p-3 mt-6 mb-11">
+      <div className="max-w-[250px] max-h-[250px] w-[250px] h-[250px] mx-auto bg-theme/5 rounded-theme p-3 mt-6 mb-11">
         <div className="bg-white w-full h-full rounded-theme p-3">
           <img src={qrsample} alt="" className="w-full h-full" />
         </div>

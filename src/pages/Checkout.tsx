@@ -12,6 +12,7 @@ import QRPayment from "src/components/qr";
 import USSDPayment from "src/components/ussd";
 import BankTransfer from "src/components/transfer";
 import ChangePaymentDrawer from "../components/changePaymentDrawer";
+import ENaira from "src/components/e-naira";
 
 // const DesktopCheckout = () => {
 //   const [active, setActive] = useState(paymentChannels[0]);
@@ -338,6 +339,7 @@ const Checkout = () => {
           {active.id === "qr" && <QRPayment />}
           {active.id === "ussd" && <USSDPayment />}
           {active.id === "transfer" && <BankTransfer />}
+          {active.id === "enaira" && <ENaira />}
         </div>
       </div>
       <div className="mt-6">
@@ -347,7 +349,7 @@ const Checkout = () => {
       </div>
       <div className="switch:hidden">
       <div
-      className={`w-full relative bg-white h-screen   min-h-fit  flex flex-col justify-between `}
+      className={`w-full relative bg-white  min-h-screen  flex flex-col justify-between `}
     >
       {selectState ? (
         <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
@@ -395,36 +397,12 @@ const Checkout = () => {
             </h2>
             <p className="text-text text-xs font-medium">philipkk@gmail.com</p>
           </div>
-          {/* {selectState === true ? (
-            <div>
-              <p className="text-[#555555]/70 mb-4">Make payment with:</p>
-
-              <ul className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-4  text-[#89B4CF] w-full ">
-                {paymentChannels.map(({ name, icon }, i) => (
-                  <li
-                    key={name}
-                    onClick={() => {
-                      setActive(i);
-                      setSelectState(false);
-                    }}
-                    className={`col-span-1 flex items-center text-xs py-3 pl-6 cursor-pointer font-medium text-[#3d3e42] rounded-theme hover:bg-theme/10 ${
-                      active === i
-                        ? "bg-theme/10 border border-theme  "
-                        : "bg-[#EDEDEDBD]/70 "
-                    }`}
-                  >
-                    <ReactSVG src={icon} className="w-4" stroke="#2837a8" />
-                    <span className="ml-3">{name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : ( */}
           {active.id === "card" && <CardPayment />}
           {active.id === "qr" && <QRPayment />}
           {active.id === "ussd" && <USSDPayment />}
           {active.id === "transfer" && <BankTransfer />}
-          {/* )} */}
+          {active.id === "enaira" && <ENaira />}
+
           {selectState === true ? (
             <ChangePaymentDrawer
               active={active}

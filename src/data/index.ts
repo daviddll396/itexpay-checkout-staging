@@ -26,12 +26,43 @@ export const paymentChannels = [
   },
   {
     name: "E-Naira",
-    id: "e-naira",
+    id: "enaira",
     icon: Card,
   },
-  {
-    name: "Mobile Money",
-    id: "momo",
-    icon: Card,
-  },
+  // {
+  //   name: "Mobile Money",
+  //   id: "momo",
+  //   icon: Card,
+  // },
 ];
+
+export const banksData=[
+{
+  bankName:"Wema Bank",
+  id:'pos'
+},
+{
+  bankName:"Polaris Bank",
+  id:'q'
+},
+{
+  bankName:"GT Bank",
+  id:'pws'
+},
+{
+  bankName:"UBA",
+  id:'pes'
+},
+{
+  bankName:"VFD Microfinance bank",
+  id:'prs'
+},
+{
+  bankName:"Firstbank of Nigeria",
+  id:'pcs'
+},
+{
+  bankName:"UBA",
+  id:'pvs'
+},
+]
