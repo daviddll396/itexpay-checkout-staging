@@ -4,7 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @font-face {
   font-family: "Avenir";
   src: url("./assets/fonts/avenir_ff/AvenirLTStd-Black.otf");
@@ -36,7 +35,6 @@
   font-weight: 400;
 }
 
-
 * {
   margin: 0;
   padding: 0;
@@ -66,6 +64,9 @@ code {
   @apply block text-[#414141] text-xs mb-1;
 }
 
+.otp-input {
+  @apply bg-white border border-[#B9B9B9] rounded p-2  placeholder:text-muted focus:outline-dark/50 focus:outline-[0.5px] w-12 h-12 text-3xl text-center;
+}
 .input {
   @apply bg-white border border-[#B9B9B9] rounded p-3;
 }
@@ -76,6 +77,57 @@ code {
 .icon {
   @apply absolute top-1/4 w-6 left-3;
 }
-.button{
-  @apply  bg-theme text-white text-base font-extrabold text-center rounded-theme py-2.5;
+.button {
+  @apply bg-theme text-white text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none;
+}
+
+.otp-input-wrapper {
+  @apply flex items-center justify-between w-full;
+}
+
+.otpinput {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: auto;
+  margin: 0 auto;
+}
+
+.otpinput > input {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  margin-right: 25px;
+  text-align: center;
+  border: 0.894118px solid #bdbdbd;
+  border-radius: 3px;
+  font-size: 35px;
+}
+
+.otpinput > input:last-child {
+  margin-right: 0;
+}
+
+.otpinput > input::-webkit-inner-spin-button,
+.otpinput > input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.otpinput > input:focus,
+.otpinput > input.focus {
+  border-color: green;
+  outline: none;
+  box-shadow: none;
+}
+.otpinput-text {
+  color: #333333;
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: 400;
+  /* line-height: 16px;
+   */
+  margin-bottom: 30px;
+  margin-top: 10px;
 }

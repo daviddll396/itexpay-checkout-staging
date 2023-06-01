@@ -4,7 +4,7 @@ import qrsample from "../../assets/images/qr-sample.png";
 const QRPayment = () => {
   return (
     <div>
-      <p className="text-xs text-center w-10/12 mx-auto">
+      <p className="text-sm text-center w-10/12 mx-auto">
         Scan the QR Code below on your Bank’s mobile app to complete the payment
       </p>
 

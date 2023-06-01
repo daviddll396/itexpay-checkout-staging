@@ -16,12 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
-    "paths": {
-      "@assets/*": ["src/assets/*"],
-      "@pages/*": ["src/pages/*"],
-      "@components/*": ["/src/components/*"]
-    }
   },
   "include": ["src"],
-  "extends": "./tsconfig.paths.json"
 }

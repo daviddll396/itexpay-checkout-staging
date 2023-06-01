@@ -56,3 +56,17 @@ export const validateExpiryDate = (val: any) => {
 
   return spacedNumber;
 };
+
+export const validateOTP = (val: string) => {
+  let inputNumbersOnly = val.replace(/\D/g, "");
+
+  if (inputNumbersOnly.length > 6) {
+    inputNumbersOnly = inputNumbersOnly.substr(0, 6);
+  }
+  return inputNumbersOnly
+};
+
+export const validateNumberOnly=(val:string)=>{
+  let inputNumbersOnly = val.replace(/\D/g, "");
+  return inputNumbersOnly
+}

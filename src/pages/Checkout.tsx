@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../components/sidebar";
 import { ReactComponent as Cancel } from "../assets/icons/cancel.svg";
 import CloseIcon from "../assets/icons/close.svg";
 import SecureFooter from "../components/shared/SecureFooter";
 import Logo from "../assets/images/merchantlogo.png";
-// import CreditCard from "../assets/icons/credit-card.svg";
 import { ReactSVG } from "react-svg";
 import { paymentChannels } from "../data";
 import CardPayment from "../components/card/CardPayment";
@@ -13,6 +12,17 @@ import USSDPayment from "src/components/ussd";
 import BankTransfer from "src/components/transfer";
 import ChangePaymentDrawer from "../components/changePaymentDrawer";
 import ENaira from "src/components/e-naira";
+import { generate_reference } from "src/api/utility";
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
+import { get_payment_details, callEvent } from "src/api";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "src/redux";
+import {
+  setReferences,
+  setTransactionResponse,
+} from "src/redux/PaymentReducer";
+import Spinner from "src/components/shared/Spinner";
+import Success from "src/components/shared/Success";
 
 // const DesktopCheckout = () => {
 //   const [active, setActive] = useState(paymentChannels[0]);
@@ -305,118 +315,335 @@ import ENaira from "src/components/e-naira";
 //   );
 // };
 
+type StateProps = {
+  selectedOption: string;
+  invalidRedirectUrl: boolean;
+  invalidPaymentId: boolean;
+  customErrorResponse: any;
+  paymentAlreadyMade: boolean;
+  paymentSuccessful: boolean;
+  messageFrom3ds: any;
+  isTestEnv: boolean;
+  fee: number;
+  isLoading: boolean;
+  fullPage: boolean;
+  merchantDataRecieved: boolean;
+  paymentid: "";
+  params: any;
+};
+
 const Checkout = () => {
+  const dispatch = useDispatch();
+  const transaction_data = useSelector(
+    (state: RootState) => state.payment.userPayload
+  );
+
   const [active, setActive] = useState(paymentChannels[0]);
   const [selectState, setSelectState] = useState(false);
-
+  const[paymentSuccessful, setPaymentSuccessful]=useState(false)
+  const [state, setState] = useState<StateProps>({
+    selectedOption: "",
+    isTestEnv: false,
+    invalidRedirectUrl: false,
+    invalidPaymentId: false,
+    customErrorResponse: null,
+    paymentAlreadyMade: false,
+    paymentSuccessful: false,
+    messageFrom3ds: null,
+    fee: 0,
+    isLoading: true,
+    fullPage: true,
+    merchantDataRecieved: false,
+    paymentid: "",
+    params: null,
+  });
+  const {
+    selectedOption,
+    invalidPaymentId,
+    isLoading,
+    paymentAlreadyMade,
+    // paymentSuccessful,
+  } = state;
+  // changes the selected payment method
   const handleChangePaymentMethod = () => {
     setSelectState(true);
   };
-  // const getActive=(channelid:string)=>{
-  // let channel = paymentChannels.find(({id})=> id = channelid)
-  // return channel
-  // }
+  // updates state
+  const handleStateChange = (name: string, value: any) => {
+    setState({
+      ...state,
+      [name]: value,
+    });
+  };
+  // toggles loading state to true/false
+  const toggleLoading = (value: boolean) => {
+    setState({
+      ...state,
+      isLoading: value,
+    });
+  };
+  // check if url is a valid url or not
+  const isValidUrl = (urlString: string) => {
+    try {
+      return Boolean(new URL(urlString));
+    } catch (e) {
+      return false;
+    }
+  };
+  // function to log event
+  const sendEvent = ({
+    type,
+    activity,
+  }: {
+    type: string;
+    activity: string;
+  }) => {
+    //type is "{init,redirect,otp,scan}"
+    const { paymentid, publickey } = transaction_data;
+    const evtData = {
+      paymentid,
+      eventtype: type,
+      activity,
+      // "modalreference": modalref,
+      // "paymentlinkreference": paymentlinkref,
+      // "context": "web",
+      // "actor": email,
+    };
+    callEvent(paymentid, evtData, publickey).then((response) => {
+      console.log("event response", response);
+      // handle failed
+    });
+  };
+  const paymentDetailsHandler = (paymentId: string) => {
+    get_payment_details(paymentId)
+      .then((response: any) => {
+        const { code, redirecturl } = response.data;
+        if (code === "00") {
+          handleStateChange("paymentAlreadyMade", true);
+          toggleLoading(false);
+          return;
+        }
+        // check if it is a valid redirect url
+        if (redirecturl && !isValidUrl(redirecturl)) {
+          handleStateChange("invalidRedirectUrl", true);
+          toggleLoading(false);
+          return;
+        }
+        handleStateChange("invalidRedirectUrl", true);
+        handleStateChange("selectedOption", "card");
+
+        // send initialize event
+        try {
+          sendEvent({ type: "init", activity: "Payment initialized" });
+        } catch (error) {
+          console.log({ prejjurTiWa: error });
+        }
+      })
+      .then((response: any) => {
+        handleStateChange("fee", response?.order?.fee?.value);
+        // this.fee = response?.order?.fee?.value;
+        dispatch(
+          setTransactionResponse({
+            transaction_amount:
+              parseFloat(transaction_data.transaction_amount) + state.fee + "",
+          })
+        );
+        // transaction_data.transaction_amount =
+        //   parseFloat(transaction_data.transaction_amount) + state.fee + "";
+        toggleLoading(false);
+      })
+      .catch((error) => {
+        const { message } = error;
+        if (error.response) {
+          const { status } = error?.response;
+          if (status === 404) {
+            handleStateChange("invalidPaymentId", true);
+            // this.invalidPaymentId = true;
+          }
+        }
+        toggleLoading(false);
+        // this.isLoading = false;
+        handleStateChange("customErrorResponse", message);
+        // this.customErrorResponse = message;
+        // this.$store.commit("show_error", { message: message });
+      });
+  };
+  const onLoad = async () => {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    const fingerprint = result.visitorId;
+    const modalref = generate_reference("MOD", 35);
+    const paymentlinkref = generate_reference("PLR", 40);
+    // set references to state
+    dispatch(setReferences({ fingerprint, modalref, paymentlinkref }));
+    const params = new URLSearchParams(window.location.search);
+    console.log(params.get("paymentid"), "params");
+    handleStateChange("params", params);
+    // check if url param has a linking reference to determine if transaction (if initiated) was successful or not
+    if (params.has("linkingreference")) {
+      const code = params.get("code");
+      if (code !== "00") {
+        handleStateChange("messageFrom3ds", params.get("message"));
+        toggleLoading(false);
+      } else {
+        // if code is success
+        alert('hi')
+        // handleStateChange("paymentSuccessful", true);
+        setPaymentSuccessful(true)
+        toggleLoading(false);
+      }
+      return;
+    }
+    //get the data from query param, if no paymentid,set invalidpaymentid to true
+    const { pathname } = new URL(window.location.href);
+    const paymentIdFromUrl = pathname?.split("/")[1];
+    if (!paymentIdFromUrl) {
+      handleStateChange("invalidPaymentId", true);
+      toggleLoading(false);
+      return;
+    }
+    dispatch(setTransactionResponse({ paymentid: paymentIdFromUrl }));
+    paymentDetailsHandler(paymentIdFromUrl);
+  };
+
+  // get url to go back to merchant site
+  const goToMerchantSite = () => {
+    console.log(state.params);
+    const paymentID = state.params.get("paymentid");
+    get_payment_details(paymentID).then((response: any) => {
+      const { redirecturl } = response.data;
+      // show success page and redirect to merchant
+      if (redirecturl) {
+        window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (transaction_data?.paymentid?.split("_")[0] === "TEST") {
+      handleStateChange("isTestEnv", true);
+    }
+  }, [transaction_data?.paymentid]);
+
+  useEffect(() => {
+    onLoad();
+  }, []);
+
   return (
-    <>
-      <div className="hidden switch:block">
-      <div className="my-[8%] p-4">
-      <div className="relative max-w-[705px] h-[580px] max-h-[580px]   mx-auto border border-theme rounded-theme bg-white shadow-custom_shadow p-10 ">
-        <img
-          src={CloseIcon}
-          alt="close"
-          className="w-10 absolute  -left-4 -top-4 z-[10] cursor-pointer"
-        />
-        <Sidebar active={active} setActive={setActive} />
+    <div className="flex items-center justify-center">
+      {isLoading && <Spinner xl={true} />}
+      {paymentSuccessful && <Success />}
+      {selectedOption && !isLoading && (
+        <>
+          {}
+          <div className="hidden switch:block ">
+            <div className="my-[8%] p-4 ">
+              <div className="relative max-w-[680px] h-[580px] max-h-[580px]   mx-auto border border-theme rounded-theme bg-white shadow-custom_shadow p-10 ">
+                <img
+                  src={CloseIcon}
+                  alt="close"
+                  className="w-10 absolute  -left-4 -top-4 z-[10] cursor-pointer"
+                />
+                <Sidebar
+                  active={active}
+                  setActive={setActive}
+                  changePaymentOption={handleStateChange}
+                  // disabled={!processing && !success}
+                />
+                <div className=" ml-[30%]  pl-5 ">
+                  <div className="text-end mt-3 mb-10">
+                    <h2 className="font-extrabold text-3xl text-[#005B27]">
+                      NGN 1,000.00
+                    </h2>
+                    <p className="text-text text-sm">philipkk@gmail.com</p>
+                  </div>
+                  {selectedOption === "card" && <CardPayment />}
+                  {selectedOption === "qr" && <QRPayment />}
+                  {selectedOption === "ussd" && <USSDPayment />}
+                  {selectedOption === "transfer" && <BankTransfer />}
+                  {selectedOption === "enaira" && <ENaira />}
+                </div>
+              </div>
 
-        <div className=" ml-[30%]  pl-5 ">
-          <div className="text-end mt-3 mb-10">
-            <h2 className="font-extrabold text-3xl text-[#005B27]">
-              NGN 1,000.00
-            </h2>
-            <p className="text-text text-sm">philipkk@gmail.com</p>
-          </div>
-          {active.id === "card" && <CardPayment />}
-          {active.id === "qr" && <QRPayment />}
-          {active.id === "ussd" && <USSDPayment />}
-          {active.id === "transfer" && <BankTransfer />}
-          {active.id === "enaira" && <ENaira />}
-        </div>
-      </div>
-      <div className="mt-6">
-        <SecureFooter />
-      </div>
-    </div>
-      </div>
-      <div className="switch:hidden">
-      <div
-      className={`w-full relative bg-white  min-h-screen  flex flex-col justify-between `}
-    >
-      {selectState ? (
-        <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
-      ) : null}
-
-      <div>
-        <div className="bg-dark text-white">
-          <div className=" flex items-center justify-between px-5 py-3">
-            <div className="flex items-center ">
-              <img src={Logo} alt="logo" className="w-9 h-9 mr-1" />
-              <h3 className="text-sm font-bold ml-1">Test MyParfait</h3>
-            </div>
-            <div className="flex items-center">
-              <Cancel className="w-5 h-5" />
-              <span className="ml-1 text-xs">Close</span>
+              <div className="mt-6">
+                <SecureFooter />
+              </div>
             </div>
           </div>
-        </div>
-        {!selectState ? (
-          <div className="border-y border-y-theme bg-theme/10 py-3 flex items-center justify-between px-4">
-            <div className="flex items-center ml-3">
-              <ReactSVG
-                src={active.icon}
-                className="w-4"
-                stroke="#001E31"
-              />
-              <span className="text-[#001E31] ml-3">
-                {active.name}
-              </span>
-            </div>
-
-            <button
-              onClick={handleChangePaymentMethod}
-              className="p-2 bg-transparent text-theme font-bold text-xs"
+          <div className="switch:hidden relative">
+            {/* <Toast /> */}
+            <div
+              className={`w-full relative bg-white h-screen pb-2   flex flex-col justify-between `}
             >
-              Change
-            </button>
-          </div>
-        ) : null}
+              {selectState ? (
+                <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
+              ) : null}
 
-        <div className="px-6">
-          <div className="text-end my-8">
-            <h2 className="font-extrabold text-2xl text-[#005B27]">
-              NGN 1,000.00
-            </h2>
-            <p className="text-text text-xs font-medium">philipkk@gmail.com</p>
-          </div>
-          {active.id === "card" && <CardPayment />}
-          {active.id === "qr" && <QRPayment />}
-          {active.id === "ussd" && <USSDPayment />}
-          {active.id === "transfer" && <BankTransfer />}
-          {active.id === "enaira" && <ENaira />}
+              <div className=" flex-1 ">
+                <div className="bg-dark text-white">
+                  <div className=" flex items-center justify-between px-5 py-3">
+                    <div className="flex items-center ">
+                      <img src={Logo} alt="logo" className="w-9 h-9 mr-1" />
+                      <h3 className="text-sm font-bold ml-1">Test MyParfait</h3>
+                    </div>
+                    <div className="flex items-center">
+                      <Cancel className="w-5 h-5" />
+                      <span className="ml-1 text-xs">Close</span>
+                    </div>
+                  </div>
+                </div>
+                {!selectState ? (
+                  <div className="border-y border-y-theme bg-theme/10 py-3 flex items-center justify-between px-4">
+                    <div className="flex items-center ml-3">
+                      <ReactSVG
+                        src={active.icon}
+                        className="w-4"
+                        stroke="#001E31"
+                      />
+                      <span className="text-[#001E31] ml-3">{active.name}</span>
+                    </div>
 
-          {selectState === true ? (
-            <ChangePaymentDrawer
-              active={active}
-              setActive={setActive}
-              selectState={selectState}
-              setSelectState={setSelectState}
-            />
-          ) : null}
-        </div>
-      </div>
-      <SecureFooter />
+                    <button
+                      onClick={handleChangePaymentMethod}
+                      className="p-2 bg-transparent text-theme font-bold text-xs"
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : null}
+
+                <div className="px-6 max-h-[500px] overflow-auto">
+                  <div className="text-end my-8">
+                    <h2 className="font-extrabold text-2xl text-[#005B27]">
+                      NGN 1,000.00
+                    </h2>
+                    <p className="text-text text-xs font-medium">
+                      philipkk@gmail.com
+                    </p>
+                  </div>
+                  {selectedOption === "card" && <CardPayment />}
+                  {selectedOption === "qr" && <QRPayment />}
+                  {selectedOption === "ussd" && <USSDPayment />}
+                  {selectedOption === "transfer" && <BankTransfer />}
+                  {selectedOption === "enaira" && <ENaira />}
+
+                  {selectState === true ? (
+                    <ChangePaymentDrawer
+                      active={active}
+                      setActive={setActive}
+                      selectState={selectState}
+                      setSelectState={setSelectState}
+                      changePaymentOption={handleStateChange}
+                    />
+                  ) : null}
+                </div>
+              </div>
+              <SecureFooter />
+            </div>
+          </div>
+        </>
+      )}
     </div>
-      </div>
-    </>
   );
 };
 

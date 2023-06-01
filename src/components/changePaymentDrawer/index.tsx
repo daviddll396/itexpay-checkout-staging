@@ -9,6 +9,7 @@ const ChangePaymentDrawer = (props: {
   setSelectState: (arg0: boolean) => void;
   active: any;
   selectState: boolean;
+  changePaymentOption: any
 }) => {
   const drawerRef = useOutsideClick(() => {
     props.setSelectState(false);
@@ -30,6 +31,7 @@ const ChangePaymentDrawer = (props: {
                 onClick={() => {
                   props.setActive(item);
                   props.setSelectState(false);
+                  props.changePaymentOption('selectedOption',item.id)
                 }}
                 className={`col-span-1 flex items-center justify-between  text-sm py-5 px-6 cursor-pointer font-medium text-[#22242e] hover:bg-theme/10 ${
                   props.active === item.id ? "bg-theme/10 " : "bg-white"

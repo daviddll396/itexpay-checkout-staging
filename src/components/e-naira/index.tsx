@@ -52,11 +52,9 @@ const ENaira = () => {
     if (!selected) {
       setErr("Please select a validation method");
     }
-
     if (!val || val === "") {
       setErr("");
     }
-
     if (selected?.id === "email") {
       let regexEmail = new RegExp(
         // /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/

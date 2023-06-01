@@ -1,0 +1,23 @@
+export const api_endpoints = (paymentid:string) => {
+    let base_url = `${process.env.REACT_APP_API_ENDPOINT}/v1`;
+    let payment_details_base_url = process.env.REACT_APP_API_ENDPOINT;
+
+    const isTest = paymentid.split('_')[0] === "TEST"
+    if (isTest) {
+        base_url = `${process.env.REACT_APP_API_ENDPOINT_TEST}/v1`;
+        payment_details_base_url = process.env.REACT_APP_API_ENDPOINT_TEST;
+    }
+    return {
+        base_url,
+        fetch_merchant_limit: '/transaction/limit',
+        fetch_merchant_setup: '/transaction/business',
+        fetch_merchant_fee: '/transaction/fee',
+        fetch_transaction_status: '/transaction/charge/status',
+        create_event: '/transaction/charge/event',
+        charge: '/transaction/charge',
+        charge_validate: '/transaction/charge/validate',
+        charge_options: '/transaction/charge/options',
+        payment_details_base_url,
+        init_payment: '/pay/init'
+    }
+}

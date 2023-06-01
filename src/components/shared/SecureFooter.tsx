@@ -6,17 +6,20 @@ import {ReactSVG} from "react-svg";
 const SecureFooter = () => {
   return (
     <>
-      <div className=" switch:hidden mx-auto  w-fit flex items-center gap-x-2">
+
+
+      <div className="  mx-auto  w-fit flex items-center gap-x-2 text-[#828282] switch:text-white">
         <LockIcon className="w-4 h-4 hidden " />
         <LockIcon className="w-4 h-4 switch:hidden" />
-        <p className="text-[#828282] text-sm font-medium">Secured By</p>
-        <ReactSVG src={LogoImg} className="w-14" />
+        <p className="  text-sm font-medium">Secured By</p>
+        <ReactSVG src={LogoImg} className="w-14 switch:hidden" />
+        <img src={LogoWhite} alt="" className="w-14 hidden switch:inline" />
       </div>
-      <div className="hidden switch:flex mx-auto  w-fit  items-center gap-x-2">
-        <LockIcon className="w-4 h-4  text-white" stroke="#FFFFFF" />
+      {/* <div className="hidden switch:flex mx-auto  w-fit  items-center gap-x-2">
+        <LockIcon className="w-4 h-4  text-white"  />
         <p className="text-white text-sm font-medium">Secured By</p>
         <img src={LogoWhite} className="w-14 " alt="" />
-      </div>
+      </div> */}
     </>
   );
 };
