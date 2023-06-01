@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import Sidebar from "../components/sidebar";
 import { ReactComponent as Cancel } from "../assets/icons/cancel.svg";
@@ -23,6 +25,7 @@ import {
 } from "src/redux/PaymentReducer";
 import Spinner from "src/components/shared/Spinner";
 import Success from "src/components/shared/Success";
+import Invalid from "src/components/shared/Invalid";
 
 // const DesktopCheckout = () => {
 //   const [active, setActive] = useState(paymentChannels[0]);
@@ -315,23 +318,6 @@ import Success from "src/components/shared/Success";
 //   );
 // };
 
-type StateProps = {
-  selectedOption: string;
-  invalidRedirectUrl: boolean;
-  invalidPaymentId: boolean;
-  customErrorResponse: any;
-  paymentAlreadyMade: boolean;
-  paymentSuccessful: boolean;
-  messageFrom3ds: any;
-  isTestEnv: boolean;
-  fee: number;
-  isLoading: boolean;
-  fullPage: boolean;
-  merchantDataRecieved: boolean;
-  paymentid: "";
-  params: any;
-};
-
 const Checkout = () => {
   const dispatch = useDispatch();
   const transaction_data = useSelector(
@@ -340,47 +326,36 @@ const Checkout = () => {
 
   const [active, setActive] = useState(paymentChannels[0]);
   const [selectState, setSelectState] = useState(false);
-  const[paymentSuccessful, setPaymentSuccessful]=useState(false)
-  const [state, setState] = useState<StateProps>({
-    selectedOption: "",
-    isTestEnv: false,
-    invalidRedirectUrl: false,
-    invalidPaymentId: false,
-    customErrorResponse: null,
-    paymentAlreadyMade: false,
-    paymentSuccessful: false,
-    messageFrom3ds: null,
-    fee: 0,
-    isLoading: true,
-    fullPage: true,
-    merchantDataRecieved: false,
-    paymentid: "",
-    params: null,
-  });
-  const {
-    selectedOption,
-    invalidPaymentId,
-    isLoading,
-    paymentAlreadyMade,
-    // paymentSuccessful,
-  } = state;
+  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
+  const [invalidPaymentId, setInvalidPaymentId] = useState(false);
+  const [invalidRedirectUrl, setInvalidRedirectUrl] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("");
+  const [fee, setFee] = useState("");
+  const [paymentid, setPaymentId] = useState("");
+  const [messageFrom3ds, setMessageFrom3ds] = useState<string | null>("");
+  const [customErroeMessage, setCustomerrorMessage] = useState<string | null>("");
+  const [paymentAlreadyMade, setPaymentAlreadyMade] = useState<boolean>(false);
+  const [isTestEnv, setIsTestEnv] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [merchantDataRecieved, setMerchantDataRecieved] = useState(true);
+  const [params, setParams] = useState<any>(null);
+
+
   // changes the selected payment method
   const handleChangePaymentMethod = () => {
     setSelectState(true);
   };
   // updates state
-  const handleStateChange = (name: string, value: any) => {
-    setState({
-      ...state,
-      [name]: value,
-    });
-  };
+  // const handleStateChange = (name: any, value: any) => {
+  //   // console.log('here')
+  //   // setState({
+  //   //   ...state,
+  //   //   [name]: value,
+  //   // });
+  // };
   // toggles loading state to true/false
   const toggleLoading = (value: boolean) => {
-    setState({
-      ...state,
-      isLoading: value,
-    });
+    setIsLoading(value);
   };
   // check if url is a valid url or not
   const isValidUrl = (urlString: string) => {
@@ -419,18 +394,21 @@ const Checkout = () => {
       .then((response: any) => {
         const { code, redirecturl } = response.data;
         if (code === "00") {
-          handleStateChange("paymentAlreadyMade", true);
+          setPaymentAlreadyMade(true);
           toggleLoading(false);
           return;
         }
         // check if it is a valid redirect url
         if (redirecturl && !isValidUrl(redirecturl)) {
-          handleStateChange("invalidRedirectUrl", true);
+          // handleStateChange("invalidRedirectUrl", true);
+          setInvalidRedirectUrl(true)
           toggleLoading(false);
           return;
         }
-        handleStateChange("invalidRedirectUrl", true);
-        handleStateChange("selectedOption", "card");
+        setInvalidRedirectUrl(true);
+        // handleStateChange("invalidRedirectUrl", true);
+        setSelectedOption('card')
+        // handleStateChange("selectedOption", "card");
 
         // send initialize event
         try {
@@ -440,12 +418,14 @@ const Checkout = () => {
         }
       })
       .then((response: any) => {
-        handleStateChange("fee", response?.order?.fee?.value);
+
+        // handleStateChange("fee", response?.order?.fee?.value);
+        setFee(response?.order?.fee?.value)
         // this.fee = response?.order?.fee?.value;
         dispatch(
           setTransactionResponse({
             transaction_amount:
-              parseFloat(transaction_data.transaction_amount) + state.fee + "",
+              parseFloat(transaction_data.transaction_amount) + parseFloat(fee) + "",
           })
         );
         // transaction_data.transaction_amount =
@@ -457,13 +437,15 @@ const Checkout = () => {
         if (error.response) {
           const { status } = error?.response;
           if (status === 404) {
-            handleStateChange("invalidPaymentId", true);
+            // handleStateChange("invalidPaymentId", true);
+            setInvalidPaymentId(true)
             // this.invalidPaymentId = true;
           }
         }
         toggleLoading(false);
         // this.isLoading = false;
-        handleStateChange("customErrorResponse", message);
+        // handleStateChange("customErrorResponse", message);
+        setCustomerrorMessage(message)
         // this.customErrorResponse = message;
         // this.$store.commit("show_error", { message: message });
       });
@@ -477,19 +459,18 @@ const Checkout = () => {
     // set references to state
     dispatch(setReferences({ fingerprint, modalref, paymentlinkref }));
     const params = new URLSearchParams(window.location.search);
-    console.log(params.get("paymentid"), "params");
-    handleStateChange("params", params);
+    setParams(params)
     // check if url param has a linking reference to determine if transaction (if initiated) was successful or not
     if (params.has("linkingreference")) {
       const code = params.get("code");
       if (code !== "00") {
-        handleStateChange("messageFrom3ds", params.get("message"));
+        let message = params.get("message");
+        setMessageFrom3ds(message);
         toggleLoading(false);
       } else {
         // if code is success
-        alert('hi')
-        // handleStateChange("paymentSuccessful", true);
-        setPaymentSuccessful(true)
+        console.log("hi");
+        setPaymentSuccessful(true);
         toggleLoading(false);
       }
       return;
@@ -498,7 +479,7 @@ const Checkout = () => {
     const { pathname } = new URL(window.location.href);
     const paymentIdFromUrl = pathname?.split("/")[1];
     if (!paymentIdFromUrl) {
-      handleStateChange("invalidPaymentId", true);
+      setInvalidPaymentId(true);
       toggleLoading(false);
       return;
     }
@@ -508,34 +489,48 @@ const Checkout = () => {
 
   // get url to go back to merchant site
   const goToMerchantSite = () => {
-    console.log(state.params);
-    const paymentID = state.params.get("paymentid");
-    get_payment_details(paymentID).then((response: any) => {
-      const { redirecturl } = response.data;
-      // show success page and redirect to merchant
-      if (redirecturl) {
-        window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
-      }
-    });
+    console.log(params);
+    const paymentID = params.get("paymentid");
+    const redirecturl  = `https://heroicons.com`;
+    // const { redirecturl } = response.data;
+    // show success page and redirect to merchant
+    if (redirecturl) {
+      window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
+    }
+    // get_payment_details(paymentID).then((response: any) => {
+    //   const { redirecturl } = response.data;
+    //   // show success page and redirect to merchant
+    //   if (redirecturl) {
+    //     window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
+    //   }
+    // });
   };
 
   useEffect(() => {
     if (transaction_data?.paymentid?.split("_")[0] === "TEST") {
-      handleStateChange("isTestEnv", true);
+      setIsTestEnv(true);
     }
   }, [transaction_data?.paymentid]);
 
   useEffect(() => {
-    onLoad();
+    setTimeout(() => {
+      onLoad();
+    }, 2000);
   }, []);
 
   return (
     <div className="flex items-center justify-center">
       {isLoading && <Spinner xl={true} />}
       {paymentSuccessful && <Success />}
+      {invalidPaymentId && <Invalid description="Invalid Payment ID"  go={goToMerchantSite} />}
+      {invalidRedirectUrl && (
+        <Invalid description="Redirect URL must be a fully qualified domain name!"go={goToMerchantSite} />
+      )}
+      {paymentAlreadyMade && (
+        <Invalid description="Payment already made.!"go={goToMerchantSite} />
+      )}
       {selectedOption && !isLoading && (
         <>
-          {}
           <div className="hidden switch:block ">
             <div className="my-[8%] p-4 ">
               <div className="relative max-w-[680px] h-[580px] max-h-[580px]   mx-auto border border-theme rounded-theme bg-white shadow-custom_shadow p-10 ">
@@ -547,7 +542,7 @@ const Checkout = () => {
                 <Sidebar
                   active={active}
                   setActive={setActive}
-                  changePaymentOption={handleStateChange}
+                  changePaymentOption={setSelectedOption}
                   // disabled={!processing && !success}
                 />
                 <div className=" ml-[30%]  pl-5 ">
@@ -570,7 +565,7 @@ const Checkout = () => {
               </div>
             </div>
           </div>
-          <div className="switch:hidden relative">
+          <div className="switch:hidden ">
             {/* <Toast /> */}
             <div
               className={`w-full relative bg-white h-screen pb-2   flex flex-col justify-between `}
@@ -633,7 +628,7 @@ const Checkout = () => {
                       setActive={setActive}
                       selectState={selectState}
                       setSelectState={setSelectState}
-                      changePaymentOption={handleStateChange}
+                      changePaymentOption={setSelectedOption}
                     />
                   ) : null}
                 </div>
