@@ -8,12 +8,12 @@ import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import banksData from "src/data/banks.json";
 
 const USSDPayment = () => {
-  const [value,copy] = useCopyToClipboard();
+  const [value, copy] = useCopyToClipboard();
   const [selected, setSelected] = useState<any>(banksData[0]);
   const [query, setQuery] = useState("");
   const [bankLogoUrl, setBankLogoUrl] = useState("");
   const [showCode, setShowCode] = useState(false);
-  const [code, setCode] = useState<string>(`*${selected?.ussd}*000*9628#`);
+  const [code, setCode] = useState<string>("");
 
   const filteredBank =
     query === ""
@@ -28,6 +28,7 @@ const USSDPayment = () => {
   const onShowCode = () => {
     if (selected) {
       setShowCode(true);
+      setCode(`*${selected?.ussd}*000*9628#`);
     } else {
       alert("Please select a bank");
     }
@@ -148,7 +149,10 @@ const USSDPayment = () => {
             <p className="text-theme font-extrabold text-2xl">{code}</p>
             <CopyIcon
               className="text-theme cursor-pointer"
-              onClick={() => copy(code)}
+              onClick={() => {
+                copy(code);
+                console.log(value);
+              }}
             />
           </div>
           <p className="text-xs w-5/6 mx-auto text-center mb-8 ">

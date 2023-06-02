@@ -6,7 +6,7 @@ module.exports = {
     extend: {
       boxShadow: {
         custom_shadow: "0px 4px 40px rgba(0, 0, 0, 0.12)",
-        bank_shadow:"0px 0px 8px rgba(0, 0, 0, 0.1)"
+        bank_shadow: "0px 0px 8px rgba(0, 0, 0, 0.1)",
       },
       colors: {
         theme: "#27AE60",
@@ -14,7 +14,7 @@ module.exports = {
         title: "#041926",
         text: "#333333",
         muted: "#B9B9B9",
-        red:""
+        test: "#CEA528",
       },
       borderRadius: {
         theme: "20px",

@@ -7,7 +7,7 @@ const PIN = () => {
     three: "",
     four: "",
   });
-  const [pin, setPin] = useState<any>("");
+  // const [pin, setPin] = useState<any>("");
   const { one, two, three, four } = otpValue;
   function getCodeBoxElement(index: number) {
     return document.getElementById("codeBox" + index) as HTMLInputElement;

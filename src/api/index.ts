@@ -9,6 +9,7 @@ export function get_payment_details(paymentid: string) {
   const url =
     api_endpoints(paymentid).payment_details_base_url +
     api_endpoints(paymentid).init_payment;
+    // console.log(url)
   return new Promise((resolve, reject) => {
     axios
       .get(url + "/" + paymentid, {
@@ -18,9 +19,11 @@ export function get_payment_details(paymentid: string) {
       })
       .then(
         (response) => {
+          console.log(response.data,'res')
           resolve(response.data);
         },
         (error) => {
+          console.log(error,'err')
           reject(error);
         }
       );

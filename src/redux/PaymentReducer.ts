@@ -1,10 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 export interface InitialState {
   userPayload: any;
   references: any;
   bankTransferResponse: any;
   payment: any;
+  inProcess: boolean;
   error: {
     show: boolean;
     message: string;
@@ -16,6 +17,7 @@ const initialState: InitialState = {
   references: {},
   bankTransferResponse: {},
   payment: {},
+  inProcess: false,
   error: {
     show: false,
     message: "",
@@ -45,6 +47,9 @@ export const paymentSlice = createSlice({
         message: payload.payload.message,
         code: payload.payload.code,
       };
+    },
+    setProcessing(state, { payload }) {
+      state.inProcess = payload;
     },
     show_error(state, payload) {
       state.error = { show: true, message: payload.payload.message };

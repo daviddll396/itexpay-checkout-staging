@@ -45,10 +45,10 @@ function encryptForge(data: any, rsaPublicKey: any) {
 
 function split_expiry(expiry: string | null) {
   if (expiry === null || expiry === "") {
-    throw "expiry date is missing";
+    throw new Error("expiry date is missing");
   }
   if (!expiry.includes("/")) {
-    throw "invalid expiry date. should be in format MM/YY";
+    throw new Error("invalid expiry date. should be in format MM/YY");
   }
   var s = expiry.split("/");
   var month = s[0];
@@ -56,14 +56,15 @@ function split_expiry(expiry: string | null) {
   try {
     var m_month = parseInt(month);
     if (m_month <= 0 || m_month > 12) {
-      throw "Invalid month specified. Month should be between 01 - 12";
+      throw new Error(
+        "Invalid month specified. Month should be between 01 - 12"
+      );
     }
   } catch (err) {
-    throw "Invalid month specified.";
+    throw new Error("Invalid month specified.");
   }
-
   if (year.length !== 2) {
-    throw "Invalid year. Year must be 2-digit";
+    throw new Error("Invalid year. Year must be 2-digit");
   }
   var y_year = parseInt(year);
   var d = new Date();
@@ -71,9 +72,8 @@ function split_expiry(expiry: string | null) {
   var nn = n + "".substr(0, 2);
   var yy_year = parseInt(nn + y_year);
   if (yy_year <= 0 || yy_year < n) {
-    throw "Invalid year specified. year should be greater than " + n;
+    throw new Error("Invalid year specified. year should be greater than " + n);
   }
-
   return s;
 }
 
@@ -477,6 +477,7 @@ function generate_references(prefix: string, length: number) {
   }
   return prefix + "-" + result;
 }
+
 // export function card_type(number: any) {
 //   if (!luhnCheck(number)) {
 //     return "";

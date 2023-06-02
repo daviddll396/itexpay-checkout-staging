@@ -2,7 +2,7 @@ export const api_endpoints = (paymentid:string) => {
     let base_url = `${process.env.REACT_APP_API_ENDPOINT}/v1`;
     let payment_details_base_url = process.env.REACT_APP_API_ENDPOINT;
 
-    const isTest = paymentid.split('_')[0] === "TEST"
+    const isTest = paymentid?.split('_')[0] === "TEST"
     if (isTest) {
         base_url = `${process.env.REACT_APP_API_ENDPOINT_TEST}/v1`;
         payment_details_base_url = process.env.REACT_APP_API_ENDPOINT_TEST;

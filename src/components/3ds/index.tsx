@@ -1,8 +1,8 @@
 import React from "react";
 
-const ThreeDS = () => {
+const ThreeDS = ({ onRedirect }: { onRedirect: () => void }) => {
   const handlePay = () => {
-    alert("hi");
+    onRedirect();
   };
   return (
     <div>

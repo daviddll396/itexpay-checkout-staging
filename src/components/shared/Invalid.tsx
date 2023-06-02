@@ -6,7 +6,7 @@ const Invalid = ({
   description,
   go,
 }: {
-  title?: string;
+  title?: string | null;
   description?: string;
   go?: () => void;
 }) => {
@@ -25,9 +25,11 @@ const Invalid = ({
           <p className=" mx-auto text-center">{description}</p>
         </div>
         <div className="my-3">
-          <button className="bg-transparent px-12 font-medium" onClick={onGo}>
-            Go back to merchant site
-          </button>
+          {go && (
+            <button className="bg-transparent px-12 font-medium" onClick={onGo}>
+              Go back to merchant site
+            </button>
+          )}
         </div>
       </div>
     </div>
