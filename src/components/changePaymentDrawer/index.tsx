@@ -32,6 +32,7 @@ const ChangePaymentDrawer = (props: {
           <ul className="grid grid-cols-1   divide-y divide-[#c9c8c5] text-[#89B4CF] w-full ">
             {transaction_data?.paymentmethods?.map((item: string) => {
               const paymentItem = paymentChannels.find(({ id }) => id === item);
+              
               if (paymentItem) {
                 return (
                   <li

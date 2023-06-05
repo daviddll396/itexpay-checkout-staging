@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { get_transaction_status, callEvent } from "src/api";
 import { RootState } from "src/redux";
-import { setPaymentCompleted } from "src/redux/PaymentReducer";
+import { setPaymentCompleted, show_error } from "src/redux/PaymentReducer";
 
 function useCustomFunctions() {
   const transaction_data = useSelector(
     (state: RootState) => state.payment.userPayload
   );
-  const dispatch =useDispatch()
+  const dispatch = useDispatch();
   const sendEvent = ({
     type,
     activity,
@@ -22,10 +22,16 @@ function useCustomFunctions() {
       eventtype: type,
       activity,
     };
-    callEvent(paymentid, evtData, publickey).then((response: any) => {
-      console.log("event response", response);
-      // handle failed
-    });
+    callEvent(paymentid, evtData, publickey)
+      .then((response: any) => {
+        console.log("event response", response);
+        // handle failed
+      })
+      .catch((error: any) => {
+        console.log("event response", {
+          errorMsg: error?.response?.data?.messgae || error?.message,
+        });
+      });
   };
   const openUrl = (redirecturl: string) => {
     window.open(redirecturl, "_blank");
@@ -42,7 +48,14 @@ function useCustomFunctions() {
     const message = response.message;
     const linkingreference = response.transaction.linkingreference;
     const code = response.code;
-    dispatch(setPaymentCompleted({ paymentid: transaction_data.paymentid, paycompleted: status, message, code }))
+    dispatch(
+      setPaymentCompleted({
+        paymentid: transaction_data.paymentid,
+        paycompleted: status,
+        message,
+        code,
+      })
+    );
     if (status === "success") {
       if (redirecturl) {
         setTimeout(() => {
@@ -66,7 +79,6 @@ function useCustomFunctions() {
       }
     }
   };
-
   const runTransaction = async () => {
     return new Promise((resolve, reject) => {
       const { paymentid, publickey } = transaction_data;
@@ -85,15 +97,37 @@ function useCustomFunctions() {
           }
           // handle failed
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.log(error);
-          //   this.$store.commit("show_error", { message: error });
+          dispatch(
+            show_error({
+              message: error?.response?.data?.message || error.message,
+            })
+          );
           reject("failed");
         });
     });
   };
+  const closeFrame = (onClose:any) => {
+    // alert('hi')
+    let url =
+      window.location !== window.parent.location
+        ? document.referrer
+        : document.location.href;
+        console.log(url,'url');
 
-  return { sendEvent, openUrl, success, runTransaction };
+        // onClose(false);
+        
+    window.parent.postMessage({ name: "closeiframe" }, url);
+    window.parent.postMessage(
+      {
+        closeModal: true,
+      },
+      "*"
+    );
+  };
+
+  return { sendEvent, openUrl, success, runTransaction,closeFrame };
 }
 
 export default useCustomFunctions;

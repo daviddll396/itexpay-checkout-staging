@@ -1,4 +1,3 @@
-import React from "react";
 
 type SpinnerProps = {
   md?: boolean;
@@ -8,7 +7,7 @@ type SpinnerProps = {
 
 const Spinner = ({ md, lg,  white }: SpinnerProps) => {
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center">
+    <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center">
       <div
         className={`border-t-transparent border-solid animate-spin  rounded-[50%] border-theme ${
           white ? "border-white" : "border-theme"

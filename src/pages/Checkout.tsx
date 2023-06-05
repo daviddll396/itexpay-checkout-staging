@@ -5,7 +5,6 @@ import Sidebar from "../components/sidebar";
 import { ReactComponent as Cancel } from "../assets/icons/cancel.svg";
 import CloseIcon from "../assets/icons/close.svg";
 import SecureFooter from "../components/shared/SecureFooter";
-import Logo from "../assets/images/merchantlogo.png";
 import { ReactSVG } from "react-svg";
 import { paymentChannels } from "../data";
 import CardPayment from "../components/card/CardPayment";
@@ -20,20 +19,24 @@ import { get_payment_details, callEvent } from "src/api";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "src/redux";
 import {
+  hide_error,
   setPaymentCompleted,
   setReferences,
   setTransactionResponse,
   show_error,
 } from "src/redux/PaymentReducer";
+import useCustomFunctions from "src/hooks/useCustomFunctions";
 import Spinner from "src/components/shared/Spinner";
 import Success from "src/components/shared/Success";
 import Invalid from "src/components/shared/Invalid";
+import Toast from "src/components/shared/Toast";
 
 const Checkout = () => {
   const dispatch = useDispatch();
   const transaction_data = useSelector(
     (state: RootState) => state.payment.userPayload
   );
+  const { sendEvent, closeFrame } = useCustomFunctions();
   const payment = useSelector((state: RootState) => state.payment.payment);
   const [active, setActive] = useState(paymentChannels[0]);
   const [selectState, setSelectState] = useState(false);
@@ -51,6 +54,7 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [merchantDataRecieved, setMerchantDataRecieved] = useState(true);
   const [params, setParams] = useState<any>(null);
+  const [show, setShow] = useState(true);
 
   // changes the selected payment method
   const handleChangePaymentMethod = () => {
@@ -58,7 +62,7 @@ const Checkout = () => {
   };
   // updates state
   // const handleStateChange = (name: any, value: any) => {
-  //   // console.log('here')
+  //   // //console.log('here')
   //   // setState({
   //   //   ...state,
   //   //   [name]: value,
@@ -76,32 +80,13 @@ const Checkout = () => {
       return false;
     }
   };
-  // function to log event
-  const sendEvent = ({
-    type,
-    activity,
-  }: {
-    type: string;
-    activity: string;
-  }) => {
-    //type is "{init,redirect,otp,scan}"
-    const { paymentid, publickey } = transaction_data;
-    const evtData = {
-      paymentid,
-      eventtype: type,
-      activity,
-    };
-    callEvent(paymentid, evtData, publickey).then((response) => {
-      console.log("event response", response);
-      // handle failed
-    });
-  };
+
   // gets transaction details
   const paymentDetailsHandler = (paymentId: string) => {
     // calls endpoint to get details of the transaction
     get_payment_details(paymentId)
       .then((response: any) => {
-        const { code, redirecturl } = response.data;
+        const { code, redirecturl } = response?.data;
         // if response contains code, show error payment already made
         if (code === "00") {
           setPaymentAlreadyMade(true);
@@ -122,29 +107,14 @@ const Checkout = () => {
             paycompleted: null,
           })
         );
-
-        // send initialize event
-        try {
-          sendEvent({ type: "init", activity: "Payment initialized" });
-        } catch (error) {
-          console.log({ prejjurTiWa: error });
-        }
-      })
-      .then((response: any) => {
-        // set merchant fee if any
-        setFee(response?.order?.fee?.value);
-        // update state with amount + fee if any
-        dispatch(
-          setTransactionResponse({
-            ...transaction_data,
-            transaction_amount:
-              parseFloat(transaction_data.transaction_amount) +
-              parseFloat(fee) +
-              "",
-          })
-        );
         setSelectedOption("card");
         toggleLoading(false);
+         // send initialize event
+         try {
+          sendEvent({ type: "init", activity: "Payment initialized" });
+        } catch (error: any) {
+          //console.log({ error: error?.message });
+        }
       })
       .catch((error) => {
         let errMsg =
@@ -158,7 +128,7 @@ const Checkout = () => {
         toggleLoading(false);
         // sets any  error that comes up and shows error screen
         setCustomErrorMessage(errMsg);
-        dispatch(show_error({ message: `${errMsg}` }));
+        // dispatch(show_error({ message: `${errMsg}` }));
       });
   };
   // page init
@@ -181,7 +151,7 @@ const Checkout = () => {
         toggleLoading(false);
       } else {
         // if code is success
-        console.log("hi");
+        //console.log("hi");
         setPaymentSuccessful(true);
         toggleLoading(false);
       }
@@ -197,6 +167,7 @@ const Checkout = () => {
       return;
     }
     // set paymentid to state
+    //console.log("transactionres set");
     dispatch(setTransactionResponse({ paymentid: paymentIdFromUrl }));
     paymentDetailsHandler(paymentIdFromUrl);
   };
@@ -215,24 +186,24 @@ const Checkout = () => {
         }
       })
       .catch((error) => {
-        console.log(error.response);
+        //console.log(error.response);
       });
   };
-
   // watches the value of the payment object and updates if payment was successful or not
   useEffect(() => {
     if (
-      payment?.paymentid === transaction_data.paymentid &&
-      payment.paycompleted === "success"
+      payment?.paymentid === transaction_data?.paymentid &&
+      payment?.paycompleted === "success"
     ) {
       setPaymentSuccessful(true);
     } else {
-      console.log("error");
-      payment.message && dispatch(
-        show_error({
-          message: `${payment.message}. Please, try another payment method`,
-        })
-      );
+      //console.log("error");
+      payment?.message &&
+        dispatch(
+          show_error({
+            message: `${payment?.message}. Please, try another payment method`,
+          })
+        );
     }
   }, [payment]);
 
@@ -243,153 +214,171 @@ const Checkout = () => {
   }, [transaction_data?.paymentid]);
 
   useEffect(() => {
+    dispatch(hide_error());
     setTimeout(() => {
       onLoad();
     }, 1000);
   }, []);
 
   return (
-    <div className=" relative">
-      {/* {isLoading && <Spinner lg={true} />}
-      {paymentSuccessful && <Success />}
-      {invalidPaymentId && (
-        <Invalid description="Invalid Payment ID" go={goToMerchantSite} />
-      )}
-      {invalidRedirectUrl && (
-        <Invalid
-          description="Redirect URL must be a fully qualified domain name!"
-          go={goToMerchantSite}
-        />
-      )}
-      {paymentAlreadyMade && (
-        <Invalid description="Payment already made.!" go={goToMerchantSite} />
-      )}
-      {customErrorMessage && (
-        <Invalid description={customErrorMessage}  />
-      )}
-      {messageFrom3ds && (
-        <Invalid description={messageFrom3ds} go={goToMerchantSite} />
-      )}
-      {!paymentSuccessful && selectedOption !== "" && !isLoading && (
-        <>
-          <div className="hidden switch:block ">
-            <div className="my-[8%] p-4 ">
-              <div className="relative max-w-[680px] h-[580px] max-h-[580px]   mx-auto border border-theme rounded-theme bg-white shadow-custom_shadow p-10 ">
-                <img
-                  src={CloseIcon}
-                  alt="close"
-                  className="w-10 absolute  -left-4 -top-4 z-[10] cursor-pointer"
-                />
-                <Sidebar
-                  active={active}
-                  setActive={setActive}
-                  changePaymentOption={setSelectedOption}
-                  // disabled={!processing && !success}
-                />
-                <div className=" ml-[30%]  pl-5 ">
-                  <div className="text-end mt-3 mb-10">
-                    <h2 className="font-extrabold text-3xl text-[#005B27]">
-                      {transaction_data?.currency}{" "}
-                      {transaction_data?.transaction_amount}
-                    </h2>
-                    <p className="text-text text-sm">
-                      {transaction_data?.source?.customer?.email}
-                    </p>
+    <>
+      {show && (
+        <div className="relative max-w-[680px] h-[580px] max-h-[580px] mx-auto">
+          <div className="switch:my-[8%] switch:p-4 ">
+            <Toast />
+            {isLoading && <Spinner lg={true} />}
+            {paymentSuccessful && <Success />}
+            {invalidPaymentId && (
+              <Invalid description="Invalid Payment ID" go={goToMerchantSite} />
+            )}
+            {invalidRedirectUrl && (
+              <Invalid
+                description="Redirect URL must be a fully qualified domain name!"
+                go={goToMerchantSite}
+              />
+            )}
+            {paymentAlreadyMade && (
+              <Invalid
+                description="Payment already made.!"
+                go={goToMerchantSite}
+              />
+            )}
+            {customErrorMessage && <Invalid description={customErrorMessage} />}
+            {messageFrom3ds && (
+              <Invalid description={messageFrom3ds} go={goToMerchantSite} />
+            )}
+            {!paymentSuccessful &&
+              !paymentAlreadyMade &&
+              !invalidPaymentId &&
+              selectedOption !== "" &&
+              !isLoading && (
+                <>
+                  <div className="hidden switch:block ">
+                    <div className="relative  w-full border rounded-theme border-dark/70 shadow-custom_shadow p-10 bg-white ">
+                      <img
+                        src={CloseIcon}
+                        alt="close"
+                        className="w-10 absolute  -right-4 -top-4 z-[10] cursor-pointer"
+                        // onClick={() => closeFrame(setShow)}
+                      />
+                      <Sidebar
+                        active={active}
+                        setActive={setActive}
+                        changePaymentOption={setSelectedOption}
+                        // disabled={!processing && !success}
+                      />
+                      <div className=" ml-[30%]  pl-5 ">
+                        <div className="text-end mt-3 mb-10">
+                          <h2 className="font-extrabold text-3xl text-[#005B27]">
+                            {transaction_data?.currency}{" "}
+                            {transaction_data?.amount}
+                          </h2>
+                          <p className="text-text text-sm">
+                            {transaction_data?.source?.customer?.email}
+                          </p>
+                        </div>
+                        <div className="min-h-[350px]">
+                        {selectedOption === "card" && <CardPayment />}
+                        {selectedOption === "qr" && <QRPayment />}
+                        {selectedOption === "ussd" && <USSDPayment />}
+                        {selectedOption === "transfer" && <BankTransfer />}
+                        {selectedOption === "enaira" && <ENaira />}</div>
+                      </div>
+                    </div>
+                    {isTestEnv && (
+                      <div className="py-2 px-12 bg-test/20 rounded-theme w-fit mx-auto my-3">
+                        <p className="text-[#d3b869] text-base font-semibold">
+                          You are currently in test mode
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="mt-6">
+                      <SecureFooter />
+                    </div>
                   </div>
-                  {selectedOption === "card" && <CardPayment />}
-                  {selectedOption === "qr" && <QRPayment />}
-                  {selectedOption === "ussd" && <USSDPayment />}
-                  {selectedOption === "transfer" && <BankTransfer />}
-                  {selectedOption === "enaira" && <ENaira />}
-                </div>
-              </div>
-              {isTestEnv && (
-                <div className="py-2 px-12 bg-test/20 rounded-theme w-fit mx-auto my-3">
-                  <p className="text-[#d3b869] text-base font-semibold">
-                    You are currently in test mode
-                  </p>
-                </div>
+                  <div className="switch:hidden ">
+                    <div
+                      className={`w-full relative bg-white h-screen pb-2   flex flex-col justify-between `}
+                    >
+                      {selectState ? (
+                        <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
+                      ) : null}
+
+                      <div className=" flex-1 ">
+                        <div className="bg-dark text-white">
+                          <div className=" flex items-center justify-between px-5 py-3">
+                            <div className="flex items-center ">
+                              <img
+                                src={transaction_data?.merchant_logo}
+                                alt="logo"
+                                className="w-9 h-9 mr-1"
+                              />
+                              <h3 className="text-sm font-bold ml-1 pr-3 truncate">
+                                {transaction_data?.tradingname}
+                              </h3>
+                            </div>
+                            <div className="flex items-center">
+                              <Cancel className="w-5 h-5" />
+                              <span className="ml-1 text-xs">Close</span>
+                            </div>
+                          </div>
+                        </div>
+                        {!selectState ? (
+                          <div className="border-y border-y-theme bg-theme/10 py-3 flex items-center justify-between px-4">
+                            <div className="flex items-center ml-3">
+                              <ReactSVG
+                                src={active.icon}
+                                className="w-4"
+                                stroke="#001E31"
+                              />
+                              <span className="text-[#001E31] ml-3">
+                                {active.name}
+                              </span>
+                            </div>
+
+                            <button
+                              onClick={handleChangePaymentMethod}
+                              className="p-2 bg-transparent text-theme font-bold text-xs"
+                            >
+                              Change
+                            </button>
+                          </div>
+                        ) : null}
+
+                        <div className="px-6 max-h-[500px] overflow-auto">
+                          <div className="text-end my-8">
+                            <h2 className="font-extrabold text-2xl text-[#005B27]">
+                              NGN 1,000.00
+                            </h2>
+                            <p className="text-text text-xs font-medium">
+                              philipkk@gmail.com
+                            </p>
+                          </div>
+                          {selectedOption === "card" && <CardPayment />}
+                          {selectedOption === "qr" && <QRPayment />}
+                          {selectedOption === "ussd" && <USSDPayment />}
+                          {selectedOption === "transfer" && <BankTransfer />}
+                          {selectedOption === "enaira" && <ENaira />}
+
+                          {selectState === true ? (
+                            <ChangePaymentDrawer
+                              active={active}
+                              setActive={setActive}
+                              selectState={selectState}
+                              setSelectState={setSelectState}
+                              changePaymentOption={setSelectedOption}
+                            />
+                          ) : null}
+                        </div>
+                      </div>
+                      <SecureFooter />
+                    </div>
+                  </div>
+                </>
               )}
 
-              <div className="mt-6">
-                <SecureFooter />
-              </div>
-            </div>
-          </div>
-          <div className="switch:hidden ">
-            <div
-              className={`w-full relative bg-white h-screen pb-2   flex flex-col justify-between `}
-            >
-              {selectState ? (
-                <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
-              ) : null}
-
-              <div className=" flex-1 ">
-                <div className="bg-dark text-white">
-                  <div className=" flex items-center justify-between px-5 py-3">
-                    <div className="flex items-center ">
-                      <img src={Logo} alt="logo" className="w-9 h-9 mr-1" />
-                      <h3 className="text-sm font-bold ml-1">Test MyParfait</h3>
-                    </div>
-                    <div className="flex items-center">
-                      <Cancel className="w-5 h-5" />
-                      <span className="ml-1 text-xs">Close</span>
-                    </div>
-                  </div>
-                </div>
-                {!selectState ? (
-                  <div className="border-y border-y-theme bg-theme/10 py-3 flex items-center justify-between px-4">
-                    <div className="flex items-center ml-3">
-                      <ReactSVG
-                        src={active.icon}
-                        className="w-4"
-                        stroke="#001E31"
-                      />
-                      <span className="text-[#001E31] ml-3">{active.name}</span>
-                    </div>
-
-                    <button
-                      onClick={handleChangePaymentMethod}
-                      className="p-2 bg-transparent text-theme font-bold text-xs"
-                    >
-                      Change
-                    </button>
-                  </div>
-                ) : null}
-
-                <div className="px-6 max-h-[500px] overflow-auto">
-                  <div className="text-end my-8">
-                    <h2 className="font-extrabold text-2xl text-[#005B27]">
-                      NGN 1,000.00
-                    </h2>
-                    <p className="text-text text-xs font-medium">
-                      philipkk@gmail.com
-                    </p>
-                  </div>
-                  {selectedOption === "card" && <CardPayment />}
-                  {selectedOption === "qr" && <QRPayment />}
-                  {selectedOption === "ussd" && <USSDPayment />}
-                  {selectedOption === "transfer" && <BankTransfer />}
-                  {selectedOption === "enaira" && <ENaira />}
-
-                  {selectState === true ? (
-                    <ChangePaymentDrawer
-                      active={active}
-                      setActive={setActive}
-                      selectState={selectState}
-                      setSelectState={setSelectState}
-                      changePaymentOption={setSelectedOption}
-                    />
-                  ) : null}
-                </div>
-              </div>
-              <SecureFooter />
-            </div>
-          </div>
-        </>
-      )} */}
-
-      <>
+            {/* <>
         <div className="hidden switch:block ">
           <div className="my-[8%] p-4 ">
             <div className="relative max-w-[680px] h-[580px] max-h-[580px]   mx-auto border border-theme rounded-theme bg-white shadow-custom_shadow p-10 ">
@@ -505,8 +494,11 @@ const Checkout = () => {
             <SecureFooter />
           </div>
         </div>
-      </>
-    </div>
+      </> */}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

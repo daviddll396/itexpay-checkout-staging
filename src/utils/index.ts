@@ -20,8 +20,8 @@ export const validateCVVNumber = (val: any) => {
   }
   const matched = value.match(regex);
   if (matched) {
-    console.log(matched);
-    value = matched;
+    // console.log(matched);
+    value = matched[0];
   }
   return value;
 };

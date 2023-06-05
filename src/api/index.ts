@@ -19,11 +19,11 @@ export function get_payment_details(paymentid: string) {
       })
       .then(
         (response) => {
-          console.log(response.data,'res')
+          // console.log(response.data,'res')
           resolve(response.data);
         },
         (error) => {
-          console.log(error,'err')
+          // console.log(error,'err')
           reject(error);
         }
       );

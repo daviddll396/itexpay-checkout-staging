@@ -25,9 +25,9 @@ const Sidebar = (props: {
         <img
           src={transaction_data?.merchant_logo}
           alt="logo"
-          className="w-12"
+          className="w-12 h-12 rounded-full"
         />
-        <h3 className="text-sm font-bold">{transaction_data?.tradingname}</h3>
+        <h3 className="text-sm font-bold pr-2 truncate capitalize">{transaction_data?.tradingname}</h3>
       </div>
 
       <div className="pl-3">
@@ -36,7 +36,7 @@ const Sidebar = (props: {
         </p>
 
         <ul className="flex flex-col gap-y-4 pl-2 text-[#89B4CF] w-full ">
-          {paymentChannels.map((paymentItem) => (
+          {/* {paymentChannels.map((paymentItem) => (
             <li
               key={paymentItem.id}
               onClick={() => {
@@ -56,9 +56,11 @@ const Sidebar = (props: {
               />
               <span className="ml-4">{paymentItem.name}</span>
             </li>
-          ))}
-          {/* {transaction_data?.paymentmethods?.map((item: string) => {
+          ))} */}
+          {transaction_data?.paymentmethods?.map((item: string) => {
             const paymentItem = paymentChannels.find(({ id }) => id === item);
+            // console.log(paymentItem,'paymentItem');
+
             if (paymentItem) {
               return (
                 <li
@@ -70,7 +72,7 @@ const Sidebar = (props: {
                   className={`flex paymentItems-center text-sm py-2 pl-6 cursor-pointer ${
                     active.id === paymentItem.id
                       ? "bg-white/10 border-y border-l border-theme rounded-tl-theme rounded-bl-theme text-theme font-bold"
-                      : "font-medium text-dark/50"
+                      : "font-medium text-white"
                   }`}
                 >
                   <ReactSVG
@@ -84,7 +86,7 @@ const Sidebar = (props: {
             } else {
               return null;
             }
-          })} */}
+          })}
         </ul>
       </div>
     </div>

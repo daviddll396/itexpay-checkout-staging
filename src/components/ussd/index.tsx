@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, Fragment, useEffect } from "react";
 import BankLogo from "../../assets/images/merchantlogo.png";
 import { ReactComponent as ArrowLeft } from "../../assets/icons/arrow-left.svg";
@@ -6,15 +7,42 @@ import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
 import { Combobox, Transition } from "@headlessui/react";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import banksData from "src/data/banks.json";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "src/redux";
+import { hide_error, show_error } from "src/redux/PaymentReducer";
+import { create_ussd_transaction, encrypt_data } from "src/api/utility";
+import { charge } from "src/api";
+import useCustomFunctions from "src/hooks/useCustomFunctions";
+import Spinner from "../shared/Spinner";
 
 const USSDPayment = () => {
+  const dispatch = useDispatch();
+  const transaction_data = useSelector(
+    (state: RootState) => state.payment.userPayload
+  );
+  const references = useSelector(
+    (state: RootState) => state.payment.references
+  );
+
+  const { runTransaction } = useCustomFunctions();
   const [value, copy] = useCopyToClipboard();
-  const [selected, setSelected] = useState<any>(banksData[0]);
+  const [selected, setSelected] = useState<any>("");
   const [query, setQuery] = useState("");
   const [bankLogoUrl, setBankLogoUrl] = useState("");
   const [showCode, setShowCode] = useState(false);
-  const [code, setCode] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [ussdAvailable, setUSSDAvailable] = useState(false);
+  const [server, setServer] = useState({
+    message: "",
+    otp: "",
+    linkingreference: "",
+    reference: "",
+    redirecturl: "",
+    code: "",
+    ussd: "",
+  });
 
+  // funtion to filter bank by query i.e value entered in the input
   const filteredBank =
     query === ""
       ? banksData
@@ -25,26 +53,163 @@ const USSDPayment = () => {
             .includes(query.toLowerCase().replace(/\s+/g, ""))
         );
 
-  const onShowCode = () => {
+  // to get the transaction ussd code after selecting the bank
+  const onGetUssdCode = () => {
+    setLoading(true);
     if (selected) {
-      setShowCode(true);
-      setCode(`*${selected?.ussd}*000*9628#`);
+      // setShowCode(true);
+      start_ussd_charge();
     } else {
-      alert("Please select a bank");
+      setLoading(false);
+      dispatch(show_error({ message: "Please select a bank to proceed" }));
     }
   };
+  // goes back to screen for picking bank
   const onGoBack = () => {
     setShowCode(false);
   };
+  // get transaction status at intervals
+  const runInterval = () => {
+    const statusCheck = setInterval(async () => {
+      try {
+        await runTransaction();
+      } catch {
+        clearInterval(statusCheck);
+      }
+    }, 5000);
+  };
 
+  const minutes: number = 300;
+  let blockminutes = minutes;
+
+  const onTimer = () => {
+    // const minutes: number = 300;
+    runInterval();
+    // let blockminutes = minutes;
+    const timer = setInterval(() => {
+      blockminutes -= 1;
+      if (blockminutes <= 0) {
+        clearInterval(timer);
+        dispatch(
+          show_error({
+            message: "Payment request timed out",
+          })
+        );
+      }
+    }, 1000);
+  };
+  const start_ussd_charge = () => {
+    dispatch(hide_error());
+    setUSSDAvailable(false);
+    if (!selected) {
+      setLoading(false);
+      return;
+    }
+    const {
+      reference,
+      redirecturl,
+      amount,
+      currency,
+      country,
+      paymentid,
+      callbackurl,
+      publickey,
+      encryptpublickey,
+    } = transaction_data;
+    const { firstname, lastname, email, phone } =
+      transaction_data?.source?.customer;
+    const { fingerprint, modalref, paymentlinkref } = references;
+
+    let data = create_ussd_transaction(
+      reference,
+      callbackurl,
+      redirecturl,
+      amount,
+      currency,
+      country,
+      firstname,
+      lastname,
+      email,
+      phone,
+      fingerprint,
+      modalref,
+      paymentlinkref,
+      paymentid
+    );
+    // create_or_update_event(this.transaction_data.public_key, this.references.modalref, this.references.paymentlinkref, this.customer.email, 'Started USSD charge')
+
+    let request = encrypt_data(JSON.stringify(data), encryptpublickey);
+    if (data === null || data === undefined) {
+      setLoading(false)
+      return;
+    }
+
+    charge(transaction_data.paymentid, publickey, request)
+      .then((response: any) => {
+        setServer({
+          ...server,
+          message: response?.message,
+          ussd: response?.transaction?.note,
+          code: response?.code,
+          linkingreference: response.transaction.linkingreference,
+          reference: response?.transaction?.reference,
+          redirecturl: response?.transaction?.redirecturl,
+        });
+        if (response.code === "09") {
+          setUSSDAvailable(true);
+          setShowCode(true)
+          onTimer();
+          // const minutes: number = 300;
+          // // runInterval();
+          // let blockminutes = minutes;
+          // const timer = setInterval(() => {
+          //   blockminutes -= 1;
+          //   if (blockminutes <= 0) {
+          //     clearInterval(timer);
+          //     dispatch(
+          //       show_error({
+          //         message: "Payment request timed out",
+          //       })
+          //     );
+          //   }
+          // }, 1000);
+          return;
+        }
+        setSelected("");
+        setUSSDAvailable(false);
+        setShowCode(false);
+        setLoading(false)
+        dispatch(show_error({ message: response.message }));
+      })
+      .catch((error) => {
+        setSelected("");
+        setUSSDAvailable(false);
+        setShowCode(false);
+        setLoading(false)
+        dispatch(show_error({ message: error?.response?.data?.message || error?.message }));
+      });
+  };
+  // open_vbv_ussd() {
+  //   // create_or_update_event(this.transaction_data.public_key, this.references.modalref, this.references.paymentlinkref, this.customer.email, 'USSD verification page opened')
+  //   this.$store.commit('hide_error')
+  //   this.isLoading = true
+  // }
+
+  // get bank logo on bank select
   useEffect(() => {
     selected?.slug
       ? setBankLogoUrl(`logos/${selected?.slug}.png`)
       : setBankLogoUrl("");
   }, [selected]);
 
+  // hides all errors on load
+  useEffect(() => {
+    dispatch(hide_error());
+  }, []);
+
   return (
     <>
+      {loading && <Spinner lg />}
       {!showCode && (
         <div className="px-1">
           <p className="mb-6 text-sm font-medium">Please Select your bank </p>
@@ -120,13 +285,13 @@ const USSDPayment = () => {
             </Combobox>
           </div>
           <div className=" my-6">
-            <button onClick={onShowCode} className="button w-full">
+            <button onClick={onGetUssdCode} className="button w-full">
               Continue
             </button>
           </div>
         </div>
       )}
-      {showCode && (
+      {ussdAvailable && selected && showCode && (
         <div className="">
           <div
             onClick={onGoBack}
@@ -146,20 +311,20 @@ const USSDPayment = () => {
             complete the payment
           </p>
           <div className="bg-theme/10 w-fit mx-auto py-1.5 px-5 rounded-3xl flex items-center gap-x-2 mb-6">
-            <p className="text-theme font-extrabold text-2xl">{code}</p>
+            <p className="text-theme font-extrabold text-2xl">{server?.ussd}</p>
             <CopyIcon
               className="text-theme cursor-pointer"
               onClick={() => {
-                copy(code);
+                copy(server?.ussd);
                 console.log(value);
               }}
             />
           </div>
           <p className="text-xs w-5/6 mx-auto text-center mb-8 ">
-            You have 26secs left to complete this payment
+            You have {blockminutes}secs left to complete this payment
           </p>
           <div className=" my-8">
-            <button onClick={onShowCode} className="button w-full">
+            <button onClick={runInterval} className="button w-full">
               I have completed this payment
             </button>
           </div>

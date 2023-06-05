@@ -18,19 +18,21 @@ import { create_card_transaction } from "src/api/utility";
 import { charge } from "src/api";
 import OTP from "../otp";
 import useCustomFunctions from "../../hooks/useCustomFunctions";
-import { hide_error } from "src/redux/PaymentReducer";
+import { hide_error, show_error } from "src/redux/PaymentReducer";
 import Spinner from "../shared/Spinner";
 
 const CardPayment = () => {
   const transaction_data = useSelector(
     (state: RootState) => state.payment.userPayload
   );
+  const customer = useSelector(
+    (state: RootState) => state.payment.userPayload?.source?.customer
+  );
   const references = useSelector(
     (state: RootState) => state.payment.references
   );
   const dispatch = useDispatch();
   const { sendEvent, runTransaction, openUrl } = useCustomFunctions();
-
   const [ccNumber, setCcNumber] = useState("");
   const [cvv, setCvv] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -154,6 +156,7 @@ const CardPayment = () => {
       request,
     })
       .then((response: any) => {
+        console.log(response);
         const { label } = response.config.formfields[0];
         // decide this.stage based on response 3ds or pin
         if (label === "3DS") {
@@ -164,8 +167,11 @@ const CardPayment = () => {
       })
       .catch((error) => {
         console.log(error.response);
-        // const { message } = error;
-        // this.$store.commit("show_error", { message: message });
+        dispatch(
+          show_error({
+            message: error?.response?.data?.message || error?.message,
+          })
+        );
       })
       .finally(() => {
         setLoading(false);
@@ -182,9 +188,9 @@ const CardPayment = () => {
       callbackurl,
       publickey,
       encryptpublickey,
-      customer: { firstname, lastname, email, phone },
+      // customer: { firstname, lastname, email, phone },
     } = transaction_data;
-    // const { firstname, lastname, email, phone } = this.customer;
+    const { firstname, lastname, email, phone } = customer;
     const { fingerprint, modalref, paymentlinkref } = references;
     try {
       let data = create_card_transaction(
@@ -237,19 +243,29 @@ const CardPayment = () => {
             return;
           }
           if (response.code === "09-REDIRECT") {
-            // this.stage = "3ds";
             setStage("3ds");
             return;
           }
           setStage("card");
           setCvv("");
           setExpiry("");
+          dispatch(
+            show_error({
+              message: response?.response?.data?.message || response?.message,
+            })
+          );
+
           //     this.$store.commit("show_error", { message: response.message });
         })
         .catch((error) => {
           setStage("card");
           setCvv("");
           setExpiry("");
+          dispatch(
+            show_error({
+              message: error?.response?.data?.message || error?.message,
+            })
+          );
           //     this.$store.commit("show_error", { message: message });
         });
     } catch (err) {
@@ -262,7 +278,7 @@ const CardPayment = () => {
       type: "redirect",
       activity: "3DS redirect initialized",
     });
-    setStage("3dsProcessing");
+    setStage("processing");
     // start polling
     openUrl(server.redirecturl);
     window.open(server.redirecturl, "_blank");
@@ -297,14 +313,12 @@ const CardPayment = () => {
     return () => {
       clearInterval(statusCheck);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProcessing]);
   useEffect(() => {
-    dispatch(hide_error())
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  
-
+    dispatch(hide_error());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     getCardImg(ccNumber);
   }, [ccNumber]);
@@ -315,8 +329,8 @@ const CardPayment = () => {
 
   return (
     <div className="">
-      {loading && <Spinner lg/>}
-      {(stage === "card" || stage === "processing") && (
+      {(loading || stage === "processing") && <Spinner lg />}
+      {stage === "card" && (
         <div className="switch:px-5">
           <h4 className="font-bold text-base text-title mb-6">
             Enter Payment Details

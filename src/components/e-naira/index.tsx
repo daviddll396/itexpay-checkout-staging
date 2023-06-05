@@ -1,6 +1,9 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition, RadioGroup } from "@headlessui/react";
 import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
+import useCustomFunctions from "src/hooks/useCustomFunctions";
+// import { useDispatch, useSelector } from "react-redux";
+// import { RootState } from "src/redux";
 
 const ENaira = () => {
   const options = [
@@ -34,10 +37,24 @@ const ENaira = () => {
       description: "Generate your token from the e-naira app.",
     },
   ];
+
+  // const dispatch = useDispatch();
+  // const transaction_data = useSelector(
+  //   (state: RootState) => state.payment.userPayload
+  // );
+  // const references = useSelector(
+  //   (state: RootState) => state.payment.references
+  // );
+  // const customer = useSelector(
+  //   (state: RootState) => state.payment.userPayload?.source?.customer
+  // );
+  const { runTransaction } = useCustomFunctions();
+
   const [selected, setSelected] = useState<any>(options[0]);
   const [ref, setRef] = useState(validation[0].id);
   const [value, setValue] = useState("");
   const [err, setErr] = useState("");
+  // const [isLoading, setIsLoading] = useState(true);
 
   const onChangeSelected = (option: { id: string; name: string }) => {
     // alert(JSON.stringify(option));
@@ -80,9 +97,7 @@ const ENaira = () => {
       setValue(val);
     }
     if (selected?.id === "wallet") {
-      let regexEmail = new RegExp(
-        ""
-      );
+      let regexEmail = new RegExp("");
       let isValidEmail = regexEmail.test(val);
       if (!isValidEmail) {
         setErr("Email must be a valid email address");
@@ -101,6 +116,19 @@ const ENaira = () => {
       }
       setValue(val);
     }
+  };
+
+  let statusCheck: any;
+
+  // get transaction status at intervals
+  const runInterval = () => {
+    statusCheck = setInterval(async () => {
+      try {
+        await runTransaction();
+      } catch {
+        clearInterval(statusCheck);
+      }
+    }, 5000);
   };
 
   return (
@@ -171,7 +199,9 @@ const ENaira = () => {
               <RadioGroup.Option key={item.id} value={item.id} as={Fragment}>
                 {({ active, checked }) => (
                   <li
-                    className={`  bg-white w-full p-4 shadow-custom_shadow my-3 rounded-md text-text  list-none cursor-pointer`}
+                    className={`  bg-white w-full p-4 shadow-custom_shadow my-3 rounded-md text-text  list-none cursor-pointer border ${
+                      checked ? "border-theme" : "border-transparent"
+                    }`}
                   >
                     <div className="flex items-center mb-2">
                       <div className="flex items-center">
