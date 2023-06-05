@@ -249,8 +249,8 @@ const Checkout = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center relative">
-      {isLoading && <Spinner lg={true} />}
+    <div className=" relative">
+      {/* {isLoading && <Spinner lg={true} />}
       {paymentSuccessful && <Success />}
       {invalidPaymentId && (
         <Invalid description="Invalid Payment ID" go={goToMerchantSite} />
@@ -387,9 +387,9 @@ const Checkout = () => {
             </div>
           </div>
         </>
-      )}
+      )} */}
 
-      {/* <>
+      <>
         <div className="hidden switch:block ">
           <div className="my-[8%] p-4 ">
             <div className="relative max-w-[680px] h-[580px] max-h-[580px]   mx-auto border border-theme rounded-theme bg-white shadow-custom_shadow p-10 ">
@@ -505,7 +505,7 @@ const Checkout = () => {
             <SecureFooter />
           </div>
         </div>
-      </> */}
+      </>
     </div>
   );
 };

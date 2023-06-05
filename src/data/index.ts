@@ -2,6 +2,7 @@ import QRIcon from "../assets/icons/qr.svg";
 import USSDIcon from "../assets/icons/ussd.svg";
 import BankTransferIcon from "../assets/icons/transfer.svg";
 import Card from "../assets/icons/card.svg";
+import ENaira from "../assets/icons/e-naira.svg"
 
 export const paymentChannels = [
   {
@@ -27,7 +28,7 @@ export const paymentChannels = [
   {
     name: "E-Naira",
     id: "enaira",
-    icon: Card,
+    icon: ENaira,
   },
   // {
   //   name: "Mobile Money",

@@ -36,7 +36,7 @@ const Sidebar = (props: {
         </p>
 
         <ul className="flex flex-col gap-y-4 pl-2 text-[#89B4CF] w-full ">
-          {/* {paymentChannels.map((paymentItem) => (
+          {paymentChannels.map((paymentItem) => (
             <li
               key={paymentItem.id}
               onClick={() => {
@@ -56,8 +56,8 @@ const Sidebar = (props: {
               />
               <span className="ml-4">{paymentItem.name}</span>
             </li>
-          ))} */}
-          {transaction_data?.paymentmethods?.map((item: string) => {
+          ))}
+          {/* {transaction_data?.paymentmethods?.map((item: string) => {
             const paymentItem = paymentChannels.find(({ id }) => id === item);
             if (paymentItem) {
               return (
@@ -84,7 +84,7 @@ const Sidebar = (props: {
             } else {
               return null;
             }
-          })}
+          })} */}
         </ul>
       </div>
     </div>
