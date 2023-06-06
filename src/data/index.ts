@@ -17,7 +17,7 @@ export const paymentChannels = [
   },
   {
     name: "Bank Transfer",
-    id: "transfer",
+    id: "account",
     icon: BankTransferIcon,
   },
   {

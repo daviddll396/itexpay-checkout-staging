@@ -224,7 +224,7 @@ export async function callEvent(paymentid: any, request: any, key: any) {
   });
 }
 
-export async function charge(paymentid: any, key: string, request: any) {
+export async function charge(paymentid: string, key: string, request: any) {
   var url =
     api_endpoints(paymentid).base_url +
     api_endpoints(paymentid).charge +

@@ -1,7 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { get_transaction_status, callEvent } from "src/api";
 import { RootState } from "src/redux";
-import { setPaymentCompleted, show_error } from "src/redux/PaymentReducer";
+import {
+  setPaymentCompleted,
+  show_error,
+  close_modal,
+} from "src/redux/PaymentReducer";
 
 function useCustomFunctions() {
   const transaction_data = useSelector(
@@ -15,21 +19,22 @@ function useCustomFunctions() {
     type: string;
     activity: string;
   }) => {
-    //type is "{init,redirect,otp,scan}"
+    //type is "{init,redirect,otp,scan}""
     const { paymentid, publickey } = transaction_data;
     const evtData = {
-      paymentid,
+      paymentid: paymentid,
       eventtype: type,
       activity,
     };
+    // console.log(evtData, paymentid, publickey);
     callEvent(paymentid, evtData, publickey)
       .then((response: any) => {
         console.log("event response", response);
         // handle failed
       })
       .catch((error: any) => {
-        console.log("event response", {
-          errorMsg: error?.response?.data?.messgae || error?.message,
+        console.log("event response error", {
+          errorMsg: error?.response?.data?.message || error?.message,
         });
       });
   };
@@ -58,14 +63,17 @@ function useCustomFunctions() {
     );
     if (status === "success") {
       if (redirecturl) {
+        // console.log("settng timeout for redirect to merchant");
+
         setTimeout(() => {
           return window.open(
             `${redirecturl}?paymentid=${paymentid}&linkingreference=${linkingreference}&code=${code}&message=${message}`,
             "_top",
             "toolbar=no,scrollbars=no,resizable=yes"
           );
-        }, 2000);
+        }, 3000);
       } else {
+        // console.log("setting timeout for closing modal");
         setTimeout(() => {
           let url =
             window.location !== window.parent.location
@@ -75,7 +83,8 @@ function useCustomFunctions() {
             { name: "vbvcomplete", response: response },
             url
           );
-        }, 2000);
+          dispatch(close_modal());
+        }, 5000);
       }
     }
   };
@@ -108,26 +117,8 @@ function useCustomFunctions() {
         });
     });
   };
-  const closeFrame = (onClose:any) => {
-    // alert('hi')
-    let url =
-      window.location !== window.parent.location
-        ? document.referrer
-        : document.location.href;
-        console.log(url,'url');
 
-        // onClose(false);
-        
-    window.parent.postMessage({ name: "closeiframe" }, url);
-    window.parent.postMessage(
-      {
-        closeModal: true,
-      },
-      "*"
-    );
-  };
-
-  return { sendEvent, openUrl, success, runTransaction,closeFrame };
+  return { sendEvent, openUrl, success, runTransaction };
 }
 
 export default useCustomFunctions;

@@ -10,6 +10,7 @@ export interface InitialState {
     show: boolean;
     message: string;
   };
+  show: boolean;
 }
 
 const initialState: InitialState = {
@@ -22,25 +23,26 @@ const initialState: InitialState = {
     show: false,
     message: "",
   },
+  show: true,
 };
 
 export const paymentSlice = createSlice({
   name: "payment",
   initialState,
   reducers: {
-    setTransactionResponse(state, {payload}) {
+    setTransactionResponse(state, { payload }) {
       state.userPayload = { ...state.bankTransferResponse, ...payload };
     },
-    setReferences(state, {payload}) {
+    setReferences(state, { payload }) {
       state.references = { ...state.references, ...payload };
     },
-    setBankTransferResponse(state, {payload}) {
+    setBankTransferResponse(state, { payload }) {
       state.bankTransferResponse = {
         paymentid: payload.paymentid,
         response: payload.response,
       };
     },
-    setPaymentCompleted(state, {payload}) {
+    setPaymentCompleted(state, { payload }) {
       state.payment = {
         paymentid: payload.paymentid,
         paycompleted: payload.paycompleted,
@@ -51,11 +53,14 @@ export const paymentSlice = createSlice({
     setProcessing(state, { payload }) {
       state.inProcess = payload;
     },
-    show_error(state, {payload}) {
+    show_error(state, { payload }) {
       state.error = { show: true, message: payload.message };
     },
     hide_error(state) {
       state.error = { show: false, message: "" };
+    },
+    close_modal(state) {
+      state.show = false;
     },
   },
 });
@@ -67,5 +72,6 @@ export const {
   setPaymentCompleted,
   show_error,
   hide_error,
+  close_modal,
 } = paymentSlice.actions;
 export default paymentSlice.reducer;

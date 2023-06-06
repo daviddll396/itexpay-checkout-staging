@@ -18,7 +18,7 @@ import { create_card_transaction } from "src/api/utility";
 import { charge } from "src/api";
 import OTP from "../otp";
 import useCustomFunctions from "../../hooks/useCustomFunctions";
-import { hide_error, show_error } from "src/redux/PaymentReducer";
+import { show_error } from "src/redux/PaymentReducer";
 import Spinner from "../shared/Spinner";
 
 const CardPayment = () => {
@@ -40,7 +40,6 @@ const CardPayment = () => {
   const [cardLogoUrl, setCardLogoUrl] = useState("");
   const [logo, setLogo] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [processing, setProcessing] = useState(false);
   const [stage, setStage] = useState("card");
   const [server, setServer] = useState({
     message: "",
@@ -130,7 +129,6 @@ const CardPayment = () => {
 
       return;
     }
-
     onVerifyCardDetails();
   };
   const onVerifyCardDetails = () => {
@@ -251,13 +249,11 @@ const CardPayment = () => {
           setExpiry("");
           dispatch(
             show_error({
-              message: response?.response?.data?.message || response?.message,
+              message: response?.data?.message || response?.message,
             })
           );
-
-          //     this.$store.commit("show_error", { message: response.message });
         })
-        .catch((error) => {
+        .catch((error: any) => {
           setStage("card");
           setCvv("");
           setExpiry("");
@@ -268,7 +264,8 @@ const CardPayment = () => {
           );
           //     this.$store.commit("show_error", { message: message });
         });
-    } catch (err) {
+    } catch (err: any) {
+      console.log(err?.message);
       setLoading(false);
     }
   };
@@ -282,43 +279,20 @@ const CardPayment = () => {
     // start polling
     openUrl(server.redirecturl);
     window.open(server.redirecturl, "_blank");
-    // runInterval();
-    setProcessing(true);
+    runInterval();
   };
-  // const runInterval = () => {
-  //   statusCheck = setInterval(async () => {
-  //     try {
-  //       await runTransaction();
-  //     } catch (error) {
-  //       setLoading(false);
-  //       clearInterval();
-  //       setStage("card");
-  //     }
-  //   }, 5000);
-  // };
-
-  const isProcessing = processing === true;
-
-  useEffect(() => {
+  const runInterval = () => {
     const statusCheck = setInterval(async () => {
       try {
-        await runTransaction();
-      } catch (error) {
-        setLoading(false);
+        const result = await runTransaction();
+        if (result === "success") {
+          clearInterval(statusCheck);
+        }
+      } catch {
         clearInterval(statusCheck);
-        setStage("card");
       }
     }, 5000);
-
-    return () => {
-      clearInterval(statusCheck);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProcessing]);
-  useEffect(() => {
-    dispatch(hide_error());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
   useEffect(() => {
     getCardImg(ccNumber);
   }, [ccNumber]);
@@ -329,7 +303,14 @@ const CardPayment = () => {
 
   return (
     <div className="">
-      {(loading || stage === "processing") && <Spinner lg />}
+      {loading && <Spinner lg />}
+      {stage === "processing" && (
+        <Spinner
+          lg
+          withText
+          text="Transaction processing. Please do not reload this page...."
+        />
+      )}
       {stage === "card" && (
         <div className="switch:px-5">
           <h4 className="font-bold text-base text-title mb-6">

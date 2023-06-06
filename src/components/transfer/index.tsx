@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ReactComponent as CopyIcon } from "../../assets/icons/copy-icon.svg";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
@@ -17,9 +17,9 @@ const BankTransfer = () => {
   const transaction_data = useSelector(
     (state: RootState) => state.payment.userPayload
   );
-  const bankTransferResponse = useSelector(
-    (state: RootState) => state.payment.bankTransferResponse
-  );
+  // const bankTransferResponse = useSelector(
+  //   (state: RootState) => state.payment.bankTransferResponse
+  // );
   // const references = useSelector(
   //   (state: RootState) => state.payment.references
   // );
@@ -30,7 +30,7 @@ const BankTransfer = () => {
   const [value, copy] = useCopyToClipboard();
   const [isLoading, setIsLoading] = useState(true);
   const [bankAccountAvailable, setBankAccountAvailable] = useState(false);
-  const [accountNumber, setAccountNumber] = useState('');
+  const [accountNumber, setAccountNumber] = useState("");
   const [bank, setBank] = useState("");
 
   let statusCheck: any;
@@ -74,6 +74,7 @@ const BankTransfer = () => {
     setIsLoading(true);
     initiate_charge(transaction_data.paymentid, publickey, request)
       .then((response: any) => {
+        console.log("transfer res", response);
         dispatch(
           setBankTransferResponse({
             paymentid: transaction_data.paymentid,
@@ -100,32 +101,36 @@ const BankTransfer = () => {
       });
   };
 
-  useLayoutEffect(() => {
-    if (bankTransferResponse.paymentid === transaction_data.paymentid) {
-      const { response } = bankTransferResponse;
+  useEffect(() => {
+    // if (
+    //   bankTransferResponse.paymentid &&
+    //   bankTransferResponse.paymentid === transaction_data.paymentid
+    // ) {
+    //   const { response } = bankTransferResponse;
 
-      if (response.code === "09") {
-        setIsLoading(false);
-        setBankAccountAvailable(true);
-        setAccountNumber(
-          response.source.customer.account.recipientaccountnumber
-        );
-        setBank(response.source.customer.account.bank);
-        runInterval();
-        return;
-      }
-      setIsLoading(false);
-      setBankAccountAvailable(false);
-      dispatch(show_error({ message: response.message }));
-    } else {
-      get_bank_account();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    //   if (response.code === "09") {
+    //     setIsLoading(false);
+    //     setBankAccountAvailable(true);
+    //     setAccountNumber(
+    //       response.source.customer.account.recipientaccountnumber
+    //     );
+    //     setBank(response.source.customer.account.bank);
+    //     runInterval();
+    //     return;
+    //   }
+    //   setIsLoading(false);
+    //   setBankAccountAvailable(false);
+    //   dispatch(show_error({ message: response.message }));
+    // } else {
+    //   get_bank_account();
+    // }
+    get_bank_account();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <>
+    <div>
       {isLoading && <Spinner lg />}
-      {bankAccountAvailable && !isLoading && (
+      {bankAccountAvailable  && (
         <div>
           <p className="mb-4 text-sm font-medium">
             Transfer directly from your bank
@@ -139,12 +144,12 @@ const BankTransfer = () => {
                   {accountNumber}
                 </p>
                 <CopyIcon
-              className="text-theme cursor-pointer"
-              onClick={() => {
-                copy(accountNumber);
-                console.log(value);
-              }}
-            />
+                  className="text-theme cursor-pointer"
+                  onClick={() => {
+                    copy(accountNumber);
+                    console.log(value);
+                  }}
+                />
               </div>
               <div className="bg-[#B9B9B9]/[0.13] rounded-[10px] grid grid-cols-2 divide-x divide-[#B1B1B1]/50 py-3 my-4">
                 <div className="col-span-1 px-3">
@@ -171,7 +176,7 @@ const BankTransfer = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
