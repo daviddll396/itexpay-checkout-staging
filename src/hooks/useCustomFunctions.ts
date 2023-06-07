@@ -63,8 +63,6 @@ function useCustomFunctions() {
     );
     if (status === "success") {
       if (redirecturl) {
-        // console.log("settng timeout for redirect to merchant");
-
         setTimeout(() => {
           return window.open(
             `${redirecturl}?paymentid=${paymentid}&linkingreference=${linkingreference}&code=${code}&message=${message}`,
