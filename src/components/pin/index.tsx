@@ -1,28 +1,33 @@
-import { useState } from "react";
+// import { useState } from "react";
 
-const PIN = () => {
-  const [otpValue, setOtpValue] = useState({
-    one: "",
-    two: "",
-    three: "",
-    four: "",
-  });
+type PinProps = {
+  pin: any;
+  setPin: any;
+  onContinue: () => void;
+};
+const PIN = ({ pin, setPin, onContinue }: PinProps) => {
+  // const [otpValue, setOtpValue] = useState({
+  //   one: "",
+  //   two: "",
+  //   three: "",
+  //   four: "",
+  // });
   // const [pin, setPin] = useState<any>("");
-  const { one, two, three, four } = otpValue;
+  const { one, two, three, four } = pin;
   function getCodeBoxElement(index: number) {
     return document.getElementById("codeBox" + index) as HTMLInputElement;
   }
   function onKeyUpEvent(index: number, event: any) {
     const eventCode = event.which || event.keyCode;
-    const eventValue = event.target.value;
-    console.log(eventCode, eventValue);
+    // const eventValue = event.target.value;
+    // console.log(eventCode, eventValue);
     console.log(getCodeBoxElement(index).value, "val");
     if (getCodeBoxElement(index).value.length === 1) {
       if (index !== 4) {
         getCodeBoxElement(index + 1).focus();
       } else {
         getCodeBoxElement(index).blur();
-        
+
         // Submit code
         // require_pin_change = false;
         // isLoading = true
@@ -34,8 +39,8 @@ const PIN = () => {
     }
   }
   const handleOTPChange = (e: any) => {
-    setOtpValue({
-      ...otpValue,
+    setPin({
+      ...pin,
       [e.target.name]: e.target.value,
     });
   };
@@ -48,15 +53,19 @@ const PIN = () => {
       }
     }
   }
+
+  const onCharge = () => {
+    onContinue();
+  };
   return (
     <div className="">
-      <p className="mb-12">
+      <p className="mb-12  font-semibold text-text/80">
         Enter your 4-digit card PIN to complete this transaction
       </p>
       <div className=" flex items-center justify-center px-8 place-content-center">
         <input
           id="codeBox1"
-          type="password"
+          // type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(1, e)}
           onFocus={() => onFocusEvent(1)}
@@ -64,10 +73,11 @@ const PIN = () => {
           name="one"
           value={one}
           className="otp-input mr-3"
+          placeholder="*"
         />
         <input
           id="codeBox2"
-          type="password"
+          // type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(2, e)}
           onFocus={() => onFocusEvent(2)}
@@ -75,10 +85,11 @@ const PIN = () => {
           value={two}
           name="two"
           onChange={(e) => handleOTPChange(e)}
+          placeholder="*"
         />
         <input
           id="codeBox3"
-          type="password"
+          // type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(3, e)}
           onFocus={() => onFocusEvent(3)}
@@ -86,24 +97,26 @@ const PIN = () => {
           value={three}
           name="three"
           onChange={(e) => handleOTPChange(e)}
+          placeholder="*"
         />
         <input
           id="codeBox4"
-          type="password"
+          // type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(4, e)}
+          placeholder="*"
           onFocus={() => onFocusEvent(4)}
           className="otp-input mr-0"
           value={four}
           name="four"
           onChange={(e) => handleOTPChange(e)}
         />
-        {/* <input id="codeBox2" type="password" maxLength={1} @keyup="onKeyUpEvent(2, $event)" @focus="onFocusEvent(2)"
-            v-model="card.pin.two" />
-          <input id="codeBox3" type="password" maxLength={1} @keyup="onKeyUpEvent(3, $event)" @focus="onFocusEvent(3)"
-            v-model="card.pin.three" />
-          <input id="codeBox4" type="password" maxLength={1} @keyup="onKeyUpEvent(4, $event)" @focus="onFocusEvent(4)"
-            v-model="card.pin.four" /> */}
+      </div>
+
+      <div className=" my-8">
+        <button onClick={onCharge} className="button w-full">
+          Continue
+        </button>
       </div>
     </div>
   );

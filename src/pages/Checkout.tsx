@@ -35,6 +35,9 @@ const Checkout = () => {
   const transaction_data = useSelector(
     (state: RootState) => state.payment.userPayload
   );
+  // const processing = useSelector(
+  //   (state: RootState) => state.payment.inProcess
+  // );
   const show = useSelector((state: RootState) => state.payment.show);
   const payment = useSelector((state: RootState) => state.payment.payment);
   const { sendEvent } = useCustomFunctions();
@@ -245,7 +248,7 @@ const Checkout = () => {
   return (
     <>
       {show && (
-        <div className="relative max-w-[680px] h-[580px] max-h-[580px] mx-auto">
+        <div className="relative max-w-[660px] h-[580px] max-h-[580px] mx-auto">
           <div className="switch:my-[8%] switch:p-4 ">
             <Toast />
             {isLoading && <Spinner lg={true} />}
@@ -288,11 +291,10 @@ const Checkout = () => {
                         active={active}
                         setActive={setActive}
                         changePaymentOption={setSelectedOption}
-                        // disabled={!processing && !success}
                       />
-                      <div className=" ml-[30%]  pl-5 ">
-                        <div className="text-end mt-3 mb-10">
-                          <h2 className="font-extrabold text-3xl text-[#005B27]">
+                      <div className=" ml-[32%]  pl-5 ">
+                        <div className="text-end mt-3 mb-5">
+                          <h2 className="font-extrabold text-3xl text-title">
                             {transaction_data?.currency}{" "}
                             {transaction_data?.amount}
                           </h2>
@@ -300,7 +302,7 @@ const Checkout = () => {
                             {transaction_data?.source?.customer?.email}
                           </p>
                         </div>
-                        <div className="min-h-[350px]">
+                        <div className="min-h-[350px] flex items-center justify-center">
                           {selectedOption === "card" && <CardPayment />}
                           {selectedOption === "qr" && <QRPayment />}
                           {selectedOption === "ussd" && <USSDPayment />}

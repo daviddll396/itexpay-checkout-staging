@@ -30,8 +30,8 @@ const Invalid = ({
           <InvalidIcon className="w-32 h-32" />
         </div>
         <div className="text-center">
-          <h3 className="text-3xl mb-2 font-semibold">{title}</h3>
-          <p className=" mx-auto text-center">{description}</p>
+          <h3 className="text-3xl mb-2 font-semibold ">{title}</h3>
+          <p className=" mx-auto text-center text-lg md:text-2xl font-semibold">{description}</p>
         </div>
         <div className="my-3">
           {go && (

@@ -71,7 +71,6 @@ function useCustomFunctions() {
           );
         }, 3000);
       } else {
-        // console.log("setting timeout for closing modal");
         setTimeout(() => {
           let url =
             window.location !== window.parent.location

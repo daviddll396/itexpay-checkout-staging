@@ -5,7 +5,7 @@ import { store } from "./redux";
 
 function App() {
   return (
-    <div className="">
+    <div className="font-sans">
       <Provider store={store}>
         <Checkout />
       </Provider>

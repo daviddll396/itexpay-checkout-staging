@@ -1,7 +1,7 @@
 export const formatAndSetCcNumber = (value: any) => {
   const inputVal = value.replace(/ /g, "");
   let inputNumbersOnly = inputVal.replace(/\D/g, "");
-  if (inputNumbersOnly.length > 18) {
+  if (inputNumbersOnly.length > 20) {
     inputNumbersOnly = inputNumbersOnly.substr(0, 18);
   }
   const splits = inputNumbersOnly.match(/.{1,4}/g);

@@ -20,9 +20,9 @@ module.exports = {
       borderRadius: {
         theme: "20px",
       },
-      // fontFamily: {
-      //   sans: ["Inter var", ...defaultTheme.fontFamily.sans],
-      // },
+      fontFamily: {
+        sans: ["Inter var", ...defaultTheme.fontFamily.sans],
+      },
       screens: {
         switch: "540px",
         ...defaultTheme.screens,

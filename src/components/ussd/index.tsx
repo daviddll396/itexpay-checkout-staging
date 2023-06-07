@@ -23,7 +23,6 @@ const USSDPayment = () => {
   const references = useSelector(
     (state: RootState) => state.payment.references
   );
-
   const { runTransaction } = useCustomFunctions();
   const [value, copy] = useCopyToClipboard();
   const [selected, setSelected] = useState<any>("");
@@ -78,14 +77,11 @@ const USSDPayment = () => {
       }
     }, 5000);
   };
-
   const minutes: number = 300;
   let blockminutes = minutes;
 
   const onTimer = () => {
-    // const minutes: number = 300;
     runInterval();
-    // let blockminutes = minutes;
     const timer = setInterval(() => {
       blockminutes -= 1;
       if (blockminutes <= 0) {

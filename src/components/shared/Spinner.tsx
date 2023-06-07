@@ -17,7 +17,11 @@ const Spinner = ({ md, lg, white, withText, text }: SpinnerProps) => {
             md ? "w-16 h-16" : lg ? "w-36 h-36" : "w-8 h-8"
           } `}
         ></div>
-        {withText && <p className="text-sm switch:text-lg text-text max-w-[200px] break-normal">{text}</p>}
+        {withText && (
+          <p className="text-sm switch:text-lg text-text w-[220px] max-w-[250px] mt-4">
+            {text}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -15,11 +15,14 @@ const Sidebar = (props: {
     (state: RootState) => state.payment.userPayload
   );
   const processing = useSelector((state: RootState) => state.payment.inProcess);
+
+  const handleChangeOption = (paymentItem: any) => {
+    setActive(paymentItem);
+    changePaymentOption(paymentItem.id);
+  };
   return (
     <div
-      className={`absolute left-0 bottom-0 top-0 rounded-tl-theme rounded-bl-theme  bg-dark  w-[30%] flex flex-col   pl-3 py-6 text-white ${
-        processing ? "cursor-not-allowed" : ""
-      }`}
+      className={`absolute left-0 bottom-0 top-0 rounded-tl-theme rounded-bl-theme  bg-dark  w-[32%] flex flex-col   pl-2 py-6 text-white `}
     >
       <div className=" flex items-center gap-x-2 mt-5 mb-10 ml-5">
         <img
@@ -27,7 +30,9 @@ const Sidebar = (props: {
           alt="logo"
           className="w-12 h-12 rounded-full"
         />
-        <h3 className="text-sm font-bold pr-2 truncate capitalize">{transaction_data?.tradingname}</h3>
+        <h3 className="text-sm font-bold pr-2 break-all capitalize">
+          {transaction_data?.tradingname}
+        </h3>
       </div>
 
       <div className="pl-3">
@@ -35,7 +40,7 @@ const Sidebar = (props: {
           Make payment with:
         </p>
 
-        <ul className="flex flex-col gap-y-4 pl-2 text-[#89B4CF] w-full ">
+        <ul className="flex flex-col gap-y-4 pl-2  text-[#89B4CF] w-full ">
           {/* {paymentChannels.map((paymentItem) => (
             <li
               key={paymentItem.id}
@@ -59,21 +64,21 @@ const Sidebar = (props: {
           ))} */}
           {transaction_data?.paymentmethods?.map((item: string) => {
             const paymentItem = paymentChannels.find(({ id }) => id === item);
-            // console.log(paymentItem,'paymentItem');
 
             if (paymentItem) {
               return (
                 <li
                   key={paymentItem.id}
-                  onClick={() => {
-                    setActive(paymentItem);
-                    changePaymentOption(paymentItem.id);
-                  }}
-                  className={`flex paymentItems-center text-sm py-2 pl-6 cursor-pointer ${
+                  onClick={
+                    processing
+                      ? undefined
+                      : () => handleChangeOption(paymentItem)
+                  }
+                  className={`flex items-center text-sm py-2 pl-5 pr-2  ${
                     active.id === paymentItem.id
                       ? "bg-white/10 border-y border-l border-theme rounded-tl-theme rounded-bl-theme text-theme font-bold"
                       : "font-medium text-white"
-                  }`}
+                  } ${processing ? "cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   <ReactSVG
                     src={paymentItem.icon}

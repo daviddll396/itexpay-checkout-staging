@@ -44,7 +44,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: rgb(0 0 0 / 0.7);
-  font-family: "Avenir", sans-serif;
+  /* font-family: "Avenir", sans-serif; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -65,20 +65,23 @@ code {
 }
 
 .otp-input {
-  @apply bg-white border border-[#B9B9B9] rounded p-2  placeholder:text-muted focus:outline-dark/50 focus:outline-[0.5px] w-12 h-12 text-3xl text-center;
+  @apply bg-white border border-[#B9B9B9] rounded p-2  placeholder:text-muted placeholder:text-center focus:outline-dark/50 focus:outline-[0.5px] w-12  text-3xl text-center;
 }
 .input {
-  @apply bg-white border border-[#B9B9B9] rounded p-3;
+  @apply bg-white border border-[#B9B9B9] rounded p-3 placeholder:text-muted focus:outline-dark/50 focus:outline-[0.5px];
 }
 .input_icon {
-  @apply bg-white border border-[#B9B9B9] rounded py-3 pr-3 pl-11 placeholder:text-muted focus:outline-dark/50 focus:outline-[0.5px];
+  @apply bg-white border border-[#B9B9B9] rounded py-2.5 pr-3 pl-11 placeholder:text-muted focus:outline-dark/50 focus:outline-[0.5px];
 }
 
 .icon {
   @apply absolute top-1/4 w-6 left-3;
 }
 .button {
-  @apply bg-theme text-white text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none;
+  @apply bg-theme text-white text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none border-transparent;
+}
+.button-outline {
+  @apply bg-white text-theme text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none border border-theme;
 }
 
 .otp-input-wrapper {
@@ -123,11 +126,15 @@ code {
 }
 .otpinput-text {
   color: #333333;
-  font-family: "Avenir",sans-serif;
+  font-family: "Avenir", sans-serif;
   font-size: 14px;
   font-weight: 400;
   /* line-height: 16px;
    */
   margin-bottom: 30px;
   margin-top: 10px;
+}
+
+.card {
+  filter: drop-shadow(0px 0.639628px 1.27926px rgba(16, 24, 40, 0.09));
 }

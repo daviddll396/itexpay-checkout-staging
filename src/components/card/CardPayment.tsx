@@ -18,8 +18,14 @@ import { create_card_transaction } from "src/api/utility";
 import { charge } from "src/api";
 import OTP from "../otp";
 import useCustomFunctions from "../../hooks/useCustomFunctions";
-import { show_error } from "src/redux/PaymentReducer";
+import {
+  hide_error,
+  setProcessing,
+  show_error,
+} from "src/redux/PaymentReducer";
 import Spinner from "../shared/Spinner";
+import { create_otp_transaction } from "src/api/utility";
+import { validate_otp } from "src/api";
 
 const CardPayment = () => {
   const transaction_data = useSelector(
@@ -31,8 +37,9 @@ const CardPayment = () => {
   const references = useSelector(
     (state: RootState) => state.payment.references
   );
+  const processing = useSelector((state: RootState) => state.payment.inProcess);
   const dispatch = useDispatch();
-  const { sendEvent, runTransaction, openUrl } = useCustomFunctions();
+  const { sendEvent, runTransaction, openUrl, success } = useCustomFunctions();
   const [ccNumber, setCcNumber] = useState("");
   const [cvv, setCvv] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -41,6 +48,13 @@ const CardPayment = () => {
   const [logo, setLogo] = useState(false);
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState("card");
+  const [pin, setPin] = useState<any>({
+    one: "",
+    two: "",
+    three: "",
+    four: "",
+  });
+  const [otp, setOtp] = useState("");
   const [server, setServer] = useState({
     message: "",
     otp: "",
@@ -49,6 +63,8 @@ const CardPayment = () => {
     redirecturl: "",
     code: "",
     note: "",
+    card_type: "",
+    bank: "",
   });
 
   const handleChange = (e: any, change: string) => {
@@ -132,6 +148,9 @@ const CardPayment = () => {
     onVerifyCardDetails();
   };
   const onVerifyCardDetails = () => {
+    dispatch(hide_error());
+    dispatch(setProcessing(true));
+    setLoading(true);
     const chargeOptionsReq = {
       transaction: {
         paymentmethod: "card",
@@ -154,22 +173,33 @@ const CardPayment = () => {
       request,
     })
       .then((response: any) => {
-        console.log(response);
-        const { label } = response.config.formfields[0];
+        // console.log(response);
+        const { label = null } = response.config.formfields[0];
+        if (!label) {
+          dispatch(show_error({ message: "Invalid card number" }));
+          setCvv("");
+          setExpiry("");
+          setLoading(false);
+          dispatch(setProcessing(false));
+          return;
+        }
         // decide this.stage based on response 3ds or pin
-        if (label === "3DS") {
+        if (label && label === "3DS") {
           main_charge_card();
         } else {
           setStage("pin");
+          setLoading(false);
         }
       })
       .catch((error) => {
-        console.log(error.response);
-        dispatch(
-          show_error({
-            message: error?.response?.data?.message || error?.message,
-          })
-        );
+        let errMsg = error?.response?.data?.message || error?.message;
+        console.log({ errMsg });
+        dispatch(show_error({ message: "Invalid card number" }));
+        setCvv("");
+        setExpiry("");
+        setLoading(false);
+        dispatch(setProcessing(false));
+        setLoading(false);
       })
       .finally(() => {
         setLoading(false);
@@ -207,10 +237,10 @@ const CardPayment = () => {
           cvv: cvv,
           expiry: expiry,
           pin: {
-            one: null,
-            two: null,
-            three: null,
-            four: null,
+            one: pin.one === "" ? null : pin.one,
+            two: pin.two === "" ? null : pin.two,
+            three: pin.three === "" ? null : pin.three,
+            four: pin.four === "" ? null : pin.four,
           },
         },
         fingerprint,
@@ -218,57 +248,78 @@ const CardPayment = () => {
         paymentlinkref,
         paymentid
       );
-      console.log(data, "card data");
       if (data === null || data === undefined) return;
-      setLoading(true);
-      //get the card type
-      // let cardType = card_type(this.card.pan);
+      // setLoading(true);
+
+      // console.log({ data });
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
-          setLoading(false);
           setServer({
             ...server,
             message: response?.message,
             linkingreference: response.transaction.linkingreference,
             reference: response?.transaction?.reference,
             redirecturl: response?.transaction?.redirecturl,
+            card_type: response?.source?.customer?.card?.bindata?.cardtype,
+            bank: response?.source?.customer?.card?.bindata?.coyname,
           });
 
           if (response.code === "09") {
             setStage("otp");
+            setLoading(false);
             return;
           }
           if (response.code === "09-REDIRECT") {
             setStage("3ds");
+            setLoading(false);
             return;
           }
           setStage("card");
           setCvv("");
           setExpiry("");
+          setPin({
+            one: "",
+            two: "",
+            three: "",
+            four: "",
+          });
+          console.log({response})
           dispatch(
             show_error({
               message: response?.data?.message || response?.message,
             })
           );
+          setLoading(false);
+          dispatch(setProcessing(false));
         })
         .catch((error: any) => {
           setStage("card");
           setCvv("");
           setExpiry("");
+          setPin({
+            one: "",
+            two: "",
+            three: "",
+            four: "",
+          });
+          console.log({ error });
           dispatch(
             show_error({
               message: error?.response?.data?.message || error?.message,
             })
           );
-          //     this.$store.commit("show_error", { message: message });
+          dispatch(setProcessing(false));
+          setLoading(false);
         });
     } catch (err: any) {
       console.log(err?.message);
+      dispatch(setProcessing(false));
       setLoading(false);
     }
   };
+  // handle redirect to 3ds
   const handleRedirect = async () => {
     // send redirect event
     sendEvent({
@@ -280,6 +331,57 @@ const CardPayment = () => {
     openUrl(server.redirecturl);
     window.open(server.redirecturl, "_blank");
     runInterval();
+  };
+  //
+  const start_card_otp_verification = () => {
+    console.log(otp);
+    // send otp event
+    sendEvent({ type: "otp", activity: "OTP sent" });
+    const { paymentid, publickey, encryptpublickey } = transaction_data;
+    // evt.preventDefault();
+    dispatch(hide_error());
+    setLoading(true);
+    let data = create_otp_transaction(otp, paymentid);
+    let request = encrypt_data(JSON.stringify(data), encryptpublickey);
+    validate_otp(transaction_data.paymentid, publickey, request)
+      .then((response: any) => {
+        const { code } = response;
+        // if response is palatable, update success state
+        if (code !== "09") {
+          if (code === "00") {
+            success(response, "success");
+          } else {
+            success(response, "failed");
+            setStage("card");
+            setCcNumber("");
+            setCvv("");
+            setExpiry("");
+            setPin({
+              one: "",
+              two: "",
+              three: "",
+              four: "",
+            });
+            setLoading(false);
+            dispatch(setProcessing(false));
+          }
+          setLoading(false);
+          return;
+        }
+      })
+      .catch((error) => {
+        setStage("card");
+        setCvv("");
+        setPin({
+          one: "",
+          two: "",
+          three: "",
+          four: "",
+        });
+        setLoading(false);
+        dispatch(setProcessing(false));
+        console.log(error);
+      });
   };
   const runInterval = () => {
     const statusCheck = setInterval(async () => {
@@ -302,16 +404,20 @@ const CardPayment = () => {
   }, [cardImg]);
 
   return (
-    <div className="">
-      {loading && <Spinner lg />}
-      {stage === "processing" && (
+    <div className="relative">
+      {/* {loading && (
+        <div className="">
+          <Spinner lg withText text="Transaction in progress..." />
+        </div>
+      )} */}
+      {(loading || stage === "processing") && (
         <Spinner
           lg
           withText
-          text="Transaction processing. Please do not reload this page...."
+          text="Transaction processing...."
         />
       )}
-      {stage === "card" && (
+      {!loading && stage === "card" && (
         <div className="switch:px-5">
           <h4 className="font-bold text-base text-title mb-6">
             Enter Payment Details
@@ -321,7 +427,7 @@ const CardPayment = () => {
               <label className="label">Card Number</label>
               <div className="relative z-[1]">
                 {cardImg && logo ? (
-                  <img src={cardLogoUrl || ""} alt="" className="icon h-6" />
+                  <img src={cardLogoUrl || ""} alt=" " className="icon h-6" />
                 ) : (
                   <CardEmptyIcon className="icon h-6" stroke="#B9B9B9" />
                 )}
@@ -377,9 +483,24 @@ const CardPayment = () => {
           </div>
         </div>
       )}
-      {stage === "pin" && <PIN />}
-      {stage === "otp" && <OTP />}
-      {stage === "3ds" && <ThreeDS onRedirect={handleRedirect} />}
+      {!loading && stage === "pin" && (
+        <PIN pin={pin} setPin={setPin} onContinue={main_charge_card} />
+      )}
+      {!loading && stage === "otp" && (
+        <OTP
+          message={server.message}
+          value={otp}
+          setValue={setOtp}
+          onVerifyOTP={start_card_otp_verification}
+        />
+      )}
+      {!loading && stage === "3ds" && (
+        <ThreeDS
+          onRedirect={handleRedirect}
+          cardType={server.card_type}
+          bank={server.bank}
+        />
+      )}
     </div>
   );
 };

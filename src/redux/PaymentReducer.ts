@@ -70,6 +70,7 @@ export const {
   setReferences,
   setBankTransferResponse,
   setPaymentCompleted,
+  setProcessing,
   show_error,
   hide_error,
   close_modal,
