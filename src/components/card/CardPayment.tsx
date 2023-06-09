@@ -37,7 +37,7 @@ const CardPayment = () => {
   const references = useSelector(
     (state: RootState) => state.payment.references
   );
-  const processing = useSelector((state: RootState) => state.payment.inProcess);
+  // const processing = useSelector((state: RootState) => state.payment.inProcess);
   const dispatch = useDispatch();
   const { sendEvent, runTransaction, openUrl, success } = useCustomFunctions();
   const [ccNumber, setCcNumber] = useState("");
@@ -285,7 +285,7 @@ const CardPayment = () => {
             three: "",
             four: "",
           });
-          console.log({response})
+          console.log({ response });
           dispatch(
             show_error({
               message: response?.data?.message || response?.message,
@@ -405,17 +405,8 @@ const CardPayment = () => {
 
   return (
     <div className="relative">
-      {/* {loading && (
-        <div className="">
-          <Spinner lg withText text="Transaction in progress..." />
-        </div>
-      )} */}
       {(loading || stage === "processing") && (
-        <Spinner
-          lg
-          withText
-          text="Transaction processing...."
-        />
+        <Spinner lg withText text="Transaction processing...." />
       )}
       {!loading && stage === "card" && (
         <div className="switch:px-5">

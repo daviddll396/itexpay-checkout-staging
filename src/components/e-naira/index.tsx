@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition, RadioGroup } from "@headlessui/react";
 import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
-import useCustomFunctions from "src/hooks/useCustomFunctions";
+// import useCustomFunctions from "src/hooks/useCustomFunctions";
 // import { useDispatch, useSelector } from "react-redux";
 // import { RootState } from "src/redux";
 
@@ -48,7 +48,7 @@ const ENaira = () => {
   // const customer = useSelector(
   //   (state: RootState) => state.payment.userPayload?.source?.customer
   // );
-  const { runTransaction } = useCustomFunctions();
+  // const { runTransaction } = useCustomFunctions();
 
   const [selected, setSelected] = useState<any>(options[0]);
   const [ref, setRef] = useState(validation[0].id);
@@ -118,18 +118,18 @@ const ENaira = () => {
     }
   };
 
-  let statusCheck: any;
+  // let statusCheck: any;
 
   // get transaction status at intervals
-  const runInterval = () => {
-    statusCheck = setInterval(async () => {
-      try {
-        await runTransaction();
-      } catch {
-        clearInterval(statusCheck);
-      }
-    }, 5000);
-  };
+  // const runInterval = () => {
+  //   statusCheck = setInterval(async () => {
+  //     try {
+  //       await runTransaction();
+  //     } catch {
+  //       clearInterval(statusCheck);
+  //     }
+  //   }, 5000);
+  // };
 
   return (
     <div className="">

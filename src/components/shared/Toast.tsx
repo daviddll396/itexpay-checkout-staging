@@ -23,7 +23,7 @@ const Toast = () => {
     >
       <div
         onClick={onClose}
-        className="absolute top-2 right-2 switch:top-4 switch:right-4 switch:w-[64.5%] p-3 bg-[#F8D7D9] z-[1000] rounded-tr-theme cursor-pointer"
+        className="absolute top-0 right-0 switch:top-4 switch:right-4 w-full switch:w-[64.5%] p-3 bg-[#F8D7D9] z-[1000] switch:rounded-tr-theme cursor-pointer"
       >
         <div className="flex items-center gap-x-2">
           <Cancel

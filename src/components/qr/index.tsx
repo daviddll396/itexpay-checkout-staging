@@ -20,10 +20,10 @@ const QRPayment = () => {
     (state: RootState) => state.payment.userPayload?.source?.customer
   );
   const { runTransaction } = useCustomFunctions();
-
   const [isLoading, setIsLoading] = useState(true);
   const [qrCodeAvailable, setQrCodeAvailable] = useState(false);
   const [qrCode, setQrCode] = useState("");
+
   // const [server, setServer] = useState({
   //   message: "",
   //   otp: "",
@@ -47,6 +47,7 @@ const QRPayment = () => {
   };
 
   const get_qr_code = () => {
+
     const {
       reference,
       redirecturl,
@@ -60,11 +61,6 @@ const QRPayment = () => {
     } = transaction_data;
     const { firstname, lastname, email, phone } = customer;
     const { fingerprint, modalref, paymentlinkref } = references;
-
-    //   qrCodeAvailable = false
-    setQrCodeAvailable(false);
-    setIsLoading(true);
-    //   isLoading = true
     let data = create_qr_transaction(
       reference,
       callbackurl,
@@ -85,25 +81,28 @@ const QRPayment = () => {
     initiate_charge(transaction_data.paymentid, publickey, request)
       .then((response: any) => {
         if (response.code === "09") {
+          setQrCode(response.transaction.redirecturl);
           setQrCodeAvailable(true);
           setIsLoading(false);
-          setQrCode(response.transaction.redirecturl);
           runInterval();
           return;
         }
         dispatch(show_error({ message: response.message }));
         setQrCodeAvailable(false);
         setIsLoading(false);
+        // clearInterval(statusCheck);
       })
       .catch((err) => {
-        dispatch(show_error({ message: err?.response?.data?.message ||err?.message }));
+        let errMsg = err?.response?.data?.message || err?.message;
+        console.log(err?.response);
+
+        dispatch(show_error({ message: errMsg }));
         setQrCodeAvailable(false);
         setIsLoading(false);
         clearInterval(statusCheck);
       });
   };
 
-  // hides all errors on load
   useEffect(() => {
     dispatch(hide_error());
     get_qr_code();
@@ -111,7 +110,14 @@ const QRPayment = () => {
   }, []);
   return (
     <>
-      {isLoading && !qrCodeAvailable && <Spinner lg />}
+      {isLoading && <Spinner lg />}
+      {!isLoading && !qrCodeAvailable && (
+        <div>
+          <h3 className="font-semibold text-text/80">
+            Unable to get Qr Code, please try a different method
+          </h3>
+        </div>
+      )}
       {!isLoading && qrCodeAvailable && (
         <div>
           <p className="text-sm text-center w-10/12 mx-auto">
