@@ -7,6 +7,7 @@ import { RootState } from "src/redux";
 import {
   close_modal,
   setBankTransferResponse,
+  setProcessing,
   show_error,
 } from "src/redux/PaymentReducer";
 import {
@@ -30,16 +31,17 @@ const BankTransfer = () => {
   const { runTransaction } = useCustomFunctions();
   const [value, copy] = useCopyToClipboard();
   const [isLoading, setIsLoading] = useState(true);
+  const [paymentMade, setPaymentMade] = useState(false);
   const [bankAccountAvailable, setBankAccountAvailable] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
   const [accountName, setAccountName] = useState("");
   const [bank, setBank] = useState("");
   const [time, setTime] = useState<number[]>([0, 0]);
-  let paymentMade = useRef(false);
+  // let paymentMade = useRef(false);
 
   let statusCheck: any;
   let timer = useRef<any>(null);
-  const seconds: number = 120;
+  const seconds: number = 300;
   let blockminutes = useRef<any>(seconds);
   const { redirecturl, paymentid } = transaction_data;
 
@@ -55,7 +57,8 @@ const BankTransfer = () => {
   };
   const onHandlePayment = () => {
     clearInterval(timer.current);
-    paymentMade.current = true;
+    setPaymentMade(true);
+    dispatch(setProcessing(true));
     runInterval();
   };
   const onTimerEnd = () => {
@@ -88,7 +91,7 @@ const BankTransfer = () => {
         const minutes = Math.floor(blockminutes.current / 60);
         const seconds = Math.floor(blockminutes.current % 60);
         setTime([minutes, seconds]);
-        console.log({ blockminutes, minutes, seconds });
+        // console.log({ blockminutes, minutes, seconds });
       } else {
         onTimerEnd();
         clearInterval(timer.current);
@@ -119,13 +122,13 @@ const BankTransfer = () => {
       phone,
       paymentid
     );
-    console.log({ data });
+    // console.log({ data });
 
     let request = encrypt_data(JSON.stringify(data), encryptpublickey);
     setIsLoading(true);
     initiate_charge(transaction_data.paymentid, publickey, request)
       .then((response: any) => {
-        console.log("transfer res", response);
+        // console.log("transfer res", response);
         dispatch(
           setBankTransferResponse({
             paymentid: transaction_data.paymentid,
@@ -179,7 +182,11 @@ const BankTransfer = () => {
     } else {
       get_bank_account();
     }
-    // get_bank_account();
+
+    return () => {
+      clearInterval(statusCheck);
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -247,8 +254,12 @@ const BankTransfer = () => {
               </p>
             </div>
             <div className=" my-8">
-              {paymentMade.current ? (
-                <SpinnerInline lg withText text="Transaction Processing. Please wait..." />
+              {paymentMade === true ? (
+                <SpinnerInline
+                  lg
+                  withText
+                  text="Checking Transaction. Please wait ..."
+                />
               ) : (
                 <button className="button w-full" onClick={onHandlePayment}>
                   I have made this payment

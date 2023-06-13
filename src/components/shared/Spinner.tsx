@@ -17,7 +17,7 @@ export const SpinnerInline = ({ md, lg, white, withText, text }: SpinnerProps) =
         } `}
       ></div>
       {withText && (
-        <p className="text-sm switch:text-lg text-text w-[220px] max-w-[250px] mt-4">
+        <p className="text-[13px] text-center switch:text-lg text-text w-[220px] max-w-[250px] mx-auto mt-4">
           {text}
         </p>
       )}

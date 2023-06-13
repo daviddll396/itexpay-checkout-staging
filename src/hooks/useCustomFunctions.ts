@@ -69,7 +69,7 @@ function useCustomFunctions() {
             "_top",
             "toolbar=no,scrollbars=no,resizable=yes"
           );
-        }, 3000);
+        }, 5000);
       } else {
         setTimeout(() => {
           let url =
