@@ -105,10 +105,10 @@ const Sidebar = (props: {
                         ? undefined
                         : () => handleChangeOption(paymentItem)
                     }
-                    className={`flex items-center text-sm py-2 pl-5 pr-2  ${
+                    className={`flex items-center text-sm py-2 pl-5 pr-2 font-semibold ${
                       active.id === paymentItem.id
-                        ? "bg-white/10 border-y border-l border-theme rounded-tl-theme rounded-bl-theme text-theme font-bold"
-                        : "font-medium text-white"
+                        ? "bg-white/10 border-y border-l border-theme rounded-tl-theme rounded-bl-theme text-theme "
+                        : " text-white"
                     } ${processing ? "cursor-not-allowed" : "cursor-pointer"}`}
                   >
                     <ReactSVG

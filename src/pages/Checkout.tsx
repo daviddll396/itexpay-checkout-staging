@@ -55,7 +55,6 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [params, setParams] = useState<any>(null);
 
-
   // updates state
   // const handleStateChange = (name: any, value: any) => {
   //   // //console.log('here')
@@ -101,6 +100,10 @@ const Checkout = () => {
             paycompleted: null,
           })
         );
+        if (response.data.paymentmethods.length < 1) {
+          setCustomErrorMessage("Payment not allowed.");
+          return;
+        }
         setSelectedOption("card");
         dispatch(hide_error());
         toggleLoading(false);
