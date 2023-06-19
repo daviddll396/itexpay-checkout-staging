@@ -120,7 +120,6 @@ const Checkout = () => {
         toggleLoading(false);
         // sets any  error that comes up and shows error screen
         setCustomErrorMessage(errMsg);
-        // dispatch(show_error({ message: `${errMsg}` }));
       });
   };
   // page init

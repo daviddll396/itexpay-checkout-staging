@@ -56,7 +56,7 @@ const Sidebar = (props: {
             </div>
           </div>
         </div>
-        {!selectState ? (
+        {!selectState  ? (
           <div className="border-y border-y-theme bg-theme/10 py-3 flex items-center justify-between px-4">
             <div className="flex items-center ml-3">
               <ReactSVG src={active.icon} className="w-4" stroke="#001E31" />

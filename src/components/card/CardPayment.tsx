@@ -206,6 +206,7 @@ const CardPayment = () => {
       });
   };
   const main_charge_card = () => {
+    setLoading(true)
     const {
       reference,
       redirecturl,
@@ -310,8 +311,9 @@ const CardPayment = () => {
               message: error?.response?.data?.message || error?.message,
             })
           );
-          dispatch(setProcessing(false));
           setLoading(false);
+          dispatch(setProcessing(false));
+         
         });
     } catch (err: any) {
       console.log(err?.message);
@@ -332,9 +334,9 @@ const CardPayment = () => {
     window.open(server.redirecturl, "_blank");
     runInterval();
   };
-  //
+  // start card otp verification
   const start_card_otp_verification = () => {
-    console.log(otp);
+    // console.log(otp);
     // send otp event
     sendEvent({ type: "otp", activity: "OTP sent" });
     const { paymentid, publickey, encryptpublickey } = transaction_data;
@@ -383,6 +385,7 @@ const CardPayment = () => {
         console.log(error);
       });
   };
+  // start polling
   const runInterval = () => {
     const statusCheck = setInterval(async () => {
       try {
