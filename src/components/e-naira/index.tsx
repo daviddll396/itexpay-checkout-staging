@@ -2,8 +2,8 @@ import { Fragment, useState } from "react";
 import { Menu, Transition, RadioGroup } from "@headlessui/react";
 import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
 // import useCustomFunctions from "src/hooks/useCustomFunctions";
-// import { useDispatch, useSelector } from "react-redux";
-// import { RootState } from "src/redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "src/redux";
 
 const ENaira = () => {
   const options = [
@@ -38,7 +38,7 @@ const ENaira = () => {
     },
   ];
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   // const transaction_data = useSelector(
   //   (state: RootState) => state.payment.userPayload
   // );
@@ -49,6 +49,12 @@ const ENaira = () => {
   //   (state: RootState) => state.payment.userPayload?.source?.customer
   // );
   // const { runTransaction } = useCustomFunctions();
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
 
   const [selected, setSelected] = useState<any>(options[0]);
   const [ref, setRef] = useState(validation[0].id);

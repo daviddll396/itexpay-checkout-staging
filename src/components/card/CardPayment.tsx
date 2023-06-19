@@ -37,6 +37,12 @@ const CardPayment = () => {
   const references = useSelector(
     (state: RootState) => state.payment.references
   );
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
   // const processing = useSelector((state: RootState) => state.payment.inProcess);
   const dispatch = useDispatch();
   const { sendEvent, runTransaction, openUrl, success } = useCustomFunctions();
@@ -206,7 +212,7 @@ const CardPayment = () => {
       });
   };
   const main_charge_card = () => {
-    setLoading(true)
+    setLoading(true);
     const {
       reference,
       redirecturl,
@@ -313,7 +319,6 @@ const CardPayment = () => {
           );
           setLoading(false);
           dispatch(setProcessing(false));
-         
         });
     } catch (err: any) {
       console.log(err?.message);
@@ -470,7 +475,15 @@ const CardPayment = () => {
               </div>
             </div>
             <div className="col-span-2 my-8">
-              <button onClick={handleCardDetails} className="button w-full">
+              <button
+                onClick={handleCardDetails}
+                className="button w-full"
+                style={{
+                  backgroundColor: button_color
+                    ? button_color.value
+                    : "#041926",
+                }}
+              >
                 Continue
               </button>
             </div>
@@ -478,7 +491,12 @@ const CardPayment = () => {
         </div>
       )}
       {!loading && stage === "pin" && (
-        <PIN pin={pin} setPin={setPin} onContinue={main_charge_card} />
+        <PIN
+          pin={pin}
+          setPin={setPin}
+          onContinue={main_charge_card}
+          button_color={button_color}
+        />
       )}
       {!loading && stage === "otp" && (
         <OTP
@@ -486,6 +504,7 @@ const CardPayment = () => {
           value={otp}
           setValue={setOtp}
           onVerifyOTP={start_card_otp_verification}
+          button_color={button_color}
         />
       )}
       {!loading && stage === "3ds" && (
@@ -493,6 +512,7 @@ const CardPayment = () => {
           onRedirect={handleRedirect}
           cardType={server.card_type}
           bank={server.bank}
+          button_color={button_color}
         />
       )}
     </div>

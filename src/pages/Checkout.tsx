@@ -21,6 +21,7 @@ import {
   setReferences,
   setTransactionResponse,
   show_error,
+  update_custom,
 } from "src/redux/PaymentReducer";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import Spinner from "src/components/shared/Spinner";
@@ -33,9 +34,7 @@ const Checkout = () => {
   const transaction_data = useSelector(
     (state: RootState) => state.payment.userPayload
   );
-  // const processing = useSelector(
-  //   (state: RootState) => state.payment.inProcess
-  // );
+
   const show = useSelector((state: RootState) => state.payment.show);
   const payment = useSelector((state: RootState) => state.payment.payment);
   const { sendEvent } = useCustomFunctions();
@@ -100,6 +99,13 @@ const Checkout = () => {
             paycompleted: null,
           })
         );
+        if (
+          Array.isArray(response.data?.custom) &&
+          response.data?.custom.length > 0
+        ) {
+          dispatch(update_custom(response.data.custom));
+        }
+
         if (response.data.paymentmethods.length < 1) {
           setCustomErrorMessage("Payment not allowed.");
           return;

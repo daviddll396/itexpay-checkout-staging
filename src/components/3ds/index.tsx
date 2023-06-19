@@ -5,10 +5,12 @@ const ThreeDS = ({
   onRedirect,
   cardType,
   bank,
+  button_color,
 }: {
   onRedirect: () => void;
   bank: string;
   cardType: string;
+  button_color: any;
 }) => {
   const handlePay = () => {
     onRedirect();
@@ -23,11 +25,22 @@ const ThreeDS = ({
         complete this transaction
       </p>
       <div className="flex items-center gap-x-2 divide-x-[1px] divide-gray-400">
-        <img src={`cards/${cardType.toLowerCase() || ""}.svg`} alt=" " className="w-12 " />
+        <img
+          src={`cards/${cardType.toLowerCase() || ""}.svg`}
+          alt=" "
+          className="w-12 "
+        />
         <p className="text-sm pl-2">{bank}</p>
       </div>
       <div className=" my-6">
-        <button onClick={handlePay} className="button-outline w-full text-4xl">
+        <button
+          onClick={handlePay}
+          className="button-outline w-full text-4xl"
+          style={{
+            borderColor: button_color ? button_color.value : "#27AE60",
+            color: button_color ? button_color.value : "#27AE60",
+          }}
+        >
           Continue
         </button>
       </div>

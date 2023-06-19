@@ -6,6 +6,7 @@ export interface InitialState {
   bankTransferResponse: any;
   payment: any;
   inProcess: boolean;
+  customColor: any;
   error: {
     show: boolean;
     message: string;
@@ -23,6 +24,7 @@ const initialState: InitialState = {
     show: false,
     message: "",
   },
+  customColor: [{name: "sidebar_color", value: "#041926"}, {name: "button_color", value: "#27AE60"}],
   show: true,
 };
 
@@ -62,6 +64,9 @@ export const paymentSlice = createSlice({
     close_modal(state) {
       state.show = false;
     },
+    update_custom(state, { payload }) {
+      state.customColor = [ ...payload];
+    },
   },
 });
 
@@ -74,5 +79,6 @@ export const {
   show_error,
   hide_error,
   close_modal,
+  update_custom,
 } = paymentSlice.actions;
 export default paymentSlice.reducer;

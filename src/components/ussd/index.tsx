@@ -9,11 +9,11 @@ import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import banksData from "src/data/banks.json";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "src/redux";
-import { hide_error, show_error } from "src/redux/PaymentReducer";
+import { hide_error, setProcessing, show_error } from "src/redux/PaymentReducer";
 import { create_ussd_transaction, encrypt_data } from "src/api/utility";
 import { charge } from "src/api";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
-import Spinner from "../shared/Spinner";
+import Spinner, { SpinnerInline } from "../shared/Spinner";
 
 const USSDPayment = () => {
   const dispatch = useDispatch();
@@ -23,6 +23,12 @@ const USSDPayment = () => {
   const references = useSelector(
     (state: RootState) => state.payment.references
   );
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
   const { runTransaction } = useCustomFunctions();
   const [value, copy] = useCopyToClipboard();
   const [selected, setSelected] = useState<any>("");
@@ -31,6 +37,8 @@ const USSDPayment = () => {
   const [showCode, setShowCode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ussdAvailable, setUSSDAvailable] = useState(false);
+  const [paymentMade, setPaymentMade] = useState(false);
+
   const [server, setServer] = useState({
     message: "",
     otp: "",
@@ -66,6 +74,12 @@ const USSDPayment = () => {
   // goes back to screen for picking bank
   const onGoBack = () => {
     setShowCode(false);
+  };
+  const onHandlePayment = () => {
+    // clearInterval(timer.current);
+    setPaymentMade(true);
+    dispatch(setProcessing(true));
+    runInterval();
   };
   // get transaction status at intervals
   const runInterval = () => {
@@ -323,6 +337,27 @@ const USSDPayment = () => {
             <button onClick={runInterval} className="button w-full">
               I have completed this payment
             </button>
+          </div>
+          <div className=" my-8">
+            {paymentMade === true ? (
+              <SpinnerInline
+                lg
+                withText
+                text="Checking Transaction. Please wait ..."
+              />
+            ) : (
+              <button
+                className="button w-full"
+                onClick={onHandlePayment}
+                style={{
+                  backgroundColor: button_color
+                    ? button_color.value
+                    : "#27AE60",
+                }}
+              >
+                I have made this payment
+              </button>
+            )}
           </div>
         </div>
       )}

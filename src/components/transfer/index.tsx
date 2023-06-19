@@ -28,6 +28,12 @@ const BankTransfer = () => {
   const customer = useSelector(
     (state: RootState) => state.payment.userPayload?.source?.customer
   );
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
   const { runTransaction } = useCustomFunctions();
   const [value, copy] = useCopyToClipboard();
   const [isLoading, setIsLoading] = useState(true);
@@ -261,7 +267,15 @@ const BankTransfer = () => {
                   text="Checking Transaction. Please wait ..."
                 />
               ) : (
-                <button className="button w-full" onClick={onHandlePayment}>
+                <button
+                  className="button w-full"
+                  onClick={onHandlePayment}
+                  style={{
+                    backgroundColor: button_color
+                      ? button_color.value
+                      : "#27AE60",
+                  }}
+                >
                   I have made this payment
                 </button>
               )}

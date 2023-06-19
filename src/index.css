@@ -78,10 +78,10 @@ code {
   @apply absolute top-1/4 w-6 left-3;
 }
 .button {
-  @apply bg-theme text-white text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none border-transparent;
+  @apply  text-white text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none border-transparent;
 }
 .button-outline {
-  @apply bg-white text-theme text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none border border-theme;
+  @apply bg-white  text-base font-extrabold text-center rounded-theme py-2.5 focus:outline-none border ;
 }
 
 .otp-input-wrapper {

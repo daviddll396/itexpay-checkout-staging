@@ -24,8 +24,15 @@ const Sidebar = (props: {
     (state: RootState) => state.payment.userPayload
   );
   const processing = useSelector((state: RootState) => state.payment.inProcess);
-
-  // const [selectState, setSelectState] = useState(false);
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const sidebar_color = customColor.find(
+    (item: any) => item.name === "sidebar_color"
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
 
   const handleChangeOption = (paymentItem: any) => {
     setActive(paymentItem);
@@ -56,7 +63,7 @@ const Sidebar = (props: {
             </div>
           </div>
         </div>
-        {!selectState  ? (
+        {!selectState ? (
           <div className="border-y border-y-theme bg-theme/10 py-3 flex items-center justify-between px-4">
             <div className="flex items-center ml-3">
               <ReactSVG src={active.icon} className="w-4" stroke="#001E31" />
@@ -74,7 +81,12 @@ const Sidebar = (props: {
         ) : null}
       </div>
       <div
-        className={` hidden absolute left-0 bottom-0 top-0 rounded-tl-theme rounded-bl-theme  bg-dark  w-[32%] switch:flex flex-col   pl-2 py-6 text-white `}
+        className={` hidden absolute left-0 bottom-0 top-0 rounded-tl-theme rounded-bl-theme    w-[32%] switch:flex flex-col   pl-2 py-6 text-white 
+     
+         `}
+        style={{
+          backgroundColor: sidebar_color ? sidebar_color.value : "#041926",
+        }}
       >
         <div className=" flex items-center gap-x-2 mt-5 mb-10 ml-5">
           <img
@@ -107,9 +119,19 @@ const Sidebar = (props: {
                     }
                     className={`flex items-center text-sm py-2 pl-5 pr-2 font-semibold ${
                       active.id === paymentItem.id
-                        ? "bg-white/10 border-y border-l border-theme rounded-tl-theme rounded-bl-theme text-theme "
+                        ? " border-y border-l rounded-tl-theme rounded-bl-theme  "
                         : " text-white"
                     } ${processing ? "cursor-not-allowed" : "cursor-pointer"}`}
+                    style={{
+                      borderColor:
+                        button_color && active.id === paymentItem.id
+                          ? button_color.value
+                          : "#041926",
+                      color: button_color && active.id === paymentItem.id ? button_color.value : "white",
+                      backgroundColor: button_color && active.id === paymentItem.id ? 'white' : "",
+                      // opacity: button_color && active.id === paymentItem.id ? '0.3' : "",
+                      
+                    }}
                   >
                     <ReactSVG
                       src={paymentItem.icon}

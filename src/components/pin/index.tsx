@@ -4,8 +4,9 @@ type PinProps = {
   pin: any;
   setPin: any;
   onContinue: () => void;
+  button_color: any;
 };
-const PIN = ({ pin, setPin, onContinue }: PinProps) => {
+const PIN = ({ pin, setPin, onContinue, button_color }: PinProps) => {
   // const [otpValue, setOtpValue] = useState({
   //   one: "",
   //   two: "",
@@ -114,7 +115,13 @@ const PIN = ({ pin, setPin, onContinue }: PinProps) => {
       </div>
 
       <div className=" my-8">
-        <button onClick={onCharge} className="button w-full">
+        <button
+          onClick={onCharge}
+          className="button w-full"
+          style={{
+            backgroundColor: button_color ? button_color.value : "#27AE60",
+          }}
+        >
           Continue
         </button>
       </div>

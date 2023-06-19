@@ -5,9 +5,10 @@ type OTPProps = {
   setValue: any;
   onVerifyOTP: () => void;
   message: string;
+  button_color:any;
 };
 
-const OTP = ({ value, setValue, onVerifyOTP, message }: OTPProps) => {
+const OTP = ({ value, setValue, onVerifyOTP, message,button_color }: OTPProps) => {
   // handle otp value change
   const handleChange = (e: any) => {
     setValue(validateOTP(e.target.value));
@@ -36,7 +37,11 @@ const OTP = ({ value, setValue, onVerifyOTP, message }: OTPProps) => {
         /> */}
 
         <div className=" my-8">
-          <button onClick={handlePay} className="button w-full">
+          <button onClick={handlePay} className="button w-full" style={{
+                  backgroundColor: button_color
+                    ? button_color.value
+                    : "#27AE60",
+                }}>
             Pay Now
           </button>
         </div>

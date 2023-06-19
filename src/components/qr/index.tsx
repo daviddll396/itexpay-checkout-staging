@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
-import { hide_error, show_error } from "src/redux/PaymentReducer";
+import {
+  hide_error,
+  setProcessing,
+  show_error,
+} from "src/redux/PaymentReducer";
 import { RootState } from "src/redux";
 import { create_qr_transaction, encrypt_data } from "src/api/utility";
 import { initiate_charge } from "src/api";
 import QRCode from "react-qr-code";
-import Spinner from "../shared/Spinner";
+import { SpinnerInline } from "../shared/Spinner";
 
 const QRPayment = () => {
   const dispatch = useDispatch();
@@ -19,10 +23,17 @@ const QRPayment = () => {
   const customer = useSelector(
     (state: RootState) => state.payment.userPayload?.source?.customer
   );
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
   const { runTransaction } = useCustomFunctions();
   const [isLoading, setIsLoading] = useState(true);
   const [qrCodeAvailable, setQrCodeAvailable] = useState(false);
   const [qrCode, setQrCode] = useState("");
+  const [paymentMade, setPaymentMade] = useState(false);
 
   // const [server, setServer] = useState({
   //   message: "",
@@ -45,9 +56,14 @@ const QRPayment = () => {
       }
     }, 5000);
   };
+  const onHandlePayment = () => {
+    // clearInterval(timer.current);
+    setPaymentMade(true);
+    dispatch(setProcessing(true));
+    runInterval();
+  };
 
   const get_qr_code = () => {
-
     const {
       reference,
       redirecturl,
@@ -106,11 +122,11 @@ const QRPayment = () => {
   useEffect(() => {
     dispatch(hide_error());
     get_qr_code();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <>
-      {isLoading && <Spinner lg />}
+      {isLoading && <SpinnerInline lg />}
       {!isLoading && !qrCodeAvailable && (
         <div>
           <h3 className="font-semibold text-text/80">
@@ -139,7 +155,25 @@ const QRPayment = () => {
           </div>
 
           <div className=" my-8">
-            <button className="button w-full">I have made this payment</button>
+            {paymentMade === true ? (
+              <SpinnerInline
+                lg
+                withText
+                text="Checking Transaction. Please wait ..."
+              />
+            ) : (
+              <button
+                className="button w-full"
+                onClick={onHandlePayment}
+                style={{
+                  backgroundColor: button_color
+                    ? button_color.value
+                    : "#27AE60",
+                }}
+              >
+                I have made this payment
+              </button>
+            )}
           </div>
         </div>
       )}
