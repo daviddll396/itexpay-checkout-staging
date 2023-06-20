@@ -92,7 +92,20 @@ const Checkout = () => {
           toggleLoading(false);
           return;
         }
-        dispatch(setTransactionResponse({ ...response.data, callbackurl: "" }));
+        dispatch(
+          setTransactionResponse({
+            ...response.data,
+            callbackurl: "",
+            paymentmethods: [
+              "card",
+              "account",
+              "enaira",
+              "ussd",
+              "qr",
+              "phone",
+            ],
+          })
+        );
         dispatch(
           setPaymentCompleted({
             paymentid: response.data.paymentid,
@@ -111,6 +124,7 @@ const Checkout = () => {
           return;
         }
         setSelectedOption("card");
+        setActive(transaction_data?.paymentmethods[0]);
         dispatch(hide_error());
         toggleLoading(false);
       })
@@ -284,7 +298,7 @@ const Checkout = () => {
                   {selectState ? (
                     <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
                   ) : null}
-                  <div className="relative w-full max-w-[680px] switch:h-[580px] switch:max-h-[580px]  mx-auto  switch:rounded-theme bg-white switch:shadow-custom_shadow switch:p-10 ">
+                  <div className="relative w-full max-w-[680px] switch:max-h-[580px]  mx-auto  switch:rounded-theme bg-white switch:shadow-custom_shadow switch:p-10 ">
                     <img
                       src={CloseIcon}
                       alt="close"

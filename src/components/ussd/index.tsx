@@ -333,11 +333,11 @@ const USSDPayment = () => {
           <p className="text-xs w-5/6 mx-auto text-center mb-8 ">
             You have {blockminutes}secs left to complete this payment
           </p>
-          <div className=" my-8">
+          {/* <div className=" my-8">
             <button onClick={runInterval} className="button w-full">
               I have completed this payment
             </button>
-          </div>
+          </div> */}
           <div className=" my-8">
             {paymentMade === true ? (
               <SpinnerInline

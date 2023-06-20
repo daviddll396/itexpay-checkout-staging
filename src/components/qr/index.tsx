@@ -64,6 +64,9 @@ const QRPayment = () => {
   };
 
   const get_qr_code = () => {
+    // setQrCode("nmjachbhufyfjgygfhejbavkygaydghbgdac");
+    // setIsLoading(false);
+    // setQrCodeAvailable(true);
     const {
       reference,
       redirecturl,
@@ -120,8 +123,12 @@ const QRPayment = () => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     dispatch(hide_error());
-    get_qr_code();
+    setTimeout(() => {
+      get_qr_code();
+    }, 3000);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -136,44 +143,60 @@ const QRPayment = () => {
       )}
       {!isLoading && qrCodeAvailable && (
         <div>
-          <p className="text-sm text-center w-10/12 mx-auto">
+          <p className="text-sm text-center w-10/12 mx-auto font-semibold text-text/80 leading-5">
             Scan the QR Code below on your Bank’s mobile app to complete the
             payment
           </p>
 
-          <div className="max-w-[250px] max-h-[250px] w-[250px] h-[250px] mx-auto bg-theme/5 rounded-theme p-3 mt-6 mb-11">
-            <div className="bg-white w-full h-full rounded-theme p-3">
-              {qrCode && (
+          <div
+            className={`max-w-[250px] max-h-[250px] w-[250px] h-[250px] mx-auto ${
+              paymentMade ? "flex items-center justify-center" : "bg-theme/5"
+            } rounded-theme p-3 mt-6 mb-11`}
+          >
+            {qrCode && !paymentMade && (
+              <div className="bg-white rounded-theme ">
                 <QRCode
                   value={qrCode}
                   bgColor={"#FFFFFF"}
                   fgColor={"#000000"}
-                  size={250}
+                  size={225}
+                  className="p-3 "
                 />
-              )}
-            </div>
-          </div>
+              </div>
+            )}
 
-          <div className=" my-8">
-            {paymentMade === true ? (
+            {paymentMade === true && (
               <SpinnerInline
                 lg
                 withText
                 text="Checking Transaction. Please wait ..."
               />
-            ) : (
-              <button
-                className="button w-full"
-                onClick={onHandlePayment}
-                style={{
-                  backgroundColor: button_color
-                    ? button_color.value
-                    : "#27AE60",
-                }}
-              >
-                I have made this payment
-              </button>
             )}
+          </div>
+
+          <div className=" my-8">
+            {/* {paymentMade === true ? (
+              <SpinnerInline
+                lg
+                withText
+                text="Checking Transaction. Please wait ..."
+              />
+            ) : ( */}
+            <button
+              className={`button w-full `}
+              onClick={onHandlePayment}
+              style={{
+                backgroundColor: paymentMade
+                  ? "#E5E5E5"
+                  : button_color
+                  ? button_color.value
+                  : "#27AE60",
+              }}
+              disabled={paymentMade}
+            >
+              I have made this payment
+            </button>
+            {/* )} */}
           </div>
         </div>
       )}

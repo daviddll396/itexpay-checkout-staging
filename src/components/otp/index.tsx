@@ -1,14 +1,34 @@
 import { validateOTP } from "src/utils";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux";
+import { ReactComponent as ArrowLeft } from "../../assets/icons/arrow-left.svg";
 
 type OTPProps = {
   value: any;
   setValue: any;
   onVerifyOTP: () => void;
   message: string;
-  button_color:any;
+  buttonText: string;
+  back?: boolean;
+  onGoBack?: () => void;
 };
 
-const OTP = ({ value, setValue, onVerifyOTP, message,button_color }: OTPProps) => {
+const OTP = ({
+  value,
+  setValue,
+  onVerifyOTP,
+  message,
+  buttonText,
+  back,
+  onGoBack,
+}: OTPProps) => {
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
+
   // handle otp value change
   const handleChange = (e: any) => {
     setValue(validateOTP(e.target.value));
@@ -20,8 +40,18 @@ const OTP = ({ value, setValue, onVerifyOTP, message,button_color }: OTPProps) =
 
   return (
     <div>
+      {back && (
+        <div
+          onClick={onGoBack}
+          className="flex items-center w-fit gap-x-1 text-[#979797] text-[11px] mb-4 cursor-pointer"
+        >
+          <ArrowLeft /> <span>Go back</span>
+        </div>
+      )}
       <div className="text-center">
-        <label className="block mb-4 pl-3 font-semibold text-text/80">{message}</label>
+        <label className="block mb-4 pl-3 font-semibold text-text/80">
+          {message}
+        </label>
         <input
           className="input text-center placeholder:text-center text-xl"
           value={value}
@@ -37,12 +67,14 @@ const OTP = ({ value, setValue, onVerifyOTP, message,button_color }: OTPProps) =
         /> */}
 
         <div className=" my-8">
-          <button onClick={handlePay} className="button w-full" style={{
-                  backgroundColor: button_color
-                    ? button_color.value
-                    : "#27AE60",
-                }}>
-            Pay Now
+          <button
+            onClick={handlePay}
+            className="button w-full"
+            style={{
+              backgroundColor: button_color ? button_color.value : "#27AE60",
+            }}
+          >
+            {buttonText}
           </button>
         </div>
       </div>

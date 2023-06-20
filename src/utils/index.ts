@@ -11,7 +11,6 @@ export const formatAndSetCcNumber = (value: any) => {
   }
   return spacedNumber;
 };
-
 export const validateCVVNumber = (val: any) => {
   let value = val.replace(/\D/g, "");
   let regex = /^[0-9]{1,3}$/;
@@ -63,10 +62,46 @@ export const validateOTP = (val: string) => {
   if (inputNumbersOnly.length > 6) {
     inputNumbersOnly = inputNumbersOnly.substr(0, 6);
   }
-  return inputNumbersOnly
+  return inputNumbersOnly;
 };
 
-export const validateNumberOnly=(val:string)=>{
+export const validateNumberOnly = (val: string) => {
   let inputNumbersOnly = val.replace(/\D/g, "");
-  return inputNumbersOnly
-}
+  return inputNumbersOnly;
+};
+
+export const validateAlias = () => {};
+export const validatePhone = (val: string) => {
+  let inputNumbersOnly = val.replace(/\D/g, "");
+  if (inputNumbersOnly.length > 11) {
+    inputNumbersOnly = inputNumbersOnly.substr(0, 11);
+  }
+  return inputNumbersOnly;
+  //  let regexPhone = new RegExp("^[0-9]{11,11}$");
+  //       let isValidPhone = regexPhone.test(val);
+};
+export const validateNuban = (val: string) => {
+  let inputNumbersOnly = val.replace(/\D/g, "");
+  if (inputNumbersOnly.length > 10) {
+    inputNumbersOnly = inputNumbersOnly.substr(0, 10);
+  }
+  return inputNumbersOnly;
+};
+
+export const isValidPhone = (val: string) => {
+  let regexPhone = new RegExp("^[0-9]{11,11}$");
+  let isValidPhone = regexPhone.test(val);
+  return isValidPhone;
+};
+export const isValidNuban = (val: string) => {
+  let regexPhone = new RegExp("^[0-9]{10,10}$");
+  let isValidNuban = regexPhone.test(val);
+  return isValidNuban;
+};
+export const isValidEmail = (val: string) => {
+  let regexEmail = new RegExp(
+    /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
+  );
+  let isValidEmail = regexEmail.test(val);
+  return isValidEmail;
+};

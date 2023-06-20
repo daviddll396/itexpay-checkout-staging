@@ -8,7 +8,7 @@ type SpinnerProps = {
 
 export const SpinnerInline = ({ md, lg, white, withText, text }: SpinnerProps) => {
   return (
-    <div className="text-center mx-auto">
+    <div className="text-center w-fit mx-auto">
       <div
         className={`border-t-transparent border-solid animate-spin mx-auto rounded-[50%] border-theme ${
           white ? "border-white" : "border-theme"
@@ -17,7 +17,7 @@ export const SpinnerInline = ({ md, lg, white, withText, text }: SpinnerProps) =
         } `}
       ></div>
       {withText && (
-        <p className="text-[13px] text-center switch:text-lg text-text w-[220px] max-w-[250px] mx-auto mt-4">
+        <p className="text-[13px] text-center switch:text-base text-text w-[200px] max-w-[200px] mx-auto mt-4">
           {text}
         </p>
       )}

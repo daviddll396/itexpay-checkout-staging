@@ -117,7 +117,7 @@ const Sidebar = (props: {
                         ? undefined
                         : () => handleChangeOption(paymentItem)
                     }
-                    className={`flex items-center text-sm py-2 pl-5 pr-2 font-semibold ${
+                    className={`flex items-center text-sm py-2 pl-4 pr-2 font-semibold ${
                       active.id === paymentItem.id
                         ? " border-y border-l rounded-tl-theme rounded-bl-theme  "
                         : " text-white"

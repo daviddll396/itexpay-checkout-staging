@@ -491,12 +491,7 @@ const CardPayment = () => {
         </div>
       )}
       {!loading && stage === "pin" && (
-        <PIN
-          pin={pin}
-          setPin={setPin}
-          onContinue={main_charge_card}
-          button_color={button_color}
-        />
+        <PIN pin={pin} setPin={setPin} onContinue={main_charge_card} message="Enter your 4-digit card PIN to complete this transaction" />
       )}
       {!loading && stage === "otp" && (
         <OTP
@@ -504,7 +499,7 @@ const CardPayment = () => {
           value={otp}
           setValue={setOtp}
           onVerifyOTP={start_card_otp_verification}
-          button_color={button_color}
+          buttonText="Pay Now"
         />
       )}
       {!loading && stage === "3ds" && (
@@ -512,7 +507,6 @@ const CardPayment = () => {
           onRedirect={handleRedirect}
           cardType={server.card_type}
           bank={server.bank}
-          button_color={button_color}
         />
       )}
     </div>

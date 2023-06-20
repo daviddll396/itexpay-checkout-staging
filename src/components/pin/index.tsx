@@ -1,19 +1,30 @@
 // import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux";
+import { ReactComponent as ArrowLeft } from "../../assets/icons/arrow-left.svg";
 
 type PinProps = {
   pin: any;
   setPin: any;
   onContinue: () => void;
-  button_color: any;
+  message: string;
+  back?: boolean;
+  onGoBack?: () => void;
 };
-const PIN = ({ pin, setPin, onContinue, button_color }: PinProps) => {
-  // const [otpValue, setOtpValue] = useState({
-  //   one: "",
-  //   two: "",
-  //   three: "",
-  //   four: "",
-  // });
-  // const [pin, setPin] = useState<any>("");
+const PIN = ({
+  pin,
+  setPin,
+  onContinue,
+  message,
+  back,
+  onGoBack,
+}: PinProps) => {
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
   const { one, two, three, four } = pin;
   function getCodeBoxElement(index: number) {
     return document.getElementById("codeBox" + index) as HTMLInputElement;
@@ -60,9 +71,15 @@ const PIN = ({ pin, setPin, onContinue, button_color }: PinProps) => {
   };
   return (
     <div className="">
-      <p className="mb-12  font-semibold text-text/80">
-        Enter your 4-digit card PIN to complete this transaction
-      </p>
+      {back && (
+        <div
+          onClick={onGoBack}
+          className="flex items-center w-fit gap-x-1 text-[#979797] text-[11px] mb-4 cursor-pointer"
+        >
+          <ArrowLeft /> <span>Go back</span>
+        </div>
+      )}
+      <p className="mb-12  font-semibold text-text/80">{message}</p>
       <div className=" flex items-center justify-center px-8 place-content-center">
         <input
           id="codeBox1"

@@ -1,17 +1,25 @@
 import React from "react";
 import { ReactComponent as Shield } from "../../assets/icons/shield.svg";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux";
 
 const ThreeDS = ({
   onRedirect,
   cardType,
   bank,
-  button_color,
+  // button_color,
 }: {
   onRedirect: () => void;
   bank: string;
   cardType: string;
-  button_color: any;
+  // button_color: any;
 }) => {
+  const customColor = useSelector(
+    (state: RootState) => state.payment.customColor
+  );
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
   const handlePay = () => {
     onRedirect();
   };
@@ -35,7 +43,7 @@ const ThreeDS = ({
       <div className=" my-6">
         <button
           onClick={handlePay}
-          className="button-outline w-full text-4xl"
+          className="button-outline w-full text-3xl"
           style={{
             borderColor: button_color ? button_color.value : "#27AE60",
             color: button_color ? button_color.value : "#27AE60",
