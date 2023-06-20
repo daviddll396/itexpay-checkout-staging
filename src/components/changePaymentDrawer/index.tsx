@@ -49,8 +49,8 @@ const ChangePaymentDrawer = (props: {
                     }`}
                   >
                     <div className="flex items-center">
-                      <img src={paymentItem.icon} alt="" className="w-6 h-6" />
-                      <span className="ml-3">{paymentItem.name}</span>
+                      {/* <img src={paymentItem.icon} alt="" className="w-6 h-6" /> */}
+                      <span className="text-text/80 text-base font-semibold">{paymentItem.name}</span>
                     </div>
                     <img src={CaretRight} alt="" className="w-4" />
                   </li>

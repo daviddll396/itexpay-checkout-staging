@@ -15,7 +15,7 @@ import {
   encrypt_data,
 } from "src/api/utility";
 import { initiate_charge } from "src/api";
-import Spinner, { SpinnerInline } from "../shared/Spinner";
+import  { SpinnerInline } from "../shared/Spinner";
 
 const BankTransfer = () => {
   const dispatch = useDispatch();
@@ -186,7 +186,10 @@ const BankTransfer = () => {
       setBankAccountAvailable(false);
       dispatch(show_error({ message: response.message }));
     } else {
-      get_bank_account();
+      setTimeout(() => {
+        get_bank_account();
+      }, 5000);
+      
     }
 
     return () => {
@@ -196,8 +199,8 @@ const BankTransfer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div>
-      {isLoading && <Spinner lg />}
+    <div className="w-full">
+      {isLoading &&  <SpinnerInline sm />}
       {!isLoading && !bankAccountAvailable && (
         <div>
           <h3 className="font-semibold text-text/80">
@@ -260,25 +263,21 @@ const BankTransfer = () => {
               </p>
             </div>
             <div className=" my-8">
-              {paymentMade === true ? (
-                <SpinnerInline
-                  lg
-                  withText
-                  text="Checking Transaction. Please wait ..."
-                />
-              ) : (
-                <button
-                  className="button w-full"
-                  onClick={onHandlePayment}
-                  style={{
-                    backgroundColor: button_color
-                      ? button_color.value
-                      : "#27AE60",
-                  }}
-                >
-                  I have made this payment
-                </button>
-              )}
+              <button
+                className="button-outline w-full"
+                onClick={onHandlePayment}
+                style={{
+                  borderColor: button_color ? button_color.value : "#27AE60",
+                  color: button_color ? button_color.value : "#27AE60",
+                }}
+                disabled={paymentMade}
+              >
+                {paymentMade ? (
+                  <SpinnerInline  />
+                ) : (
+                  " I have made this payment"
+                )}
+              </button>
             </div>
           </div>
         </div>

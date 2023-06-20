@@ -23,7 +23,7 @@ import {
   setProcessing,
   show_error,
 } from "src/redux/PaymentReducer";
-import Spinner from "../shared/Spinner";
+import Spinner, { SpinnerInline } from "../shared/Spinner";
 import { create_otp_transaction } from "src/api/utility";
 import { validate_otp } from "src/api";
 
@@ -413,10 +413,10 @@ const CardPayment = () => {
 
   return (
     <div className="relative">
-      {(loading || stage === "processing") && (
-        <Spinner lg withText text="Transaction processing...." />
+      {( stage === "processing") && (
+        <Spinner md withText text="Transaction processing...." />
       )}
-      {!loading && stage === "card" && (
+      { stage === "card" && (
         <div className="switch:px-5">
           <h4 className="font-bold text-base text-title mb-6">
             Enter Payment Details
@@ -476,33 +476,41 @@ const CardPayment = () => {
             </div>
             <div className="col-span-2 my-8">
               <button
-                onClick={handleCardDetails}
                 className="button w-full"
+                onClick={handleCardDetails}
                 style={{
                   backgroundColor: button_color
                     ? button_color.value
-                    : "#041926",
+                    : "#27AE60",
                 }}
+                disabled={loading}
               >
-                Continue
+                {loading ? <SpinnerInline white /> : " Continue"}
               </button>
             </div>
           </div>
         </div>
       )}
-      {!loading && stage === "pin" && (
-        <PIN pin={pin} setPin={setPin} onContinue={main_charge_card} message="Enter your 4-digit card PIN to complete this transaction" />
+      { stage === "pin" && (
+        <PIN
+          pin={pin}
+          setPin={setPin}
+          onContinue={main_charge_card}
+          message="Enter your 4-digit card PIN to complete this transaction"
+          loading={loading}
+        />
       )}
-      {!loading && stage === "otp" && (
+      { stage === "otp" && (
         <OTP
           message={server.message}
           value={otp}
           setValue={setOtp}
           onVerifyOTP={start_card_otp_verification}
           buttonText="Pay Now"
+          loading={loading}
         />
       )}
-      {!loading && stage === "3ds" && (
+      { stage === "3ds" && (
         <ThreeDS
           onRedirect={handleRedirect}
           cardType={server.card_type}

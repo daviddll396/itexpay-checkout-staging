@@ -5,7 +5,7 @@ import SecureFooter from "../components/shared/SecureFooter";
 import { paymentChannels } from "../data";
 import CardPayment from "../components/card/CardPayment";
 import QRPayment from "src/components/qr";
-import USSDPayment from "src/components/ussd";
+// import USSDPayment from "src/components/ussd";
 import BankTransfer from "src/components/transfer";
 import ChangePaymentDrawer from "../components/changePaymentDrawer";
 import ENaira from "src/components/e-naira";
@@ -28,6 +28,8 @@ import Spinner from "src/components/shared/Spinner";
 import Success from "src/components/shared/Success";
 import Invalid from "src/components/shared/Invalid";
 import Toast from "src/components/shared/Toast";
+import PayAttitude from "src/components/payattitude";
+
 
 const Checkout = () => {
   const dispatch = useDispatch();
@@ -39,6 +41,7 @@ const Checkout = () => {
   const payment = useSelector((state: RootState) => state.payment.payment);
   const { sendEvent } = useCustomFunctions();
   const [active, setActive] = useState(paymentChannels[0]);
+  const [activeImgUrl, setActiveImgUrl] = useState("");
   const [selectState, setSelectState] = useState(false);
   const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   const [invalidPaymentId, setInvalidPaymentId] = useState(false);
@@ -222,6 +225,10 @@ const Checkout = () => {
   const onCloseFrame = () => {
     dispatch(close_modal());
   };
+  useEffect(() => {
+    setActiveImgUrl(`cards/${selectedOption}.png`);
+  }, [selectedOption]);
+
   // watches value of public key and logs event when it is is available
   useEffect(() => {
     if (!transaction_data.publickey) {
@@ -314,21 +321,27 @@ const Checkout = () => {
                     />
 
                     <div className="p-4 switch:ml-[32%]  switch:pl-5 ">
-                      <div className="text-end mt-3 mb-4">
-                        <h2 className="font-extrabold text-lg sm:text-3xl text-title">
-                          {transaction_data?.currency}{" "}
-                          {transaction_data?.amount}
-                        </h2>
-                        <p className="text-text text-sm">
-                          {transaction_data?.source?.customer?.email}
-                        </p>
+                      <div className=" mt-2 mb-4 pb-2 border-b border-b-[#B9B9B9] flex items-center justify-between">
+                        <div className="max-w-[200px]">
+                          <img src={activeImgUrl} alt="" className="w-36" />
+                        </div>
+                        <div>
+                          <h2 className="font-extrabold text-lg sm:text-xl text-title">
+                            {transaction_data?.currency}{" "}
+                            {transaction_data?.amount}
+                          </h2>
+                          <p className="text-text text-xs switch:text-sm">
+                            {transaction_data?.source?.customer?.email}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-h-[350px] flex items-center justify-center">
+                      <div className="min-h-[350px] flex items-center ">
                         {selectedOption === "card" && <CardPayment />}
                         {selectedOption === "qr" && <QRPayment />}
-                        {selectedOption === "ussd" && <USSDPayment />}
+                        {/* {selectedOption === "ussd" && <USSDPayment />} */}
                         {selectedOption === "account" && <BankTransfer />}
                         {selectedOption === "enaira" && <ENaira />}
+                        {selectedOption === "phone" && <PayAttitude />}
                       </div>
                     </div>
                   </div>

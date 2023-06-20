@@ -15,6 +15,7 @@ import {
   validateNuban,
   validatePhone,
 } from "src/utils";
+import  { SpinnerInline } from "../shared/Spinner";
 
 const ENaira = () => {
   const options = [
@@ -75,6 +76,7 @@ const ENaira = () => {
     three: "",
     four: "",
   });
+  const [paymentMade, setPaymentMade] = useState(false);
   const [err, setErr] = useState("");
   const [stage, setStage] = useState("enaira");
   const [loading, setLoading] = useState(false);
@@ -159,10 +161,12 @@ const ENaira = () => {
     }
     if (ref === "pin") {
       setStage("pin");
+      dispatch(setProcessing(true))
       return;
     }
     if (ref === "token") {
       setStage("token");
+      dispatch(setProcessing(true))
       return;
     }
     dispatch(
@@ -170,13 +174,14 @@ const ENaira = () => {
     );
   };
   const onHandlePayment = () => {
-    // setPaymentMade(true);
+    setPaymentMade(true);
     dispatch(setProcessing(true));
     handleTransaction();
     // runInterval();
   };
   const handleGoBack = () => {
     setStage("enaira");
+    dispatch(setProcessing(false))
     setPin({
       one: "",
       two: "",
@@ -185,7 +190,6 @@ const ENaira = () => {
     });
     setTokenValue("");
   };
-
   let statusCheck: any;
 
   // get transaction status at intervals
@@ -246,54 +250,23 @@ const ENaira = () => {
         ref,
         authdata
       );
-      // console.log("enaira data", data);
       if (data === null || data === undefined) return;
-      // setLoading(true);
 
-      // console.log({ data });
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
-          runInterval();
-          // console.log({ response });
-          // setServer({
-          //   ...server,
-          //   message: response?.message,
-          //   linkingreference: response.transaction.linkingreference,
-          //   reference: response?.transaction?.reference,
-          //   redirecturl: response?.transaction?.redirecturl,
-          //   card_type: response?.source?.customer?.card?.bindata?.cardtype,
-          //   bank: response?.source?.customer?.card?.bindata?.coyname,
-          // });
-
-          // if (response.code === "09") {
-          //   setStage("otp");
-          //   setLoading(false);
-          //   return;
-          // }
-          // if (response.code === "09-REDIRECT") {
-          //   setStage("3ds");
-          //   setLoading(false);
-          //   return;
-          // }
-          // setStage("card");
-          // setCvv("");
-          // setExpiry("");
-          // setPin({
-          //   one: "",
-          //   two: "",
-          //   three: "",
-          //   four: "",
-          // });
-          // console.log({ response });
-          // dispatch(
-          //   show_error({
-          //     message: response?.data?.message || response?.message,
-          //   })
-          // );
-          // setLoading(false);
-          // dispatch(setProcessing(false));
+          if (response.code === "09") {
+            runInterval();
+            return;
+          }
+          dispatch(
+            show_error({
+              message: response?.data?.message || response?.message,
+            })
+          );
+          setLoading(false);
+          dispatch(setProcessing(false));
         })
         .catch((error: any) => {
           console.log({ error });
@@ -314,14 +287,17 @@ const ENaira = () => {
 
   return (
     <>
+      {/* {paymentMade && (
+        <Spinner md withText text="Checking Transaction. Please wait..." />
+      )} */}
       {stage === "enaira" && (
-        <div className="">
+        <div className="w-full">
           <p className="mb-4 text-sm switch:text-base  font-semibold text-text/80">
             Pay using your e-naira wallet
           </p>
 
           <div className="mb-4">
-            <div className="flex items-center flex-nowrap input focus:outline-dark/50 focus:outline-[0.5px]">
+            <div className="flex items-center flex-nowrap input focus:outline-dark/50 focus:outline-[0.5px] w-full">
               <div className="flex-1">
                 <Menu as="div" className="relative inline-block text-left">
                   <div>
@@ -423,14 +399,14 @@ const ENaira = () => {
                   >
                     {({ active, checked }) => (
                       <li
-                        className={`  bg-white w-full px-4 py-2 shadow-custom_shadow my-3 rounded-md text-text  list-none cursor-pointer border ${
+                        className={`  bg-white w-full px-6 py-2 shadow-custom_shadow_three my-3 rounded-md text-text  list-none cursor-pointer border ${
                           checked ? "border-theme" : "border-transparent"
                         }`}
                       >
-                        <div className="flex items-center mb-2">
+                        <div className="flex items-center mb-1">
                           <div className="flex items-center">
                             <div
-                              className={`w-5 h-5 rounded-full border-2 border-theme p-0.5  ${
+                              className={`w-4 h-4 rounded-full border-2 border-theme p-0.5  ${
                                 checked ? "bg-theme/10 " : ""
                               }`}
                             >
@@ -442,10 +418,12 @@ const ENaira = () => {
                             </div>
                           </div>
 
-                          <span className="ml-2 ">Pay with {item.name}</span>
+                          <span className="ml-2 font-semibold ">
+                            Pay with {item.name}
+                          </span>
                         </div>
 
-                        <p className="text-sm pl-7">{item.description}</p>
+                        <p className="text-xs pl-7">{item.description}</p>
                       </li>
                     )}
                   </RadioGroup.Option>
@@ -453,23 +431,17 @@ const ENaira = () => {
               </div>
             </RadioGroup>
           </div>
-
           <div className=" my-8">
             <button
               className={`button w-full `}
               onClick={onNext}
               style={{
-                backgroundColor: loading
-                  ? "#E5E5E5"
-                  : button_color
-                  ? button_color.value
-                  : "#27AE60",
+                backgroundColor: button_color ? button_color.value : "#27AE60",
               }}
               disabled={loading}
             >
-              Continue
+              {loading ? <SpinnerInline white /> : " Continue"}
             </button>
-            {/* )} */}
           </div>
         </div>
       )}
@@ -481,6 +453,7 @@ const ENaira = () => {
           message="Enter your 4-digit PIN to complete this transaction"
           back
           onGoBack={handleGoBack}
+          loading={paymentMade}
         />
       )}
       {stage === "token" && (
@@ -492,6 +465,7 @@ const ENaira = () => {
           onVerifyOTP={onHandlePayment}
           back
           onGoBack={handleGoBack}
+          loading={paymentMade}
         />
       )}
     </>

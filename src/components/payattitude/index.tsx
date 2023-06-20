@@ -7,10 +7,15 @@ import {
   setProcessing,
   show_error,
 } from "src/redux/PaymentReducer";
-import { create_ussd_transaction, encrypt_data } from "src/api/utility";
+import {
+  create_payattitude_transaction,
+  encrypt_data,
+} from "src/api/utility";
 import { charge } from "src/api";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import { SpinnerInline } from "../shared/Spinner";
+import { validatePhone } from "src/utils";
+
 
 const PayAttitude = () => {
   const dispatch = useDispatch();
@@ -19,6 +24,9 @@ const PayAttitude = () => {
   );
   const references = useSelector(
     (state: RootState) => state.payment.references
+  );
+  const customer = useSelector(
+    (state: RootState) => state.payment.userPayload?.source?.customer
   );
   const customColor = useSelector(
     (state: RootState) => state.payment.customColor
@@ -30,22 +38,29 @@ const PayAttitude = () => {
   const [showCode, setShowCode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [paymentMade, setPaymentMade] = useState(false);
-  const [phone, setPhone] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [err, setErr] = useState("");
 
+  // handles phone input change
+  const handleChangePhone = (e: any) => {
+    const val = e.target.value;
+    setPhoneNumber(validatePhone(val));
+    setErr("");
+  };
   // to get the transaction ussd code after selecting the bank
   const onGetPhoneAuth = () => {
-    setLoading(true);
-    if (!phone || phone.length < 11) {
+    if (!phoneNumber || phoneNumber.length < 11) {
       setErr("Please input a valid phone number");
       return;
     } else {
-        setLoading(true)
+      setLoading(true);
+      handleTransaction();
     }
   };
-
   // get transaction status at intervals
   const runInterval = () => {
+    dispatch(setProcessing(true));
+    setPaymentMade(true);
     const statusCheck = setInterval(async () => {
       try {
         await runTransaction();
@@ -54,7 +69,75 @@ const PayAttitude = () => {
       }
     }, 5000);
   };
+  const handleTransaction = () => {
+    dispatch(setProcessing(true))
+    const {
+      reference,
+      redirecturl,
+      amount,
+      currency,
+      country,
+      paymentid,
+      callbackurl,
+      publickey,
+      encryptpublickey,
+    } = transaction_data;
+    const { firstname, lastname, email, phone } = customer;
+    const { fingerprint, modalref, paymentlinkref } = references;
 
+    try {
+      let data = create_payattitude_transaction(
+        reference,
+        callbackurl,
+        redirecturl,
+        amount,
+        currency,
+        country,
+        firstname,
+        lastname,
+        email,
+        phone,
+        fingerprint,
+        modalref,
+        paymentlinkref,
+        paymentid,
+        phoneNumber
+      );
+      if (data === null || data === undefined) return;
+      let request = encrypt_data(JSON.stringify(data), encryptpublickey);
+
+      charge(transaction_data.paymentid, publickey, request)
+        .then((response: any) => {
+          console.log({ response });
+          if (response.code === "09") {
+            setShowCode(true);
+            setLoading(false);
+            return;
+          }
+          dispatch(
+            show_error({
+              message: response?.data?.message || response?.message,
+            })
+          );
+          setLoading(false);
+          dispatch(setProcessing(false));
+        })
+        .catch((error: any) => {
+          console.log({ error });
+          dispatch(
+            show_error({
+              message: error?.response?.data?.message || error?.message,
+            })
+          );
+          setLoading(false);
+          dispatch(setProcessing(false));
+        });
+    } catch (err: any) {
+      console.log(err?.message);
+      dispatch(setProcessing(false));
+      setLoading(false);
+    }
+  };
   // hides all errors on load
   useEffect(() => {
     dispatch(hide_error());
@@ -64,12 +147,16 @@ const PayAttitude = () => {
     <>
       {/* {loading && <SpinnerInline lg />} */}
       {!showCode && (
-        <div className="px-1">
-          <p className="mb-5 text-sm font-medium text-text/80">
-            Please input your phone number{}
+        <div className="px-1 w-full">
+          <p className="mb-5 text-sm font-semibold text-text/80">
+            Please input your phone number to pay with phone
           </p>
-          <div className="">
-            <input className="" value={phone} />
+          <div className="my-8">
+            <input
+              className="input w-full"
+              value={phoneNumber}
+              onChange={handleChangePhone}
+            />
             {err && <p className="text-[10px] text-[#FF0000]">{err}</p>}
           </div>
           <div className=" my-6">
@@ -77,39 +164,36 @@ const PayAttitude = () => {
               onClick={onGetPhoneAuth}
               className="button w-full"
               disabled={loading}
+              style={{
+                backgroundColor: button_color ? button_color.value : "#27AE60",
+              }}
             >
               {loading ? <SpinnerInline white /> : "Continue"}
             </button>
           </div>
         </div>
       )}
-      {showCode && !paymentMade && (
+      {showCode && (
         <div className="">
-          <p className="text-base w-4/6 mx-auto text-center mb-6 text-text/80 font-semibold">
+          <p className="text-base  text-center mb-6 text-text/80 font-semibold">
             Please authenticate the payment with either your PayAttitude app,
             Bank app or USSD.
           </p>
-          <div className="bg-theme/10 w-fit mx-auto py-1.5 px-5 rounded-3xl flex items-center gap-x-2 mb-6"></div>
 
           <div className=" my-8">
-            {paymentMade ? (
-              <SpinnerInline
-                lg
-                withText
-                text="Checking Transaction. Please wait ..."
-              />
-            ) : (
+      
               <button
-                className="button w-full"
+                className="button-outline w-full"
                 onClick={runInterval}
+                disabled={paymentMade}
                 style={{
                   borderColor: button_color ? button_color.value : "#27AE60",
                   color: button_color ? button_color.value : "#27AE60",
                 }}
               >
-                I have made this payment
+                 {paymentMade ? <SpinnerInline  /> : " I have made this payment"}
+               
               </button>
-            )}
           </div>
         </div>
       )}
