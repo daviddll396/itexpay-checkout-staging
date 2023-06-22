@@ -1,9 +1,8 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition, RadioGroup } from "@headlessui/react";
 import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "src/redux";
-import { setProcessing, show_error } from "src/redux/PaymentReducer";
+import { useAppDispatch,useAppSelector } from "src/redux/hooks";
+import { setProcessing, setTransactionErrorMessage, show_error } from "src/redux/PaymentReducer";
 import { create_enaira_transaction, encrypt_data } from "src/api/utility";
 import { charge } from "src/api";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
@@ -48,22 +47,22 @@ const ENaira = () => {
       description: "Generate your token from the e-naira app.",
     },
   ];
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
+  const transaction_data =   useAppSelector(
+    (state ) => state.payment.userPayload
   );
-  const customer = useSelector(
-    (state: RootState) => state.payment.userPayload?.source?.customer
+  const customer =   useAppSelector(
+    (state ) => state.payment.userPayload?.source?.customer
   );
-  const references = useSelector(
-    (state: RootState) => state.payment.references
+  const references =   useAppSelector(
+    (state ) => state.payment.references
   );
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
+  const customColor =   useAppSelector(
+    (state ) => state.payment.customColor
   );
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { runTransaction } = useCustomFunctions();
 
   const [selected, setSelected] = useState<any>(options[0]);
@@ -260,8 +259,13 @@ const ENaira = () => {
             runInterval();
             return;
           }
+          // dispatch(
+          //   show_error({
+          //     message: response?.data?.message || response?.message,
+          //   })
+          // );
           dispatch(
-            show_error({
+            setTransactionErrorMessage({
               message: response?.data?.message || response?.message,
             })
           );

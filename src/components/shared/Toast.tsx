@@ -1,13 +1,12 @@
-import { useSelector, useDispatch } from "react-redux";
 import { ReactComponent as Cancel } from "../../assets/icons/cancel2.svg";
 import { ReactComponent as ErrorIcon } from "../../assets/icons/error.svg";
-import { RootState } from "src/redux";
 import { hide_error } from "src/redux/PaymentReducer";
 import { Transition } from "@headlessui/react";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
 
 const Toast = () => {
-  const error = useSelector((state: RootState) => state.payment.error);
-  const dispatch = useDispatch();
+  const error = useAppSelector((state) => state.payment.error);
+  const dispatch = useAppDispatch();
   const onClose = () => {
     dispatch(hide_error());
   };
@@ -31,7 +30,9 @@ const Toast = () => {
             onClick={onClose}
           />
           <ErrorIcon className=" text-[#ff0000b6] w-6 h-6" onClick={onClose} />
-          <p className="pr-5 text-[#e80505b6] text-sm font-semibold">{error.message}</p>
+          <p className="pr-5 text-[#e80505b6] text-sm font-semibold">
+            {error.message}
+          </p>
         </div>
       </div>
     </Transition>

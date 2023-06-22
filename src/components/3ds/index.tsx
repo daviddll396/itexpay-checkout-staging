@@ -1,22 +1,17 @@
 import React from "react";
 import { ReactComponent as Shield } from "../../assets/icons/shield.svg";
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppSelector } from "src/redux/hooks";
 
 const ThreeDS = ({
   onRedirect,
   cardType,
   bank,
-  // button_color,
 }: {
   onRedirect: () => void;
   bank: string;
   cardType: string;
-  // button_color: any;
 }) => {
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
-  );
+  const customColor = useAppSelector((state) => state.payment.customColor);
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );

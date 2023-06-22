@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppSelector } from "src/redux/hooks";
 
 type SpinnerProps = {
   md?: boolean;
@@ -18,8 +17,8 @@ export const SpinnerInline = ({
   withText,
   text,
 }: SpinnerProps) => {
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
+  const customColor = useAppSelector(
+    (state ) => state.payment.customColor
   );
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
@@ -49,8 +48,8 @@ export const SpinnerInline = ({
   );
 };
 const Spinner = ({ md, lg, white, withText, text }: SpinnerProps) => {
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
+  const customColor = useAppSelector(
+    (state ) => state.payment.customColor
   );
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"

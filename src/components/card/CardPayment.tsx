@@ -8,10 +8,8 @@ import {
   validateExpiryDate,
 } from "../../utils";
 import PIN from "../pin";
-// import Spinner from "../shared/Spinner";
 import ThreeDS from "../3ds";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppDispatch,useAppSelector } from "src/redux/hooks";
 import { encrypt_data } from "src/api/utility";
 import { charge_options } from "src/api";
 import { create_card_transaction } from "src/api/utility";
@@ -28,23 +26,23 @@ import { create_otp_transaction } from "src/api/utility";
 import { validate_otp } from "src/api";
 
 const CardPayment = () => {
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
+  const transaction_data =  useAppSelector(
+    (state ) => state.payment.userPayload
   );
-  const customer = useSelector(
-    (state: RootState) => state.payment.userPayload?.source?.customer
+  const customer =  useAppSelector(
+    (state ) => state.payment.userPayload?.source?.customer
   );
-  const references = useSelector(
-    (state: RootState) => state.payment.references
+  const references =  useAppSelector(
+    (state ) => state.payment.references
   );
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
+  const customColor =  useAppSelector(
+    (state ) => state.payment.customColor
   );
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );
-  // const processing = useSelector((state: RootState) => state.payment.inProcess);
-  const dispatch = useDispatch();
+  // const processing =  useAppSelector((state ) => state.payment.inProcess);
+  const dispatch = useAppDispatch();
   const { sendEvent, runTransaction, openUrl, success } = useCustomFunctions();
   const [ccNumber, setCcNumber] = useState("");
   const [cvv, setCvv] = useState("");

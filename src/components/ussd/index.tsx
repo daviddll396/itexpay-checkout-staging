@@ -7,25 +7,22 @@ import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
 import { Combobox, Transition } from "@headlessui/react";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import banksData from "src/data/banks.json";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "src/redux";
-import { hide_error, setProcessing, show_error } from "src/redux/PaymentReducer";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
+import {
+  hide_error,
+  setProcessing,
+  show_error,
+} from "src/redux/PaymentReducer";
 import { create_ussd_transaction, encrypt_data } from "src/api/utility";
 import { charge } from "src/api";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import Spinner, { SpinnerInline } from "../shared/Spinner";
 
 const USSDPayment = () => {
-  const dispatch = useDispatch();
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
-  );
-  const references = useSelector(
-    (state: RootState) => state.payment.references
-  );
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
-  );
+  const dispatch = useAppDispatch();
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
+  const references = useAppSelector((state) => state.payment.references);
+  const customColor = useAppSelector((state) => state.payment.customColor);
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );
@@ -150,7 +147,7 @@ const USSDPayment = () => {
 
     let request = encrypt_data(JSON.stringify(data), encryptpublickey);
     if (data === null || data === undefined) {
-      setLoading(false)
+      setLoading(false);
       return;
     }
 
@@ -167,7 +164,7 @@ const USSDPayment = () => {
         });
         if (response.code === "09") {
           setUSSDAvailable(true);
-          setShowCode(true)
+          setShowCode(true);
           onTimer();
           // const minutes: number = 300;
           // // runInterval();
@@ -188,15 +185,19 @@ const USSDPayment = () => {
         setSelected("");
         setUSSDAvailable(false);
         setShowCode(false);
-        setLoading(false)
+        setLoading(false);
         dispatch(show_error({ message: response.message }));
       })
       .catch((error) => {
         setSelected("");
         setUSSDAvailable(false);
         setShowCode(false);
-        setLoading(false)
-        dispatch(show_error({ message: error?.response?.data?.message || error?.message }));
+        setLoading(false);
+        dispatch(
+          show_error({
+            message: error?.response?.data?.message || error?.message,
+          })
+        );
       });
   };
   // open_vbv_ussd() {

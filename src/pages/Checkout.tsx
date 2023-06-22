@@ -12,15 +12,14 @@ import ENaira from "src/components/e-naira";
 import { generate_reference } from "src/api/utility";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { get_payment_details } from "src/api";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
 import {
   close_modal,
   hide_error,
   setPaymentCompleted,
   setReferences,
   setTransactionResponse,
-  show_error,
+  // show_error,
   update_custom,
 } from "src/redux/PaymentReducer";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
@@ -30,15 +29,15 @@ import Invalid from "src/components/shared/Invalid";
 import Toast from "src/components/shared/Toast";
 import PayAttitude from "src/components/payattitude";
 
-
 const Checkout = () => {
-  const dispatch = useDispatch();
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
-  );
+  const dispatch = useAppDispatch();
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
 
-  const show = useSelector((state: RootState) => state.payment.show);
-  const payment = useSelector((state: RootState) => state.payment.payment);
+  const show = useAppSelector((state) => state.payment.show);
+  const payment = useAppSelector((state) => state.payment.payment);
+  const transactionError = useAppSelector(
+    (state) => state.payment.transactionErrorMessage
+  );
   const { sendEvent } = useCustomFunctions();
   const [active, setActive] = useState(paymentChannels[0]);
   const [activeImgUrl, setActiveImgUrl] = useState("");
@@ -47,7 +46,6 @@ const Checkout = () => {
   const [invalidPaymentId, setInvalidPaymentId] = useState(false);
   const [invalidRedirectUrl, setInvalidRedirectUrl] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
-  // const [fee, setFee] = useState("0");
   const [messageFrom3ds, setMessageFrom3ds] = useState<string | null>("");
   const [customErrorMessage, setCustomErrorMessage] = useState<string | null>(
     ""
@@ -57,14 +55,12 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [params, setParams] = useState<any>(null);
 
-  // updates state
-  // const handleStateChange = (name: any, value: any) => {
-  //   // //console.log('here')
-  //   // setState({
-  //   //   ...state,
-  //   //   [name]: value,
-  //   // });
-  // };
+  useEffect(() => {
+    if (transactionError) {
+      setCustomErrorMessage(transactionError.message);
+    }
+  }, [transactionError]);
+
   // toggles loading state to true/false
   const toggleLoading = (value: boolean) => {
     setIsLoading(value);
@@ -187,48 +183,49 @@ const Checkout = () => {
   };
   // get url to go back to merchant site
   const goToMerchantSite = () => {
+    dispatch(close_modal());
     // const { pathname } = new URL(window.location.href);
-    const paymentID = params.get("paymentid");
-    // const paymentID = pathname.split("/")[1];
-    // show success page and redirect to merchant
-    get_payment_details(paymentID)
-      .then((response: any) => {
-        const { redirecturl } = response.data;
-        // show success page and redirect to merchant
-        if (redirecturl) {
-          window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
-        } else {
-          setTimeout(() => {
-            let url =
-              window.location !== window.parent.location
-                ? document.referrer
-                : document.location.href;
-            window.parent.postMessage(
-              { name: "vbvcomplete", response: response },
-              url
-            );
-            dispatch(close_modal());
-          }, 1000);
-        }
-      })
-      .catch((error) => {
-        console.log({
-          errMsg:
-            error?.response?.data?.message ||
-            error?.response?.data?.status ||
-            error?.message,
-        });
-        dispatch(close_modal());
-      });
+    // const paymentID = params.get("paymentid");
+    // // const paymentID = pathname.split("/")[1];
+    // // show success page and redirect to merchant
+    // get_payment_details(paymentID)
+    //   .then((response: any) => {
+    //     const { redirecturl } = response.data;
+    //     // show success page and redirect to merchant
+    //     if (redirecturl) {
+    //       window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
+    //     } else {
+    //       setTimeout(() => {
+    //         let url =
+    //           window.location !== window.parent.location
+    //             ? document.referrer
+    //             : document.location.href;
+    //         window.parent.postMessage(
+    //           { name: "vbvcomplete", response: response },
+    //           url
+    //         );
+    //         dispatch(close_modal());
+    //       }, 1000);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log({
+    //       errMsg:
+    //         error?.response?.data?.message ||
+    //         error?.response?.data?.status ||
+    //         error?.message,
+    //     });
+    //     dispatch(close_modal());
+    //   });
   };
   // close frame
   const onCloseFrame = () => {
     dispatch(close_modal());
   };
+
   useEffect(() => {
     setActiveImgUrl(`cards/${selectedOption}.png`);
   }, [selectedOption]);
-
   // watches value of public key and logs event when it is is available
   useEffect(() => {
     if (!transaction_data.publickey) {
@@ -246,11 +243,12 @@ const Checkout = () => {
       setPaymentSuccessful(true);
     } else {
       payment?.message &&
-        dispatch(
-          show_error({
-            message: `${payment?.message}. Please, try another payment method`,
-          })
-        );
+        // dispatch(
+        //   show_error({
+        //     message: `${payment?.message}. Please, try another payment method`,
+        //   })
+        // );
+        setCustomErrorMessage(payment?.message);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payment?.paycompleted]);
@@ -273,15 +271,16 @@ const Checkout = () => {
     <>
       {show && (
         <div className="relative w-full  max-w-[680px] min-h-screen switch:h-[580px] switch:max-h-[580px] mx-auto bg-white switch:bg-transparent">
-          {/* <div className="switch:my-[8%] switch:p-4 "> */}
           <Toast />
           {isLoading && <Spinner lg={true} />}
           {paymentSuccessful && <Success />}
-          {invalidPaymentId && <Invalid description="Invalid Payment ID" />}
+          {invalidPaymentId && (
+            <Invalid description="Invalid Payment ID" go={goToMerchantSite} />
+          )}
           {invalidRedirectUrl && (
             <Invalid
               description="Redirect URL must be a fully qualified domain name!"
-              // go={goToMerchantSite}
+              go={goToMerchantSite}
             />
           )}
           {paymentAlreadyMade && (
@@ -290,7 +289,9 @@ const Checkout = () => {
               go={goToMerchantSite}
             />
           )}
-          {customErrorMessage && <Invalid description={customErrorMessage} />}
+          {customErrorMessage && (
+            <Invalid description={customErrorMessage} go={goToMerchantSite} />
+          )}
           {messageFrom3ds && (
             <Invalid description={messageFrom3ds} go={goToMerchantSite} />
           )}
@@ -368,7 +369,6 @@ const Checkout = () => {
               </>
             )}
         </div>
-        // </div>
       )}
     </>
   );

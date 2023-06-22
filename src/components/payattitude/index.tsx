@@ -1,36 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, Fragment, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
 import {
   hide_error,
   setProcessing,
+  setTransactionErrorMessage,
   show_error,
 } from "src/redux/PaymentReducer";
-import {
-  create_payattitude_transaction,
-  encrypt_data,
-} from "src/api/utility";
+import { create_payattitude_transaction, encrypt_data } from "src/api/utility";
 import { charge } from "src/api";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import { SpinnerInline } from "../shared/Spinner";
 import { validatePhone } from "src/utils";
 
-
 const PayAttitude = () => {
-  const dispatch = useDispatch();
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
+  const dispatch = useAppDispatch();
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
+  const references = useAppSelector((state) => state.payment.references);
+  const customer = useAppSelector(
+    (state) => state.payment.userPayload?.source?.customer
   );
-  const references = useSelector(
-    (state: RootState) => state.payment.references
-  );
-  const customer = useSelector(
-    (state: RootState) => state.payment.userPayload?.source?.customer
-  );
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
-  );
+  const customColor = useAppSelector((state) => state.payment.customColor);
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );
@@ -70,7 +60,7 @@ const PayAttitude = () => {
     }, 5000);
   };
   const handleTransaction = () => {
-    dispatch(setProcessing(true))
+    dispatch(setProcessing(true));
     const {
       reference,
       redirecturl,
@@ -114,8 +104,14 @@ const PayAttitude = () => {
             setLoading(false);
             return;
           }
+          // dispatch(
+          //   show_error({
+          //     message: response?.data?.message || response?.message,
+          //   })
+          // );
+
           dispatch(
-            show_error({
+            setTransactionErrorMessage({
               message: response?.data?.message || response?.message,
             })
           );
@@ -181,19 +177,17 @@ const PayAttitude = () => {
           </p>
 
           <div className=" my-8">
-      
-              <button
-                className="button-outline w-full"
-                onClick={runInterval}
-                disabled={paymentMade}
-                style={{
-                  borderColor: button_color ? button_color.value : "#27AE60",
-                  color: button_color ? button_color.value : "#27AE60",
-                }}
-              >
-                 {paymentMade ? <SpinnerInline  /> : " I have made this payment"}
-               
-              </button>
+            <button
+              className="button-outline w-full"
+              onClick={runInterval}
+              disabled={paymentMade}
+              style={{
+                borderColor: button_color ? button_color.value : "#27AE60",
+                color: button_color ? button_color.value : "#27AE60",
+              }}
+            >
+              {paymentMade ? <SpinnerInline /> : " I have made this payment"}
+            </button>
           </div>
         </div>
       )}

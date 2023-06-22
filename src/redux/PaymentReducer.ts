@@ -12,6 +12,7 @@ export interface InitialState {
     message: string;
   };
   show: boolean;
+  transactionErrorMessage: { message: string } | null;
 }
 
 const initialState: InitialState = {
@@ -24,8 +25,12 @@ const initialState: InitialState = {
     show: false,
     message: "",
   },
-  customColor: [{name: "sidebar_color", value: "#041926"}, {name: "button_color", value: "#27AE60"}],
+  customColor: [
+    { name: "sidebar_color", value: "#041926" },
+    { name: "button_color", value: "#27AE60" },
+  ],
   show: true,
+  transactionErrorMessage: null,
 };
 
 export const paymentSlice = createSlice({
@@ -55,6 +60,9 @@ export const paymentSlice = createSlice({
     setProcessing(state, { payload }) {
       state.inProcess = payload;
     },
+    setTransactionErrorMessage(state, { payload }) {
+      state.transactionErrorMessage = payload;
+    },
     show_error(state, { payload }) {
       state.error = { show: true, message: payload.message };
     },
@@ -62,10 +70,26 @@ export const paymentSlice = createSlice({
       state.error = { show: false, message: "" };
     },
     close_modal(state) {
-      state.show = false;
+      let redirecturl = state.userPayload?.redirecturl || null;
+      if (redirecturl) {
+        window.open(`${redirecturl}`, "_top");
+      } else {
+        let url =
+          window.location !== window.parent.location
+            ? document.referrer
+            : document.location.href;
+        window.parent.postMessage({ name: "closeiframe" }, url);
+        window.parent.postMessage(
+          {
+            closeModal: true,
+          },
+          "*"
+        );
+      }
+      // state.show = false;
     },
     update_custom(state, { payload }) {
-      state.customColor = [ ...payload];
+      state.customColor = [...payload];
     },
   },
 });
@@ -76,6 +100,7 @@ export const {
   setBankTransferResponse,
   setPaymentCompleted,
   setProcessing,
+  setTransactionErrorMessage,
   show_error,
   hide_error,
   close_modal,

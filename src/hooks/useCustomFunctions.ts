@@ -4,7 +4,7 @@ import { RootState } from "src/redux";
 import {
   setPaymentCompleted,
   show_error,
-  close_modal,
+  // close_modal,
 } from "src/redux/PaymentReducer";
 
 function useCustomFunctions() {
@@ -69,7 +69,7 @@ function useCustomFunctions() {
             "_top",
             "toolbar=no,scrollbars=no,resizable=yes"
           );
-        }, 5000);
+        }, 10000);
       } else {
         setTimeout(() => {
           let url =
@@ -80,9 +80,12 @@ function useCustomFunctions() {
             { name: "vbvcomplete", response: response },
             url
           );
-          dispatch(close_modal());
-        }, 5000);
+        }, 10000);
       }
+    }else{
+        setTimeout(()=>{
+
+        })
     }
   };
   const runTransaction = async () => {

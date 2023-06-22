@@ -1,11 +1,8 @@
 // import { useState } from "react";
 import { paymentChannels } from "../../data";
 import { ReactComponent as Cancel } from "../../assets/icons/cancel.svg";
-// import Logo from "../../assets/images/merchantlogo.png";
-// import { ReactSVG } from "react-svg";
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux";
-import {ReactComponent as CaretRight} from "../../assets/icons/caret-right.svg";
+import { useAppSelector } from "src/redux/hooks";
+import { ReactComponent as CaretRight } from "../../assets/icons/caret-right.svg";
 
 const Sidebar = (props: {
   setActive: React.Dispatch<React.SetStateAction<any>>;
@@ -21,13 +18,9 @@ const Sidebar = (props: {
     selectState,
     setSelectState,
   } = props;
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
-  );
-  const processing = useSelector((state: RootState) => state.payment.inProcess);
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
-  );
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
+  const processing = useAppSelector((state) => state.payment.inProcess);
+  const customColor = useAppSelector((state) => state.payment.customColor);
   const sidebar_color = customColor.find(
     (item: any) => item.name === "sidebar_color"
   );

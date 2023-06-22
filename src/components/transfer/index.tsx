@@ -2,12 +2,12 @@ import { useEffect, useState, useRef } from "react";
 import { ReactComponent as CopyIcon } from "../../assets/icons/copy-icon.svg";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
 import {
   close_modal,
   setBankTransferResponse,
   setProcessing,
+  setTransactionErrorMessage,
   show_error,
 } from "src/redux/PaymentReducer";
 import {
@@ -15,22 +15,18 @@ import {
   encrypt_data,
 } from "src/api/utility";
 import { initiate_charge } from "src/api";
-import  { SpinnerInline } from "../shared/Spinner";
+import { SpinnerInline } from "../shared/Spinner";
 
 const BankTransfer = () => {
-  const dispatch = useDispatch();
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
+  const dispatch = useAppDispatch();
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
+  const bankTransferResponse = useAppSelector(
+    (state) => state.payment.bankTransferResponse
   );
-  const bankTransferResponse = useSelector(
-    (state: RootState) => state.payment.bankTransferResponse
+  const customer = useAppSelector(
+    (state) => state.payment.userPayload?.source?.customer
   );
-  const customer = useSelector(
-    (state: RootState) => state.payment.userPayload?.source?.customer
-  );
-  const customColor = useSelector(
-    (state: RootState) => state.payment.customColor
-  );
+  const customColor = useAppSelector((state) => state.payment.customColor);
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );
@@ -134,7 +130,6 @@ const BankTransfer = () => {
     setIsLoading(true);
     initiate_charge(transaction_data.paymentid, publickey, request)
       .then((response: any) => {
-        // console.log("transfer res", response);
         dispatch(
           setBankTransferResponse({
             paymentid: transaction_data.paymentid,
@@ -154,15 +149,18 @@ const BankTransfer = () => {
         }
         setIsLoading(false);
         setBankAccountAvailable(false);
-        dispatch(show_error({ message: response.message }));
-        // onTimer();
+        dispatch(
+          setTransactionErrorMessage({
+            message: response?.data?.message || response?.message,
+          })
+        );
+        // dispatch(show_error({ message: response.message }));
       })
       .catch((error) => {
         // console.log({error})
         let errMsg = error?.response?.data?.message || error?.message;
         setIsLoading(false);
         dispatch(show_error({ message: errMsg }));
-        // onTimer();
       });
   };
   useEffect(() => {
@@ -189,7 +187,6 @@ const BankTransfer = () => {
       setTimeout(() => {
         get_bank_account();
       }, 5000);
-      
     }
 
     return () => {
@@ -200,7 +197,7 @@ const BankTransfer = () => {
   }, []);
   return (
     <div className="w-full">
-      {isLoading &&  <SpinnerInline sm />}
+      {isLoading && <SpinnerInline sm />}
       {!isLoading && !bankAccountAvailable && (
         <div>
           <h3 className="font-semibold text-text/80">
@@ -272,11 +269,7 @@ const BankTransfer = () => {
                 }}
                 disabled={paymentMade}
               >
-                {paymentMade ? (
-                  <SpinnerInline  />
-                ) : (
-                  " I have made this payment"
-                )}
+                {paymentMade ? <SpinnerInline /> : " I have made this payment"}
               </button>
             </div>
           </div>
