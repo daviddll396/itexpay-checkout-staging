@@ -19,6 +19,7 @@ import useCustomFunctions from "../../hooks/useCustomFunctions";
 import {
   hide_error,
   setProcessing,
+  setTransactionErrorMessage,
   show_error,
 } from "src/redux/PaymentReducer";
 import Spinner, { SpinnerInline } from "../shared/Spinner";
@@ -292,10 +293,15 @@ const CardPayment = () => {
           });
           console.log({ response });
           dispatch(
-            show_error({
+            setTransactionErrorMessage({
               message: response?.data?.message || response?.message,
             })
           );
+          // dispatch(
+          //   show_error({
+          //     message: response?.data?.message || response?.message,
+          //   })
+          // );
           setLoading(false);
           dispatch(setProcessing(false));
         })
