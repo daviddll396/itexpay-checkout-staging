@@ -95,14 +95,6 @@ const Checkout = () => {
           setTransactionResponse({
             ...response.data,
             callbackurl: "",
-            paymentmethods: [
-              "card",
-              "account",
-              "enaira",
-              "ussd",
-              "qr",
-              "phone",
-            ],
           })
         );
         dispatch(
