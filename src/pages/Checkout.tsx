@@ -53,6 +53,7 @@ const Checkout = () => {
   const [paymentAlreadyMade, setPaymentAlreadyMade] = useState<boolean>(false);
   const [isTestEnv, setIsTestEnv] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [params, setParams] = useState<any>(null);
 
   useEffect(() => {
