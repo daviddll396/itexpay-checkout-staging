@@ -115,9 +115,7 @@ const QRPayment = () => {
   useEffect(() => {
     setIsLoading(true);
     dispatch(hide_error());
-    setTimeout(() => {
-      get_qr_code();
-    }, 2000);
+    get_qr_code();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

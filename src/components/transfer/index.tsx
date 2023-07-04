@@ -184,11 +184,8 @@ const BankTransfer = () => {
       setBankAccountAvailable(false);
       dispatch(show_error({ message: response.message }));
     } else {
-      setTimeout(() => {
-        get_bank_account();
-      }, 5000);
+      get_bank_account();
     }
-
     return () => {
       clearInterval(statusCheck);
     };

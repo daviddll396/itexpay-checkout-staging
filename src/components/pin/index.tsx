@@ -84,7 +84,7 @@ const PIN = ({
       <div className=" flex items-center justify-center px-8 place-content-center">
         <input
           id="codeBox1"
-          // type="password"
+          type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(1, e)}
           onFocus={() => onFocusEvent(1)}
@@ -96,7 +96,7 @@ const PIN = ({
         />
         <input
           id="codeBox2"
-          // type="password"
+          type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(2, e)}
           onFocus={() => onFocusEvent(2)}
@@ -108,7 +108,7 @@ const PIN = ({
         />
         <input
           id="codeBox3"
-          // type="password"
+          type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(3, e)}
           onFocus={() => onFocusEvent(3)}
@@ -120,7 +120,7 @@ const PIN = ({
         />
         <input
           id="codeBox4"
-          // type="password"
+          type="password"
           maxLength={1}
           onKeyUp={(e) => onKeyUpEvent(4, e)}
           placeholder="*"

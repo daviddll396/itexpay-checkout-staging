@@ -254,9 +254,7 @@ const Checkout = () => {
 
   useEffect(() => {
     dispatch(hide_error());
-    setTimeout(() => {
-      onLoad();
-    }, 1000);
+    onLoad();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -266,7 +264,7 @@ const Checkout = () => {
         <div className="relative w-full  max-w-[680px] min-h-screen switch:h-[580px] switch:max-h-[580px] mx-auto bg-white switch:bg-transparent">
           <Toast />
           {isLoading && <Spinner lg={true} />}
-          {paymentSuccessful && <Success />}
+          {paymentSuccessful && <Success go={goToMerchantSite} />}
           {invalidPaymentId && (
             <Invalid description="Invalid Payment ID" go={goToMerchantSite} />
           )}

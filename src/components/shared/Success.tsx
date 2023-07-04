@@ -1,10 +1,15 @@
 import React from "react";
 import CirceCheck from "../../assets/images/circle-check.png";
-import { useAppDispatch } from "src/redux/hooks";
-import { close_modal } from "src/redux/PaymentReducer";
+import { useAppSelector } from "src/redux/hooks";
 
-const Success = () => {
-  const dispatch = useAppDispatch();
+const Success = ({ go }: { go?: () => void }) => {
+  const onGo = () => {
+    if (go) go();
+  };
+  const customColor = useAppSelector((state) => state.payment.customColor);
+  const button_color = customColor.find(
+    (item: any) => item.name === "button_color"
+  );
 
   return (
     <div className="relative w-full max-w-[500px] mx-auto h-screen switch:h-[500px] switch:mt-16 bg-white rounded-theme pb-12 pt-20">
@@ -23,12 +28,17 @@ const Success = () => {
           </p>
         </div>
         <div className="my-3">
-          <button
-            className="button  px-12 font-medium"
-            onClick={() => dispatch(close_modal())}
-          >
-            Go back to merchant site
-          </button>
+          {go && (
+            <button
+              className="button  px-12 font-medium"
+              onClick={onGo}
+              style={{
+                backgroundColor: button_color ? button_color.value : "#27AE60",
+              }}
+            >
+              Go back to merchant site
+            </button>
+          )}
         </div>
       </div>
     </div>

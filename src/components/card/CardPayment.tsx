@@ -206,9 +206,6 @@ const CardPayment = () => {
         dispatch(setProcessing(false));
         setLoading(false);
       })
-      .finally(() => {
-        setLoading(false);
-      });
   };
   const main_charge_card = () => {
     setLoading(true);
@@ -291,17 +288,13 @@ const CardPayment = () => {
             three: "",
             four: "",
           });
-          console.log({ response });
+          // console.log({ response });
           dispatch(
             setTransactionErrorMessage({
               message: response?.data?.message || response?.message,
             })
           );
-          // dispatch(
-          //   show_error({
-          //     message: response?.data?.message || response?.message,
-          //   })
-          // );
+
           setLoading(false);
           dispatch(setProcessing(false));
         })
@@ -340,7 +333,6 @@ const CardPayment = () => {
     setStage("processing");
     // start polling
     openUrl(server.redirecturl);
-    window.open(server.redirecturl, "_blank");
     runInterval();
   };
   // start card otp verification
@@ -418,7 +410,9 @@ const CardPayment = () => {
   return (
     <div className="relative">
       {( stage === "processing") && (
-        <Spinner md withText text="Transaction processing...." />
+        <div className="flex justify-center">
+        <SpinnerInline md withText text="Transaction processing...." />
+        </div>
       )}
       { stage === "card" && (
         <div className="switch:px-5">

@@ -68,7 +68,6 @@ const Spinner = ({ md, lg, white, withText, text }: SpinnerProps) => {
               ? button_color.value
               : "#27AE60",
             borderTopColor: white ? button_color.value : "transparent",
-            // color: button_color ? button_color.value : "#27AE60",
           }}
         ></div>
         {withText && (
