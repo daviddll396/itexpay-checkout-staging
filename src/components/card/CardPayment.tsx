@@ -22,7 +22,7 @@ import {
   setTransactionErrorMessage,
   show_error,
 } from "src/redux/PaymentReducer";
-import Spinner, { SpinnerInline } from "../shared/Spinner";
+import  { SpinnerInline } from "../shared/Spinner";
 import { create_otp_transaction } from "src/api/utility";
 import { validate_otp } from "src/api";
 

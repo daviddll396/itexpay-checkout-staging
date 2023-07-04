@@ -48,7 +48,7 @@ const ThreeDS = ({
     if (cardType && typeof cardType === "string") {
       getCardType(cardType);
     }
-  }, []);
+  }, [cardType]);
 
   return (
     <div>
