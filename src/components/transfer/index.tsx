@@ -50,7 +50,10 @@ const BankTransfer = () => {
   const runInterval = () => {
     statusCheck = setInterval(async () => {
       try {
-        await runTransaction();
+        const response:any = await runTransaction();
+        if (response?.code !== "00") {
+          clearInterval(statusCheck);
+        }
       } catch {
         clearInterval(statusCheck);
       }
