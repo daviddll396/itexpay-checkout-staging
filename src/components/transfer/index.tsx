@@ -39,7 +39,6 @@ const BankTransfer = () => {
   const [accountName, setAccountName] = useState("");
   const [bank, setBank] = useState("");
   const [time, setTime] = useState<number[]>([0, 0]);
-  // let paymentMade = useRef(false);
 
   let statusCheck: any;
   let timer = useRef<any>(null);
@@ -124,7 +123,6 @@ const BankTransfer = () => {
       phone,
       paymentid
     );
-    // console.log({ data });
 
     let request = encrypt_data(JSON.stringify(data), encryptpublickey);
     setIsLoading(true);

@@ -9,7 +9,7 @@ import {
 } from "../../utils";
 import PIN from "../pin";
 import ThreeDS from "../3ds";
-import { useAppDispatch,useAppSelector } from "src/redux/hooks";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
 import { encrypt_data } from "src/api/utility";
 import { charge_options } from "src/api";
 import { create_card_transaction } from "src/api/utility";
@@ -19,26 +19,22 @@ import useCustomFunctions from "../../hooks/useCustomFunctions";
 import {
   hide_error,
   setProcessing,
+  setThreeDSModal,
   setTransactionErrorMessage,
   show_error,
 } from "src/redux/PaymentReducer";
-import  { SpinnerInline } from "../shared/Spinner";
+import { SpinnerInline } from "../shared/Spinner";
 import { create_otp_transaction } from "src/api/utility";
 import { validate_otp } from "src/api";
+import ThreeDSModal from "./3ds-modal";
 
 const CardPayment = () => {
-  const transaction_data =  useAppSelector(
-    (state ) => state.payment.userPayload
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
+  const customer = useAppSelector(
+    (state) => state.payment.userPayload?.source?.customer
   );
-  const customer =  useAppSelector(
-    (state ) => state.payment.userPayload?.source?.customer
-  );
-  const references =  useAppSelector(
-    (state ) => state.payment.references
-  );
-  const customColor =  useAppSelector(
-    (state ) => state.payment.customColor
-  );
+  const references = useAppSelector((state) => state.payment.references);
+  const customColor = useAppSelector((state) => state.payment.customColor);
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );
@@ -150,6 +146,7 @@ const CardPayment = () => {
 
       return;
     }
+    // handleRedirect();
     onVerifyCardDetails();
   };
   const onVerifyCardDetails = () => {
@@ -205,7 +202,7 @@ const CardPayment = () => {
         setLoading(false);
         dispatch(setProcessing(false));
         setLoading(false);
-      })
+      });
   };
   const main_charge_card = () => {
     setLoading(true);
@@ -331,8 +328,9 @@ const CardPayment = () => {
       activity: "3DS redirect initialized",
     });
     setStage("processing");
+    dispatch(setThreeDSModal(true));
     // start polling
-    openUrl(server.redirecturl);
+    // openUrl(server.redirecturl);
     runInterval();
   };
   // start card otp verification
@@ -408,114 +406,117 @@ const CardPayment = () => {
   }, [cardImg]);
 
   return (
-    <div className="relative">
-      {( stage === "processing") && (
-        <div className="flex justify-center">
-        <SpinnerInline md withText text="Transaction processing...." />
-        </div>
-      )}
-      { stage === "card" && (
-        <div className="switch:px-5">
-          <h4 className="font-bold text-base text-title mb-6">
-            Enter Payment Details
-          </h4>
-          <div className="grid grid-cols-2 gap-5 ">
-            <div className="col-span-2">
-              <label className="label">Card Number</label>
-              <div className="relative z-[1]">
-                {cardImg && logo ? (
-                  <img src={cardLogoUrl || ""} alt=" " className="icon h-6" />
-                ) : (
-                  <CardEmptyIcon className="icon h-6" stroke="#B9B9B9" />
-                )}
-                <input
-                  className="input_icon w-full"
-                  placeholder="1234  5789  1234  5472"
-                  value={ccNumber}
-                  onChange={(e) => handleChange(e, "cc")}
-                />
+    <>
+      <div className="relative w-full">
+        {stage === "processing" && (
+          <div className="w-full flex justify-center">
+            <SpinnerInline md withText text="Transaction processing...." />
+          </div>
+        )}
+        {stage === "card" && (
+          <div className="switch:px-5">
+            <h4 className="font-bold text-base text-title mb-6">
+              Enter Payment Details
+            </h4>
+            <div className="grid grid-cols-2 gap-5 ">
+              <div className="col-span-2">
+                <label className="label">Card Number</label>
+                <div className="relative z-[1]">
+                  {cardImg && logo ? (
+                    <img src={cardLogoUrl || ""} alt=" " className="icon h-6" />
+                  ) : (
+                    <CardEmptyIcon className="icon h-6" stroke="#B9B9B9" />
+                  )}
+                  <input
+                    className="input_icon w-full"
+                    placeholder="1234  5789  1234  5472"
+                    value={ccNumber}
+                    onChange={(e) => handleChange(e, "cc")}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="col-span-1">
-              <label className="label">Expiry Date</label>
-              <div className="relative z-[1]">
-                <ExpiryIcon
-                  className="icon h-6"
-                  stroke={expiry === "" ? "#B9B9B9" : " #041926"}
-                  strokeWidth={0.7}
-                />
-                <input
-                  className="input_icon w-full"
-                  placeholder="12/24"
-                  value={expiry}
-                  onChange={(e) => {
-                    handleChange(e, "expiry");
+              <div className="col-span-1">
+                <label className="label">Expiry Date</label>
+                <div className="relative z-[1]">
+                  <ExpiryIcon
+                    className="icon h-6"
+                    stroke={expiry === "" ? "#B9B9B9" : " #041926"}
+                    strokeWidth={0.7}
+                  />
+                  <input
+                    className="input_icon w-full"
+                    placeholder="12/24"
+                    value={expiry}
+                    onChange={(e) => {
+                      handleChange(e, "expiry");
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-span-1">
+                <label className="label">CVV</label>
+                <div className="relative z-[1]">
+                  <CVVIcon
+                    className="icon h-6"
+                    stroke={cvv !== "" ? "#041926" : "#B9B9B9"}
+                    strokeWidth={0.7}
+                  />
+                  <input
+                    className="input_icon w-full"
+                    placeholder="123"
+                    value={cvv}
+                    onChange={(e) => {
+                      handleChange(e, "cvv");
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-span-2 my-8">
+                <button
+                  className="button w-full"
+                  onClick={handleCardDetails}
+                  style={{
+                    backgroundColor: button_color
+                      ? button_color.value
+                      : "#27AE60",
                   }}
-                />
+                  disabled={loading}
+                >
+                  {loading ? <SpinnerInline white /> : " Continue"}
+                </button>
               </div>
-            </div>
-            <div className="col-span-1">
-              <label className="label">CVV</label>
-              <div className="relative z-[1]">
-                <CVVIcon
-                  className="icon h-6"
-                  stroke={cvv !== "" ? "#041926" : "#B9B9B9"}
-                  strokeWidth={0.7}
-                />
-                <input
-                  className="input_icon w-full"
-                  placeholder="123"
-                  value={cvv}
-                  onChange={(e) => {
-                    handleChange(e, "cvv");
-                  }}
-                />
-              </div>
-            </div>
-            <div className="col-span-2 my-8">
-              <button
-                className="button w-full"
-                onClick={handleCardDetails}
-                style={{
-                  backgroundColor: button_color
-                    ? button_color.value
-                    : "#27AE60",
-                }}
-                disabled={loading}
-              >
-                {loading ? <SpinnerInline white /> : " Continue"}
-              </button>
             </div>
           </div>
-        </div>
-      )}
-      { stage === "pin" && (
-        <PIN
-          pin={pin}
-          setPin={setPin}
-          onContinue={main_charge_card}
-          message="Enter your 4-digit card PIN to complete this transaction"
-          loading={loading}
-        />
-      )}
-      { stage === "otp" && (
-        <OTP
-          message={server.message}
-          value={otp}
-          setValue={setOtp}
-          onVerifyOTP={start_card_otp_verification}
-          buttonText="Pay Now"
-          loading={loading}
-        />
-      )}
-      { stage === "3ds" && (
-        <ThreeDS
-          onRedirect={handleRedirect}
-          cardType={server.card_type}
-          bank={server.bank}
-        />
-      )}
-    </div>
+        )}
+        {stage === "pin" && (
+          <PIN
+            pin={pin}
+            setPin={setPin}
+            onContinue={main_charge_card}
+            message="Enter your 4-digit card PIN to complete this transaction"
+            loading={loading}
+          />
+        )}
+        {stage === "otp" && (
+          <OTP
+            message={server.message}
+            value={otp}
+            setValue={setOtp}
+            onVerifyOTP={start_card_otp_verification}
+            buttonText="Pay Now"
+            loading={loading}
+          />
+        )}
+        {stage === "3ds" && (
+          <ThreeDS
+            onRedirect={handleRedirect}
+            cardType={server.card_type}
+            bank={server.bank}
+          />
+        )}
+      </div>
+      <ThreeDSModal src={server.redirecturl} />
+    </>
   );
 };
 

@@ -12,6 +12,7 @@ export interface InitialState {
     message: string;
   };
   show: boolean;
+  threeDsModal: boolean;
   transactionErrorMessage: { message: string } | null;
 }
 
@@ -30,6 +31,7 @@ const initialState: InitialState = {
     { name: "button_color", value: "#27AE60" },
   ],
   show: true,
+  threeDsModal: false,
   transactionErrorMessage: null,
 };
 
@@ -88,6 +90,10 @@ export const paymentSlice = createSlice({
       }
       // state.show = false;
     },
+    setThreeDSModal(state, { payload }) {
+      state.threeDsModal = payload as boolean;
+    },
+
     update_custom(state, { payload }) {
       state.customColor = [...payload];
     },
@@ -101,6 +107,7 @@ export const {
   setPaymentCompleted,
   setProcessing,
   setTransactionErrorMessage,
+  setThreeDSModal,
   show_error,
   hide_error,
   close_modal,
