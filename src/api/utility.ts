@@ -512,12 +512,12 @@ export function create_enaira_transaction(
           fingerprint: fingerprint,
           ip: "127.0.0.1",
         },
-      },
-      enaira: {
-        wallettype: wallettype,
-        wallet: wallet,
-        authtype: authtype,
-        authdata: authdata,
+        enaira: {
+          wallettype: wallettype,
+          wallet: wallet,
+          authtype: authtype,
+          authdata: authdata,
+        },
       },
     },
   };
@@ -565,9 +565,9 @@ export function create_payattitude_transaction(
           fingerprint: fingerprint,
           ip: "127.0.0.1",
         },
-      },
-      payattitude: {
-        phonenumber: phonenumber,
+        payattitude: {
+          phonenumber: phonenumber,
+        },
       },
     },
   };
