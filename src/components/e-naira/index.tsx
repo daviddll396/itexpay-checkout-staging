@@ -250,6 +250,7 @@ const ENaira = () => {
         authdata
       );
       if (data === null || data === undefined) return;
+      // console.log({data})
 
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 

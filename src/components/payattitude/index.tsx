@@ -94,6 +94,7 @@ const PayAttitude = () => {
         phoneNumber
       );
       if (data === null || data === undefined) return;
+      console.log({data})
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 
       charge(transaction_data.paymentid, publickey, request)
