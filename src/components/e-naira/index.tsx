@@ -1,8 +1,12 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition, RadioGroup } from "@headlessui/react";
 import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
-import { useAppDispatch,useAppSelector } from "src/redux/hooks";
-import { setProcessing, setTransactionErrorMessage, show_error } from "src/redux/PaymentReducer";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
+import {
+  setProcessing,
+  setTransactionErrorMessage,
+  show_error,
+} from "src/redux/PaymentReducer";
 import { create_enaira_transaction, encrypt_data } from "src/api/utility";
 import { charge } from "src/api";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
@@ -14,7 +18,7 @@ import {
   validateNuban,
   validatePhone,
 } from "src/utils";
-import  { SpinnerInline } from "../shared/Spinner";
+import { SpinnerInline } from "../shared/Spinner";
 
 const ENaira = () => {
   const options = [
@@ -47,18 +51,12 @@ const ENaira = () => {
       description: "Generate your token from the e-naira app.",
     },
   ];
-  const transaction_data =   useAppSelector(
-    (state ) => state.payment.userPayload
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
+  const customer = useAppSelector(
+    (state) => state.payment.userPayload?.source?.customer
   );
-  const customer =   useAppSelector(
-    (state ) => state.payment.userPayload?.source?.customer
-  );
-  const references =   useAppSelector(
-    (state ) => state.payment.references
-  );
-  const customColor =   useAppSelector(
-    (state ) => state.payment.customColor
-  );
+  const references = useAppSelector((state) => state.payment.references);
+  const customColor = useAppSelector((state) => state.payment.customColor);
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
   );
@@ -160,12 +158,12 @@ const ENaira = () => {
     }
     if (ref === "pin") {
       setStage("pin");
-      dispatch(setProcessing(true))
+      dispatch(setProcessing(true));
       return;
     }
     if (ref === "token") {
       setStage("token");
-      dispatch(setProcessing(true))
+      dispatch(setProcessing(true));
       return;
     }
     dispatch(
@@ -180,7 +178,7 @@ const ENaira = () => {
   };
   const handleGoBack = () => {
     setStage("enaira");
-    dispatch(setProcessing(false))
+    dispatch(setProcessing(false));
     setPin({
       one: "",
       two: "",
@@ -250,21 +248,21 @@ const ENaira = () => {
         authdata
       );
       if (data === null || data === undefined) return;
-      console.log({data})
+      console.log({ data });
 
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
+          if (response.code === "00") {
+            runTransaction();
+            return;
+          }
           if (response.code === "09") {
             runInterval();
             return;
           }
-          // dispatch(
-          //   show_error({
-          //     message: response?.data?.message || response?.message,
-          //   })
-          // );
+
           dispatch(
             setTransactionErrorMessage({
               message: response?.data?.message || response?.message,

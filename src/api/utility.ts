@@ -398,7 +398,7 @@ export function create_bank_transfer_transaction(
       txref: mref,
       callbackurl: callbackurl,
       authoption: "BANK_TRANSFER",
-      paymentmethod: "bank_transfer",
+      paymentmethod: "account",
     },
     order: {
       amount: amt,
