@@ -40,7 +40,7 @@ const CardPayment = () => {
   );
   // const processing =  useAppSelector((state ) => state.payment.inProcess);
   const dispatch = useAppDispatch();
-  const { sendEvent, runTransaction, openUrl, success } = useCustomFunctions();
+  const { sendEvent, runTransaction, success } = useCustomFunctions();
   const [ccNumber, setCcNumber] = useState("");
   const [cvv, setCvv] = useState("");
   const [expiry, setExpiry] = useState("");
