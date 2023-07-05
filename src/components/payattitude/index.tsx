@@ -94,22 +94,17 @@ const PayAttitude = () => {
         phoneNumber
       );
       if (data === null || data === undefined) return;
-      console.log({data})
+      // console.log({data})
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
-          console.log({ response });
+          // console.log({ response });
           if (response.code === "09") {
             setShowCode(true);
             setLoading(false);
             return;
           }
-          // dispatch(
-          //   show_error({
-          //     message: response?.data?.message || response?.message,
-          //   })
-          // );
 
           dispatch(
             setTransactionErrorMessage({
