@@ -551,7 +551,7 @@ export function create_payattitude_transaction(
     },
     order: {
       amount: amt,
-      description: "Enaira payment",
+      description: `Pay with phone from ${phonenumber}`,
       currency: currency,
       country: country,
     },
@@ -572,7 +572,6 @@ export function create_payattitude_transaction(
     },
   };
 }
-
 function generate_references(prefix: string, length: number) {
   var result = "";
   var characters =

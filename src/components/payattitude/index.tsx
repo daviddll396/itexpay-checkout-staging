@@ -93,6 +93,7 @@ const PayAttitude = () => {
         paymentid,
         phoneNumber
       );
+      // console.log({data})
       if (data === null || data === undefined) return;
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 

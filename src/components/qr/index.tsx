@@ -94,7 +94,7 @@ const QRPayment = () => {
           setQrCode(response.transaction.redirecturl);
           setQrCodeAvailable(true);
           setIsLoading(false);
-          runInterval();
+          // runInterval();
           return;
         }
         dispatch(setTransactionErrorMessage({ message: response.message }));
