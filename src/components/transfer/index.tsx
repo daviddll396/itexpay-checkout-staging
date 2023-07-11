@@ -31,7 +31,7 @@ const BankTransfer = () => {
     (item: any) => item.name === "button_color"
   );
   const { runTransaction } = useCustomFunctions();
-  const [value, copy] = useCopyToClipboard();
+  const [ , copy] = useCopyToClipboard();
   const [isLoading, setIsLoading] = useState(true);
   const [paymentMade, setPaymentMade] = useState(false);
   const [bankAccountAvailable, setBankAccountAvailable] = useState(false);
@@ -50,7 +50,7 @@ const BankTransfer = () => {
   const runInterval = () => {
     statusCheck = setInterval(async () => {
       try {
-        const response:any = await runTransaction();
+        const response: any = await runTransaction();
         if (response?.code !== "00") {
           clearInterval(statusCheck);
         }
@@ -220,7 +220,7 @@ const BankTransfer = () => {
                   className="text-theme cursor-pointer"
                   onClick={() => {
                     copy(accountNumber);
-                    console.log(value);
+                    // console.log(value);
                   }}
                 />
               </div>

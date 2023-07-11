@@ -44,7 +44,10 @@ const QRPayment = () => {
   const runInterval = () => {
     statusCheck = setInterval(async () => {
       try {
-        await runTransaction();
+        const response: any = await runTransaction();
+        if (response?.code !== "00") {
+          clearInterval(statusCheck);
+        }
       } catch {
         clearInterval(statusCheck);
       }
@@ -155,18 +158,15 @@ const QRPayment = () => {
 
           <div className=" my-5">
             <button
-              className={`button w-full `}
+              className="button-outline w-full"
               onClick={onHandlePayment}
               style={{
-                backgroundColor: button_color ? button_color.value : "#27AE60",
+                borderColor: button_color ? button_color.value : "#27AE60",
+                color: button_color ? button_color.value : "#27AE60",
               }}
               disabled={paymentMade}
             >
-              {paymentMade ? (
-                <SpinnerInline white />
-              ) : (
-                " I have made this payment"
-              )}
+              {paymentMade ? <SpinnerInline /> : " I have made this payment"}
             </button>
           </div>
         </div>
