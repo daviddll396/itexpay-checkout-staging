@@ -126,6 +126,7 @@ const QRPayment = () => {
   useEffect(() => {
     setIsLoading(true);
     dispatch(hide_error());
+    console.log(qrResponse?.paymentid ,"here1")
     if (
       qrResponse.paymentid &&
       qrResponse.paymentid === transaction_data.paymentid
@@ -144,7 +145,7 @@ const QRPayment = () => {
     } else {
       get_qr_code();
     }
-    get_qr_code();
+    // get_qr_code();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

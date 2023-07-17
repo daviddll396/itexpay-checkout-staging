@@ -31,7 +31,7 @@ const BankTransfer = () => {
     (item: any) => item.name === "button_color"
   );
   const { runTransaction } = useCustomFunctions();
-  const [ , copy] = useCopyToClipboard();
+  const [, copy] = useCopyToClipboard();
   const [isLoading, setIsLoading] = useState(true);
   const [paymentMade, setPaymentMade] = useState(false);
   const [bankAccountAvailable, setBankAccountAvailable] = useState(false);
@@ -136,6 +136,7 @@ const BankTransfer = () => {
             response,
           })
         );
+        console.log("called dispatch");
         if (response.code && response.code === "09") {
           setBankAccountAvailable(true);
           setAccountNumber(
@@ -154,7 +155,6 @@ const BankTransfer = () => {
             message: response?.data?.message || response?.message,
           })
         );
-        // dispatch(show_error({ message: response.message }));
       })
       .catch((error) => {
         // console.log({error})
@@ -164,6 +164,7 @@ const BankTransfer = () => {
       });
   };
   useEffect(() => {
+    console.log(bankTransferResponse?.paymentid, "here2");
     if (
       bankTransferResponse.paymentid &&
       bankTransferResponse.paymentid === transaction_data.paymentid
@@ -175,9 +176,10 @@ const BankTransfer = () => {
         setAccountNumber(
           response.source.customer.account.recipientaccountnumber
         );
+        setAccountName(response.source.customer.account.recipientname);
         setBank(response.source.customer.account.bank);
         setIsLoading(false);
-        runInterval();
+        // runInterval();
         return;
       }
       setIsLoading(false);
@@ -261,14 +263,20 @@ const BankTransfer = () => {
                 className="button w-full"
                 onClick={onHandlePayment}
                 style={{
-                  backgroundColor: button_color ? button_color.value : "#27AE60",
+                  backgroundColor: button_color
+                    ? button_color.value
+                    : "#27AE60",
 
                   // borderColor: button_color ? button_color.value : "#27AE60",
                   // color: button_color ? button_color.value : "#27AE60",
                 }}
                 disabled={paymentMade}
               >
-                {paymentMade ? <SpinnerInline white /> : " I have made this payment"}
+                {paymentMade ? (
+                  <SpinnerInline white />
+                ) : (
+                  " I have made this payment"
+                )}
               </button>
             </div>
           </div>

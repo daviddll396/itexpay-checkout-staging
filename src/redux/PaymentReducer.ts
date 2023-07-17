@@ -49,13 +49,13 @@ export const paymentSlice = createSlice({
     },
     setBankTransferResponse(state, { payload }) {
       state.bankTransferResponse = {
-        // paymentid: payload.paymentid,
+        paymentid: payload.paymentid,
         response: payload.response,
       };
     },
     setQRResponse(state, { payload }) {
       state.qrResponse = {
-        // paymentid: payload.paymentid,
+        paymentid: payload.paymentid,
         response: payload.response,
       };
     },
