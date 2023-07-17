@@ -68,10 +68,10 @@ const ThreeDS = ({
       <div className=" my-6">
         <button
           onClick={handlePay}
-          className="button-outline w-full text-3xl"
+          className="button w-full text-3xl"
           style={{
-            borderColor: button_color ? button_color.value : "#27AE60",
-            color: button_color ? button_color.value : "#27AE60",
+            backgroundColor: button_color ? button_color.value : "#27AE60",
+            // color: button_color ? button_color.value : "#27AE60",
           }}
         >
           Continue

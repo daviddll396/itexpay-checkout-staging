@@ -158,15 +158,17 @@ const QRPayment = () => {
 
           <div className=" my-5">
             <button
-              className="button-outline w-full"
+              className="button w-full"
               onClick={onHandlePayment}
               style={{
-                borderColor: button_color ? button_color.value : "#27AE60",
-                color: button_color ? button_color.value : "#27AE60",
+                backgroundColor: button_color ? button_color.value : "#27AE60",
+
+                // borderColor: button_color ? button_color.value : "#27AE60",
+                // color: button_color ? button_color.value : "#27AE60",
               }}
               disabled={paymentMade}
             >
-              {paymentMade ? <SpinnerInline /> : " I have made this payment"}
+              {paymentMade ? <SpinnerInline  white/> : " I have made this payment"}
             </button>
           </div>
         </div>
