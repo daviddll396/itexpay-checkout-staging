@@ -97,7 +97,7 @@ const Sidebar = (props: {
           </h3>
         </div>
 
-        <div className="pl-3">
+        <div className="pl-3 max-h-[350px]  h-full overflow-y-auto">
           <p className="text-white/60 font-semibold text-sm mb-3 ml-2">
             Make payment with:
           </p>
