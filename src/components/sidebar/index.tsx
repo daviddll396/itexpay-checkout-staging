@@ -10,6 +10,7 @@ const Sidebar = (props: {
   changePaymentOption: React.Dispatch<React.SetStateAction<any>>;
   setSelectState: React.Dispatch<React.SetStateAction<boolean>>;
   active: any;
+  onClose: any;
 }) => {
   const {
     active,
@@ -17,6 +18,7 @@ const Sidebar = (props: {
     changePaymentOption,
     selectState,
     setSelectState,
+    onClose,
   } = props;
   const transaction_data = useAppSelector((state) => state.payment.userPayload);
   const processing = useAppSelector((state) => state.payment.inProcess);
@@ -51,7 +53,7 @@ const Sidebar = (props: {
                 {transaction_data?.tradingname}
               </h3>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center" onClick={onClose && onClose}>
               <Cancel className="w-5 h-5" />
               <span className="ml-1 text-xs">Close</span>
             </div>

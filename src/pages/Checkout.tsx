@@ -297,7 +297,7 @@ const Checkout = () => {
                   {selectState ? (
                     <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
                   ) : null}
-                  <div className="relative w-full max-w-[680px] switch:max-h-[580px]  mx-auto  switch:rounded-theme bg-white switch:shadow-custom_shadow switch:p-10 ">
+                  <div className="relative w-full max-w-[680px] switch:max-h-[580px]  mx-auto  switch:rounded-theme bg-transparent switch:shadow-custom_shadow ">
                     <img
                       src={CloseIcon}
                       alt="close"
@@ -310,9 +310,10 @@ const Checkout = () => {
                       changePaymentOption={setSelectedOption}
                       selectState={selectState}
                       setSelectState={setSelectState}
+                      onClose={onCloseFrame}
                     />
 
-                    <div className="p-4 switch:ml-[32%]  switch:pl-5 ">
+                    <div className="p-4 switch:ml-[32%]  switch:pl-16 switch:py-10 switch:pr-10 bg-white switch:rounded-r-theme">
                       <div className=" mt-2 mb-4 pb-2 border-b border-b-[#B9B9B9] flex items-center justify-between">
                         <div className="max-w-[200px]">
                           <img src={activeImgUrl} alt="" className="w-36" />
