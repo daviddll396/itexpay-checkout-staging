@@ -126,7 +126,6 @@ const BankTransfer = () => {
       phone,
       paymentid
     );
-
     let request = encrypt_data(JSON.stringify(data), encryptpublickey);
     setIsLoading(true);
     initiate_charge(transaction_data.paymentid, publickey, request)

@@ -3,6 +3,7 @@ import useCustomFunctions from "src/hooks/useCustomFunctions";
 import {
   hide_error,
   setProcessing,
+  setQRResponse,
   setTransactionErrorMessage,
   show_error,
 } from "src/redux/PaymentReducer";
@@ -19,6 +20,7 @@ const QRPayment = () => {
   const customer = useAppSelector(
     (state) => state.payment.userPayload?.source?.customer
   );
+  const qrResponse = useAppSelector((state) => state.payment.qrResponse);
   const customColor = useAppSelector((state) => state.payment.customColor);
   const button_color = customColor.find(
     (item: any) => item.name === "button_color"
@@ -93,6 +95,12 @@ const QRPayment = () => {
     let request = encrypt_data(JSON.stringify(data), encryptpublickey);
     initiate_charge(transaction_data.paymentid, publickey, request)
       .then((response: any) => {
+        dispatch(
+          setQRResponse({
+            paymentid: transaction_data.paymentid,
+            response,
+          })
+        );
         if (response.code === "09") {
           setQrCode(response.transaction.redirecturl);
           setQrCodeAvailable(true);
@@ -118,6 +126,24 @@ const QRPayment = () => {
   useEffect(() => {
     setIsLoading(true);
     dispatch(hide_error());
+    if (
+      qrResponse.paymentid &&
+      qrResponse.paymentid === transaction_data.paymentid
+    ) {
+      const { response } = qrResponse;
+
+      if (response && response.code === "09") {
+        setQrCode(response.transaction.redirecturl);
+        setQrCodeAvailable(true);
+        setIsLoading(false);
+        return;
+      }
+      dispatch(setTransactionErrorMessage({ message: response.message }));
+      setQrCodeAvailable(false);
+      setIsLoading(false);
+    } else {
+      get_qr_code();
+    }
     get_qr_code();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,7 +194,11 @@ const QRPayment = () => {
               }}
               disabled={paymentMade}
             >
-              {paymentMade ? <SpinnerInline  white/> : " I have made this payment"}
+              {paymentMade ? (
+                <SpinnerInline white />
+              ) : (
+                " I have made this payment"
+              )}
             </button>
           </div>
         </div>

@@ -4,6 +4,7 @@ export interface InitialState {
   userPayload: any;
   references: any;
   bankTransferResponse: any;
+  qrResponse:any;
   payment: any;
   inProcess: boolean;
   customColor: any;
@@ -20,6 +21,7 @@ const initialState: InitialState = {
   userPayload: {},
   references: {},
   bankTransferResponse: {},
+  qrResponse:{},
   payment: {},
   inProcess: false,
   error: {
@@ -47,7 +49,13 @@ export const paymentSlice = createSlice({
     },
     setBankTransferResponse(state, { payload }) {
       state.bankTransferResponse = {
-        paymentid: payload.paymentid,
+        // paymentid: payload.paymentid,
+        response: payload.response,
+      };
+    },
+    setQRResponse(state, { payload }) {
+      state.qrResponse = {
+        // paymentid: payload.paymentid,
         response: payload.response,
       };
     },
@@ -104,6 +112,7 @@ export const {
   setTransactionResponse,
   setReferences,
   setBankTransferResponse,
+  setQRResponse,
   setPaymentCompleted,
   setProcessing,
   setTransactionErrorMessage,
