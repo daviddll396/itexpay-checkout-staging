@@ -164,7 +164,6 @@ const BankTransfer = () => {
       });
   };
   useEffect(() => {
-    console.log(bankTransferResponse?.paymentid, "here2");
     if (
       bankTransferResponse.paymentid &&
       bankTransferResponse.paymentid === transaction_data.paymentid
