@@ -7,6 +7,7 @@ module.exports = {
       boxShadow: {
         custom_shadow: "0px 4px 40px rgba(0, 0, 0, 0.12)",
         custom_shadow_two:"5px 7px 0px 2px rgba(230,237,224,0.47)",
+        custom_shadow_three: "0px 1px 12px rgba(0, 0, 0, 0.12)",
         bank_shadow: "0px 0px 8px rgba(0, 0, 0, 0.1)",
       },
       colors: {

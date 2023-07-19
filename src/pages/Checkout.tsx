@@ -5,47 +5,47 @@ import SecureFooter from "../components/shared/SecureFooter";
 import { paymentChannels } from "../data";
 import CardPayment from "../components/card/CardPayment";
 import QRPayment from "src/components/qr";
-import USSDPayment from "src/components/ussd";
+// import USSDPayment from "src/components/ussd";
 import BankTransfer from "src/components/transfer";
 import ChangePaymentDrawer from "../components/changePaymentDrawer";
 import ENaira from "src/components/e-naira";
 import { generate_reference } from "src/api/utility";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { get_payment_details } from "src/api";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppDispatch, useAppSelector } from "src/redux/hooks";
 import {
   close_modal,
   hide_error,
   setPaymentCompleted,
   setReferences,
   setTransactionResponse,
-  show_error,
+  // show_error,
+  update_custom,
 } from "src/redux/PaymentReducer";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import Spinner from "src/components/shared/Spinner";
 import Success from "src/components/shared/Success";
 import Invalid from "src/components/shared/Invalid";
 import Toast from "src/components/shared/Toast";
+import PayAttitude from "src/components/payattitude";
 
 const Checkout = () => {
-  const dispatch = useDispatch();
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
+  const dispatch = useAppDispatch();
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
+
+  const show = useAppSelector((state) => state.payment.show);
+  const payment = useAppSelector((state) => state.payment.payment);
+  const transactionError = useAppSelector(
+    (state) => state.payment.transactionErrorMessage
   );
-  // const processing = useSelector(
-  //   (state: RootState) => state.payment.inProcess
-  // );
-  const show = useSelector((state: RootState) => state.payment.show);
-  const payment = useSelector((state: RootState) => state.payment.payment);
   const { sendEvent } = useCustomFunctions();
   const [active, setActive] = useState(paymentChannels[0]);
+  const [activeImgUrl, setActiveImgUrl] = useState("");
   const [selectState, setSelectState] = useState(false);
   const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   const [invalidPaymentId, setInvalidPaymentId] = useState(false);
   const [invalidRedirectUrl, setInvalidRedirectUrl] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
-  // const [fee, setFee] = useState("0");
   const [messageFrom3ds, setMessageFrom3ds] = useState<string | null>("");
   const [customErrorMessage, setCustomErrorMessage] = useState<string | null>(
     ""
@@ -53,16 +53,15 @@ const Checkout = () => {
   const [paymentAlreadyMade, setPaymentAlreadyMade] = useState<boolean>(false);
   const [isTestEnv, setIsTestEnv] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [params, setParams] = useState<any>(null);
 
-  // updates state
-  // const handleStateChange = (name: any, value: any) => {
-  //   // //console.log('here')
-  //   // setState({
-  //   //   ...state,
-  //   //   [name]: value,
-  //   // });
-  // };
+  useEffect(() => {
+    if (transactionError) {
+      setCustomErrorMessage(transactionError.message);
+    }
+  }, [transactionError]);
+
   // toggles loading state to true/false
   const toggleLoading = (value: boolean) => {
     setIsLoading(value);
@@ -93,18 +92,31 @@ const Checkout = () => {
           toggleLoading(false);
           return;
         }
-        dispatch(setTransactionResponse({ ...response.data, callbackurl: "" }));
+        dispatch(
+          setTransactionResponse({
+            ...response.data,
+            callbackurl: "",
+          })
+        );
         dispatch(
           setPaymentCompleted({
             paymentid: response.data.paymentid,
             paycompleted: null,
           })
         );
+        if (
+          Array.isArray(response.data?.custom) &&
+          response.data?.custom.length > 0
+        ) {
+          dispatch(update_custom(response.data.custom));
+        }
+
         if (response.data.paymentmethods.length < 1) {
           setCustomErrorMessage("Payment not allowed.");
           return;
         }
         setSelectedOption("card");
+        setActive(transaction_data?.paymentmethods[0]);
         dispatch(hide_error());
         toggleLoading(false);
       })
@@ -120,7 +132,6 @@ const Checkout = () => {
         toggleLoading(false);
         // sets any  error that comes up and shows error screen
         setCustomErrorMessage(errMsg);
-        // dispatch(show_error({ message: `${errMsg}` }));
       });
   };
   // page init
@@ -165,44 +176,49 @@ const Checkout = () => {
   };
   // get url to go back to merchant site
   const goToMerchantSite = () => {
+    dispatch(close_modal());
     // const { pathname } = new URL(window.location.href);
-    const paymentID = params.get("paymentid");
-    // const paymentID = pathname.split("/")[1];
-    // show success page and redirect to merchant
-    get_payment_details(paymentID)
-      .then((response: any) => {
-        const { redirecturl } = response.data;
-        // show success page and redirect to merchant
-        if (redirecturl) {
-          window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
-        } else {
-          setTimeout(() => {
-            let url =
-              window.location !== window.parent.location
-                ? document.referrer
-                : document.location.href;
-            window.parent.postMessage(
-              { name: "vbvcomplete", response: response },
-              url
-            );
-            dispatch(close_modal());
-          }, 1000);
-        }
-      })
-      .catch((error) => {
-        console.log({
-          errMsg:
-            error?.response?.data?.message ||
-            error?.response?.data?.status ||
-            error?.message,
-        });
-        dispatch(close_modal());
-      });
+    // const paymentID = params.get("paymentid");
+    // // const paymentID = pathname.split("/")[1];
+    // // show success page and redirect to merchant
+    // get_payment_details(paymentID)
+    //   .then((response: any) => {
+    //     const { redirecturl } = response.data;
+    //     // show success page and redirect to merchant
+    //     if (redirecturl) {
+    //       window.open(`${redirecturl}?paymentid=${paymentID}`, "_top");
+    //     } else {
+    //       setTimeout(() => {
+    //         let url =
+    //           window.location !== window.parent.location
+    //             ? document.referrer
+    //             : document.location.href;
+    //         window.parent.postMessage(
+    //           { name: "vbvcomplete", response: response },
+    //           url
+    //         );
+    //         dispatch(close_modal());
+    //       }, 1000);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log({
+    //       errMsg:
+    //         error?.response?.data?.message ||
+    //         error?.response?.data?.status ||
+    //         error?.message,
+    //     });
+    //     dispatch(close_modal());
+    //   });
   };
   // close frame
   const onCloseFrame = () => {
     dispatch(close_modal());
   };
+
+  useEffect(() => {
+    setActiveImgUrl(`cards/${selectedOption}.png`);
+  }, [selectedOption]);
   // watches value of public key and logs event when it is is available
   useEffect(() => {
     if (!transaction_data.publickey) {
@@ -220,11 +236,12 @@ const Checkout = () => {
       setPaymentSuccessful(true);
     } else {
       payment?.message &&
-        dispatch(
-          show_error({
-            message: `${payment?.message}. Please, try another payment method`,
-          })
-        );
+        // dispatch(
+        //   show_error({
+        //     message: `${payment?.message}. Please, try another payment method`,
+        //   })
+        // );
+        setCustomErrorMessage(payment?.message);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payment?.paycompleted]);
@@ -237,9 +254,7 @@ const Checkout = () => {
 
   useEffect(() => {
     dispatch(hide_error());
-    setTimeout(() => {
-      onLoad();
-    }, 1000);
+    onLoad();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -247,15 +262,16 @@ const Checkout = () => {
     <>
       {show && (
         <div className="relative w-full  max-w-[680px] min-h-screen switch:h-[580px] switch:max-h-[580px] mx-auto bg-white switch:bg-transparent">
-          {/* <div className="switch:my-[8%] switch:p-4 "> */}
           <Toast />
           {isLoading && <Spinner lg={true} />}
-          {paymentSuccessful && <Success />}
-          {invalidPaymentId && <Invalid description="Invalid Payment ID" />}
+          {paymentSuccessful && <Success go={goToMerchantSite} />}
+          {invalidPaymentId && (
+            <Invalid description="Invalid Payment ID" go={goToMerchantSite} />
+          )}
           {invalidRedirectUrl && (
             <Invalid
               description="Redirect URL must be a fully qualified domain name!"
-              // go={goToMerchantSite}
+              go={goToMerchantSite}
             />
           )}
           {paymentAlreadyMade && (
@@ -264,7 +280,9 @@ const Checkout = () => {
               go={goToMerchantSite}
             />
           )}
-          {customErrorMessage && <Invalid description={customErrorMessage} />}
+          {customErrorMessage && (
+            <Invalid description={customErrorMessage} go={goToMerchantSite} />
+          )}
           {messageFrom3ds && (
             <Invalid description={messageFrom3ds} go={goToMerchantSite} />
           )}
@@ -279,7 +297,7 @@ const Checkout = () => {
                   {selectState ? (
                     <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-[3]"></div>
                   ) : null}
-                  <div className="relative w-full max-w-[680px] switch:h-[580px] switch:max-h-[580px]  mx-auto  switch:rounded-theme bg-white switch:shadow-custom_shadow switch:p-10 ">
+                  <div className="relative w-full max-w-[680px] switch:max-h-[580px]  mx-auto  switch:rounded-theme bg-white switch:shadow-custom_shadow switch:p-10 ">
                     <img
                       src={CloseIcon}
                       alt="close"
@@ -292,24 +310,31 @@ const Checkout = () => {
                       changePaymentOption={setSelectedOption}
                       selectState={selectState}
                       setSelectState={setSelectState}
+                      onClose={onCloseFrame}
                     />
 
                     <div className="p-4 switch:ml-[32%]  switch:pl-5 ">
-                      <div className="text-end mt-3 mb-4">
-                        <h2 className="font-extrabold text-lg sm:text-3xl text-title">
-                          {transaction_data?.currency}{" "}
-                          {transaction_data?.amount}
-                        </h2>
-                        <p className="text-text text-sm">
-                          {transaction_data?.source?.customer?.email}
-                        </p>
+                      <div className=" mt-2 mb-4 pb-2 border-b border-b-[#B9B9B9] flex items-center justify-between">
+                        <div className="max-w-[200px]">
+                          <img src={activeImgUrl} alt="" className="w-36" />
+                        </div>
+                        <div>
+                          <h2 className="font-extrabold text-lg sm:text-xl text-title">
+                            {transaction_data?.currency}{" "}
+                            {transaction_data?.amount}
+                          </h2>
+                          <p className="text-text text-xs switch:text-sm">
+                            {transaction_data?.source?.customer?.email}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-h-[350px] flex items-center justify-center">
+                      <div className="min-h-[300px] flex items-center ">
                         {selectedOption === "card" && <CardPayment />}
                         {selectedOption === "qr" && <QRPayment />}
-                        {selectedOption === "ussd" && <USSDPayment />}
+                        {/* {selectedOption === "ussd" && <USSDPayment />} */}
                         {selectedOption === "account" && <BankTransfer />}
                         {selectedOption === "enaira" && <ENaira />}
+                        {selectedOption === "phone" && <PayAttitude />}
                       </div>
                     </div>
                   </div>
@@ -336,7 +361,6 @@ const Checkout = () => {
               </>
             )}
         </div>
-        // </div>
       )}
     </>
   );

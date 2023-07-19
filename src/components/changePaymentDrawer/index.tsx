@@ -1,10 +1,8 @@
 import React from "react";
 import { paymentChannels } from "../../data";
-// import { ReactSVG } from "react-svg";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import CaretRight from "../../assets/icons/caret-right.svg";
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux";
+import { useAppSelector } from "src/redux/hooks";
 
 const ChangePaymentDrawer = (props: {
   setActive: React.Dispatch<React.SetStateAction<any>>;
@@ -16,9 +14,7 @@ const ChangePaymentDrawer = (props: {
   const drawerRef = useOutsideClick(() => {
     props.setSelectState(false);
   });
-  const transaction_data = useSelector(
-    (state: RootState) => state.payment.userPayload
-  );
+  const transaction_data = useAppSelector((state) => state.payment.userPayload);
 
   return (
     <div
@@ -32,7 +28,7 @@ const ChangePaymentDrawer = (props: {
           <ul className="grid grid-cols-1   divide-y divide-[#c9c8c5] text-[#89B4CF] w-full ">
             {transaction_data?.paymentmethods?.map((item: string) => {
               const paymentItem = paymentChannels.find(({ id }) => id === item);
-              
+
               if (paymentItem) {
                 return (
                   <li
@@ -49,8 +45,10 @@ const ChangePaymentDrawer = (props: {
                     }`}
                   >
                     <div className="flex items-center">
-                      <img src={paymentItem.icon} alt="" className="w-6 h-6" />
-                      <span className="ml-3">{paymentItem.name}</span>
+                      {/* <img src={paymentItem.icon} alt="" className="w-6 h-6" /> */}
+                      <span className="text-text/80 text-base font-semibold">
+                        {paymentItem.name}
+                      </span>
                     </div>
                     <img src={CaretRight} alt="" className="w-4" />
                   </li>

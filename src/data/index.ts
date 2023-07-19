@@ -10,11 +10,11 @@ export const paymentChannels = [
     id: "card",
     icon: Card,
   },
-  {
-    name: "USSD",
-    id: "ussd",
-    icon: USSDIcon,
-  },
+  // {
+  //   name: "USSD",
+  //   id: "ussd",
+  //   icon: USSDIcon,
+  // },
   {
     name: "Bank Transfer",
     id: "account",
@@ -29,6 +29,11 @@ export const paymentChannels = [
     name: "E-Naira",
     id: "enaira",
     icon: ENaira,
+  },
+  {
+    name: "Pay With Phone",
+    id: "phone",
+    icon: USSDIcon,
   },
   // {
   //   name: "Mobile Money",

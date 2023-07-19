@@ -1,0 +1,32 @@
+trigger:
+  branches:
+    include:
+      - staging
+
+jobs:
+  - job: DeployToS3
+    displayName: Deploy to AWS S3
+    pool:
+      vmImage: "ubuntu-latest"
+
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: "18.0.0"
+        displayName: "Install Node.js"
+
+      - script: |
+          yarn install
+          yarn build
+        displayName: "Build ITEX Pay checkout app"
+
+      - task: S3Upload@1
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/build"
+          Contents: "**"
+          TargetFolder: ""
+          awsCredentials: 'myAWSCredentials'
+          regionName: 'us-west-2'
+          bucketName: 'checkout.itexpay.com-staging-env'
+          globExpressions: '**'
+          filesAcl: 'private'

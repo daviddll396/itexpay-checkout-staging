@@ -466,7 +466,112 @@ export function create_qr_transaction(
     },
   };
 }
-
+export function create_enaira_transaction(
+  mref: any,
+  callbackurl: any,
+  redirecturl: any,
+  amt: any,
+  currency: any,
+  country: any,
+  fname: any,
+  lname: any,
+  email: any,
+  phone: any,
+  fingerprint: any,
+  modalref: any,
+  plref: any,
+  paymentid: any,
+  wallet: any,
+  wallettype: any,
+  authtype: any,
+  authdata: any
+) {
+  return {
+    transaction: {
+      modalreference: modalref,
+      paymentlinkreference: plref,
+      paymentid: paymentid,
+      txref: mref,
+      callbackurl: callbackurl,
+      redirecturl: redirecturl,
+      paymentmethod: "enaira",
+    },
+    order: {
+      amount: amt,
+      description: "Enaira payment",
+      currency: currency,
+      country: country,
+    },
+    source: {
+      customer: {
+        firstname: fname,
+        lastname: lname,
+        email: email,
+        msisdn: phone,
+        device: {
+          fingerprint: fingerprint,
+          ip: "127.0.0.1",
+        },
+        enaira: {
+          wallettype: wallettype,
+          wallet: wallet,
+          authtype: authtype,
+          authdata: authdata,
+        },
+      },
+    },
+  };
+}
+export function create_payattitude_transaction(
+  mref: any,
+  callbackurl: any,
+  redirecturl: any,
+  amt: any,
+  currency: any,
+  country: any,
+  fname: any,
+  lname: any,
+  email: any,
+  phone: any,
+  fingerprint: any,
+  modalref: any,
+  plref: any,
+  paymentid: any,
+  phonenumber: any
+) {
+  return {
+    transaction: {
+      modalreference: modalref,
+      paymentlinkreference: plref,
+      paymentid: paymentid,
+      txref: mref,
+      callbackurl: callbackurl,
+      redirecturl: redirecturl,
+      paymentmethod: "phone",
+    },
+    order: {
+      amount: amt,
+      description: `Pay with phone from ${phonenumber}`,
+      currency: currency,
+      country: country,
+    },
+    source: {
+      customer: {
+        firstname: fname,
+        lastname: lname,
+        email: email,
+        msisdn: phone,
+        device: {
+          fingerprint: fingerprint,
+          ip: "127.0.0.1",
+        },
+        payattitude: {
+          phonenumber: phonenumber,
+        },
+      },
+    },
+  };
+}
 function generate_references(prefix: string, length: number) {
   var result = "";
   var characters =

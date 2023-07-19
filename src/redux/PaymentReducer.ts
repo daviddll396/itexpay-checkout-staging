@@ -4,26 +4,37 @@ export interface InitialState {
   userPayload: any;
   references: any;
   bankTransferResponse: any;
+  qrResponse:any;
   payment: any;
   inProcess: boolean;
+  customColor: any;
   error: {
     show: boolean;
     message: string;
   };
   show: boolean;
+  threeDsModal: boolean;
+  transactionErrorMessage: { message: string } | null;
 }
 
 const initialState: InitialState = {
   userPayload: {},
   references: {},
   bankTransferResponse: {},
+  qrResponse:{},
   payment: {},
   inProcess: false,
   error: {
     show: false,
     message: "",
   },
+  customColor: [
+    { name: "sidebar_color", value: "#041926" },
+    { name: "button_color", value: "#27AE60" },
+  ],
   show: true,
+  threeDsModal: false,
+  transactionErrorMessage: null,
 };
 
 export const paymentSlice = createSlice({
@@ -42,6 +53,12 @@ export const paymentSlice = createSlice({
         response: payload.response,
       };
     },
+    setQRResponse(state, { payload }) {
+      state.qrResponse = {
+        paymentid: payload.paymentid,
+        response: payload.response,
+      };
+    },
     setPaymentCompleted(state, { payload }) {
       state.payment = {
         paymentid: payload.paymentid,
@@ -53,6 +70,9 @@ export const paymentSlice = createSlice({
     setProcessing(state, { payload }) {
       state.inProcess = payload;
     },
+    setTransactionErrorMessage(state, { payload }) {
+      state.transactionErrorMessage = payload;
+    },
     show_error(state, { payload }) {
       state.error = { show: true, message: payload.message };
     },
@@ -60,7 +80,30 @@ export const paymentSlice = createSlice({
       state.error = { show: false, message: "" };
     },
     close_modal(state) {
-      state.show = false;
+      let redirecturl = state.userPayload?.redirecturl || null;
+      if (redirecturl) {
+        window.open(`${redirecturl}`, "_top");
+      } else {
+        let url =
+          window.location !== window.parent.location
+            ? document.referrer
+            : document.location.href;
+        window.parent.postMessage({ name: "closeiframe" }, url);
+        window.parent.postMessage(
+          {
+            closeModal: true,
+          },
+          "*"
+        );
+      }
+      // state.show = false;
+    },
+    setThreeDSModal(state, { payload }) {
+      state.threeDsModal = payload as boolean;
+    },
+
+    update_custom(state, { payload }) {
+      state.customColor = [...payload];
     },
   },
 });
@@ -69,10 +112,14 @@ export const {
   setTransactionResponse,
   setReferences,
   setBankTransferResponse,
+  setQRResponse,
   setPaymentCompleted,
   setProcessing,
+  setTransactionErrorMessage,
+  setThreeDSModal,
   show_error,
   hide_error,
   close_modal,
+  update_custom,
 } = paymentSlice.actions;
 export default paymentSlice.reducer;
