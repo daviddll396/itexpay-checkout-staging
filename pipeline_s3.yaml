@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - staging
+      - master
 
 jobs:
   - job: DeployToS3
@@ -26,7 +26,7 @@ jobs:
           Contents: "**"
           TargetFolder: ""
           awsCredentials: 'myAWSCredentials'
-          regionName: 'us-west-2'
-          bucketName: 'checkout.itexpay.com-staging-env'
+          regionName: 'us-east-1'
+          bucketName: 'checkout.itexpay.com'
           globExpressions: '**'
           filesAcl: 'private'
