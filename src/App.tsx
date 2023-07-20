@@ -10,7 +10,7 @@ function App() {
     function (config) {
       const userip = localStorage.getItem("ip") || "";
       const { ip } = JSON.parse(userip) || null;
-      config.headers.IP = `${ip}`;
+      config.headers['Clientaddress'] = `${ip}`;
       // Do something before request is sent
       return config;
     },
