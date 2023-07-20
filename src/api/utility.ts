@@ -582,7 +582,6 @@ function generate_references(prefix: string, length: number) {
   }
   return prefix + "-" + result;
 }
-
 // export function card_type(number: any) {
 //   if (!luhnCheck(number)) {
 //     return "";
