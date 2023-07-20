@@ -252,6 +252,8 @@ const Checkout = () => {
     }
   }, [transaction_data?.paymentid]);
 
+
+
   useEffect(() => {
     dispatch(hide_error());
     onLoad();
