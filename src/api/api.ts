@@ -1,12 +1,17 @@
-export const api_endpoints = (paymentid:string) => {
+export const api_endpoints = (paymentid: string) => {
     let base_url = `${process.env.REACT_APP_API_ENDPOINT}/v1`;
     let payment_details_base_url = process.env.REACT_APP_API_ENDPOINT;
 
-    const isTest = paymentid?.split('_')[0] === "TEST" 
-    const isLiveUrl = window.location.href.includes("checkout.itexpay.com")
-    if (isTest || !isLiveUrl) {
+    const isTest = paymentid?.split('_')[0] === "TEST";
+    const isLiveUrl = window.location.href.includes("checkout.itexpay.com");
+    const isLocal = window.location.href.includes("localhost") || window.location.href.includes("checkout.itexpay.com-staging-env.s3");
+    if (isTest && isLiveUrl) {
         base_url = `${process.env.REACT_APP_API_ENDPOINT_TEST}/v1`;
         payment_details_base_url = process.env.REACT_APP_API_ENDPOINT_TEST;
+    }
+    if (isLocal) {
+        base_url = `${process.env.REACT_APP_API_ENDPOINT_LOCAL}/v1`;
+        payment_details_base_url = process.env.REACT_APP_API_ENDPOINT_LOCAL;
     }
     return {
         base_url,
