@@ -72,13 +72,13 @@ function useCustomFunctions() {
         }, 2000);
       } else {
         setTimeout(() => {
-          let url =
-            window.location !== window.parent.location
-              ? document.referrer
-              : document.location.href;
+          // let url =
+          //   window.location !== window.parent.location
+          //     ? document.referrer
+          //     : document.location.href;
           window.parent.postMessage(
             { name: "vbvcomplete", response: response },
-            url
+            '*'
           );
         }, 2000);
       }

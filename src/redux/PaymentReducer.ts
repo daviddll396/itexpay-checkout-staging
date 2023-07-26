@@ -4,7 +4,7 @@ export interface InitialState {
   userPayload: any;
   references: any;
   bankTransferResponse: any;
-  qrResponse:any;
+  qrResponse: any;
   payment: any;
   inProcess: boolean;
   customColor: any;
@@ -21,7 +21,7 @@ const initialState: InitialState = {
   userPayload: {},
   references: {},
   bankTransferResponse: {},
-  qrResponse:{},
+  qrResponse: {},
   payment: {},
   inProcess: false,
   error: {
@@ -88,8 +88,8 @@ export const paymentSlice = createSlice({
           window.location !== window.parent.location
             ? document.referrer
             : document.location.href;
-            console.log({url},'here')
-        window.parent.postMessage({ name: "closeiframe" }, url);
+        console.log({ url }, "here");
+        window.parent.postMessage({ name: "closeiframe" }, "*");
         window.parent.postMessage(
           {
             closeModal: true,
