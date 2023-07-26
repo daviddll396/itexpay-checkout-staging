@@ -80,7 +80,7 @@ function useCustomFunctions() {
           window.location !== window.parent.location
             ? window.location.href
             : window.parent.location.href;
-        console.log({ url }, "here");
+        // console.log({ url }, "here");
           window.parent.postMessage(
             { name: "vbvcomplete", response: response },
            url

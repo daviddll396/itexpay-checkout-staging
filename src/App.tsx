@@ -30,6 +30,15 @@ function App() {
         .catch((error) => console.log(error));
     }
 
+    window.addEventListener("load", () => {
+      window.parent.postMessage(
+        {
+          checkoutMounted: true,
+        },
+        "*"
+      );
+    });
+
     getIP();
   }, []);
 
