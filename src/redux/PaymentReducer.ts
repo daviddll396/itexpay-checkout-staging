@@ -84,11 +84,11 @@ export const paymentSlice = createSlice({
       if (redirecturl) {
         window.open(`${redirecturl}`, "_top");
       } else {
-        let url =
-          window.location !== window.parent.location
-            ? document.referrer
-            : document.location.href;
-        console.log({ url }, "here");
+        // let url =
+        //   window.location !== window.parent.location
+        //     ? document.referrer
+        //     : document.location.href;
+        // console.log({ url }, "here");
         window.parent.postMessage({ name: "closeiframe" }, "*");
         window.parent.postMessage(
           {
