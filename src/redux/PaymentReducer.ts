@@ -80,23 +80,10 @@ export const paymentSlice = createSlice({
       state.error = { show: false, message: "" };
     },
     close_modal(state) {
-      console.log("removed window");
-      console.log({
-        location: window.location.href,
-        parent: window.parent.location.href,
-      });
-
       let redirecturl = state.userPayload?.redirecturl || null;
       if (redirecturl) {
         window.open(`${redirecturl}`, "_top");
       } else {
-        // let url =
-        //   window.location !== window.parent.location
-        //     ? window.top
-        //       ? window.top?.location.href
-        //       : window.parent.location.href
-        //     : window.location.href;
-        // console.log({ url }, "change to  top parent");
         window.parent.postMessage({ name: "closeiframe" }, "*");
         window.parent.postMessage(
           {

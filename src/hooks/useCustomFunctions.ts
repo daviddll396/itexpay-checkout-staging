@@ -72,15 +72,6 @@ function useCustomFunctions() {
         }, 2000);
       } else {
         setTimeout(() => {
-          // let url =
-          //   window.location !== window.parent.location
-          //     ? document.referrer
-          //     : document.location.href;
-          // let url =
-          // window.location !== window.parent.location
-          //   ? window.location.href
-          //   : window.parent.location.href;
-          // console.log({ url }, "here");
           window.parent.postMessage(
             { name: "vbvcomplete", response: response },
             "*"
