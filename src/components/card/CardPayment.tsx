@@ -19,7 +19,6 @@ import useCustomFunctions from "../../hooks/useCustomFunctions";
 import {
   hide_error,
   setProcessing,
-  setThreeDSModal,
   setTransactionErrorMessage,
   show_error,
 } from "src/redux/PaymentReducer";
@@ -40,7 +39,7 @@ const CardPayment = () => {
   );
   // const processing =  useAppSelector((state ) => state.payment.inProcess);
   const dispatch = useAppDispatch();
-  const { sendEvent, runTransaction, success } = useCustomFunctions();
+  const { sendEvent, runTransaction, success, openUrl } = useCustomFunctions();
   const [ccNumber, setCcNumber] = useState("");
   const [cvv, setCvv] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -347,9 +346,9 @@ const CardPayment = () => {
       activity: "3DS redirect initialized",
     });
     setStage("processing");
-    dispatch(setThreeDSModal(true));
+    // dispatch(setThreeDSModal(true));
     // start polling
-    // openUrl(server.redirecturl);
+    openUrl(server.redirecturl);
     runInterval();
   };
   // start card otp verification
