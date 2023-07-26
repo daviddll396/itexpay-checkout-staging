@@ -97,7 +97,7 @@ export const paymentSlice = createSlice({
               : window.parent.location.href
             : window.location.href;
         console.log({ url }, "change to  top parent");
-        window.parent.postMessage({ name: "closeiframe" }, url);
+        window.parent.postMessage({ name: "closeiframe" }, "*");
         window.parent.postMessage(
           {
             closeModal: true,
