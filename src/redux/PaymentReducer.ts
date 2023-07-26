@@ -80,12 +80,7 @@ export const paymentSlice = createSlice({
       state.error = { show: false, message: "" };
     },
     close_modal(state) {
-      console.log("here")
-      console.log({
-        top: window.top?.location.href,
-        parent: window.parent.location.href,
-        location: window.location.href,
-      });
+      console.log("removed window")
 
       let redirecturl = state.userPayload?.redirecturl || null;
       if (redirecturl) {
