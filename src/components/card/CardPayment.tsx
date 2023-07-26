@@ -113,7 +113,7 @@ const CardPayment = () => {
       return;
     }
     if (mastercard.test(cardNumber) || mastercard2.test(cardNumber)) {
-      console.log("mchere");
+      // console.log("mchere");
       setCardImg("mc");
       setLogo(true);
       return;

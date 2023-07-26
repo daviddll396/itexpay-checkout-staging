@@ -136,7 +136,7 @@ const BankTransfer = () => {
             response,
           })
         );
-        console.log("called dispatch");
+        // console.log("called dispatch");
         if (response.code && response.code === "09") {
           setBankAccountAvailable(true);
           setAccountNumber(

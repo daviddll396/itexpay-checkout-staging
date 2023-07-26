@@ -216,7 +216,7 @@ const ENaira = () => {
     const { fingerprint, modalref, paymentlinkref } = references;
     let authdata;
     if (ref === "pin" && pin.one && pin.two && pin.three && pin.four) {
-      console.log("here");
+      // console.log("here");
       authdata = `${pin.one}${pin.two}${pin.three}${pin.four}`;
     } else {
       if (ref === "token") {

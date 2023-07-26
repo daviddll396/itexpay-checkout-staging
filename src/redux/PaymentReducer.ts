@@ -88,7 +88,7 @@ export const paymentSlice = createSlice({
           window.location !== window.parent.location
             ? document.referrer
             : document.location.href;
-            console.log({url})
+            console.log({url},'here')
         window.parent.postMessage({ name: "closeiframe" }, url);
         window.parent.postMessage(
           {

@@ -27,7 +27,7 @@ const USSDPayment = () => {
     (item: any) => item.name === "button_color"
   );
   const { runTransaction } = useCustomFunctions();
-  const [value, copy] = useCopyToClipboard();
+  const [, copy] = useCopyToClipboard();
   const [selected, setSelected] = useState<any>("");
   const [query, setQuery] = useState("");
   const [bankLogoUrl, setBankLogoUrl] = useState("");
@@ -327,7 +327,7 @@ const USSDPayment = () => {
               className="text-theme cursor-pointer"
               onClick={() => {
                 copy(server?.ussd);
-                console.log(value);
+                // console.log(value);
               }}
             />
           </div>

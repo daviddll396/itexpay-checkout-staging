@@ -29,7 +29,7 @@ function useCustomFunctions() {
     // console.log(evtData, paymentid, publickey);
     callEvent(paymentid, evtData, publickey)
       .then((response: any) => {
-        console.log("event response", response);
+        // console.log("event response", response);
         // handle failed
       })
       .catch((error: any) => {

@@ -6,14 +6,14 @@ const useCountdown = (value: number) => {
   const [timerDone, setTimerDone] = useState(false);
 
   const onTimer = () => {
-    console.log("timerstarts");
+    // console.log("timerstarts");
     const timer = setInterval(() => {
       let num = countDown;
       num -= 1;
       setCountDown(num);
       setRemValue(getReturnValues(num));
 
-      console.log(countDown);
+      // console.log(countDown);
       if (countDown <= 0) {
         setTimerDone(true);
         clearInterval(timer);

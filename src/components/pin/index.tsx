@@ -33,7 +33,7 @@ const PIN = ({
     const eventCode = event.which || event.keyCode;
     // const eventValue = event.target.value;
     // console.log(eventCode, eventValue);
-    console.log(getCodeBoxElement(index).value, "val");
+    // console.log(getCodeBoxElement(index).value, "val");
     if (getCodeBoxElement(index).value.length === 1) {
       if (index !== 4) {
         getCodeBoxElement(index + 1).focus();
