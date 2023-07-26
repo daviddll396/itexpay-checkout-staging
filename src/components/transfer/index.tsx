@@ -136,7 +136,6 @@ const BankTransfer = () => {
             response,
           })
         );
-        // console.log("called dispatch");
         if (response.code && response.code === "09") {
           setBankAccountAvailable(true);
           setAccountNumber(
@@ -157,10 +156,13 @@ const BankTransfer = () => {
         );
       })
       .catch((error) => {
-        // console.log({error})
         let errMsg = error?.response?.data?.message || error?.message;
+        if (errMsg === "duplicate transaction reference") {
+          dispatch(setTransactionErrorMessage({ message: errMsg }));
+        } else {
+          dispatch(show_error({ message: errMsg }));
+        }
         setIsLoading(false);
-        dispatch(show_error({ message: errMsg }));
       });
   };
   useEffect(() => {
@@ -178,12 +180,11 @@ const BankTransfer = () => {
         setAccountName(response.source.customer.account.recipientname);
         setBank(response.source.customer.account.bank);
         setIsLoading(false);
-        // runInterval();
         return;
       }
       setIsLoading(false);
       setBankAccountAvailable(false);
-      dispatch(show_error({ message: response.message }));
+      dispatch(setTransactionErrorMessage({ message: response.message }));
     } else {
       get_bank_account();
     }

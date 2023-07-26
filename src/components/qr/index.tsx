@@ -114,9 +114,12 @@ const QRPayment = () => {
       })
       .catch((err) => {
         let errMsg = err?.response?.data?.message || err?.message;
-        console.log(err?.response);
-
-        dispatch(show_error({ message: errMsg }));
+        // console.log(err?.response);
+        if (errMsg === "duplicate transaction reference") {
+          dispatch(setTransactionErrorMessage({ message: errMsg }));
+        } else {
+          dispatch(show_error({ message: errMsg }));
+        }
         setQrCodeAvailable(false);
         setIsLoading(false);
         clearInterval(statusCheck);
