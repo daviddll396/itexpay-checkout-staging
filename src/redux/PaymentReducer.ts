@@ -86,9 +86,9 @@ export const paymentSlice = createSlice({
       } else {
         let url =
           window.location !== window.parent.location
-            ? window.parent.location.href
+            ? (window.top ? window.top?.location.href : window.parent.location.href)
             : window.location.href;
-        console.log({ url }, "change parent");
+        console.log({ url }, "change to  top parent");
         window.parent.postMessage({ name: "closeiframe" }, url);
         window.parent.postMessage(
           {
