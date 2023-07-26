@@ -88,6 +88,7 @@ export const paymentSlice = createSlice({
           window.location !== window.parent.location
             ? document.referrer
             : document.location.href;
+            console.log({url})
         window.parent.postMessage({ name: "closeiframe" }, url);
         window.parent.postMessage(
           {
@@ -101,7 +102,6 @@ export const paymentSlice = createSlice({
     setThreeDSModal(state, { payload }) {
       state.threeDsModal = payload as boolean;
     },
-
     update_custom(state, { payload }) {
       state.customColor = [...payload];
     },

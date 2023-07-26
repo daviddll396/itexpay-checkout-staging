@@ -69,7 +69,7 @@ function useCustomFunctions() {
             "_top",
             "toolbar=no,scrollbars=no,resizable=yes"
           );
-        }, 10000);
+        }, 2000);
       } else {
         setTimeout(() => {
           let url =
@@ -80,12 +80,10 @@ function useCustomFunctions() {
             { name: "vbvcomplete", response: response },
             url
           );
-        }, 10000);
+        }, 2000);
       }
-    }else{
-        setTimeout(()=>{
-
-        })
+    } else {
+      setTimeout(() => {});
     }
   };
   const runTransaction = async () => {

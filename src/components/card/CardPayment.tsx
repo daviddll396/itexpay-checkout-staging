@@ -249,13 +249,34 @@ const CardPayment = () => {
         paymentid
       );
       if (data === null || data === undefined) return;
-      // setLoading(true);
-
-      // console.log({ data });
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
 
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
+          if (
+            response.code === "09" &&
+            response.message ===
+              "Payment option unavailable, kindly try another payment option"
+          ) {
+            dispatch(
+              show_error({
+                message: response?.message || response.message,
+              })
+            );
+            setStage("card");
+            setCvv("");
+            setExpiry("");
+            setPin({
+              one: "",
+              two: "",
+              three: "",
+              four: "",
+            });
+            setLoading(false);
+            dispatch(setProcessing(false));
+            return;
+          }
+
           setServer({
             ...server,
             message: response?.message,
@@ -285,13 +306,11 @@ const CardPayment = () => {
             three: "",
             four: "",
           });
-          // console.log({ response });
           dispatch(
             setTransactionErrorMessage({
               message: response?.data?.message || response?.message,
             })
           );
-
           setLoading(false);
           dispatch(setProcessing(false));
         })
