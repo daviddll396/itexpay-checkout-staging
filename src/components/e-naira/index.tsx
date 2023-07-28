@@ -132,9 +132,12 @@ const ENaira = () => {
     const val = selected.id;
     if (!val) {
       setErr("Please select a validaton method");
-      // dispatch(show_error({ message: "Please select a validaton method" }));
       return;
     }
+    // if (!value) {
+    //   setErr("Please input a value for your selected validation method");
+    //   return;
+    // }
     if (
       val === "alias" &&
       (!alias || !alias.startsWith("@" || alias.length < 5))

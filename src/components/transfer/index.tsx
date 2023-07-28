@@ -225,18 +225,18 @@ const BankTransfer = () => {
                   }}
                 />
               </div>
-              <div className="bg-[#B9B9B9]/[0.13] rounded-[10px] grid grid-cols-2 divide-x divide-[#B1B1B1]/50 py-3 my-4">
-                <div className="col-span-1 px-3">
+              <div className="bg-[#B9B9B9]/[0.13] rounded-[10px] grid grid-cols-2 divide-y divide-[#B1B1B1]/50 py-3 my-4">
+                <div className="col-span-2 px-3">
                   <p className="text-[10px] text-center mb-1">Bank Name</p>
                   <h5 className="text-center font-medium truncate">
                     {bank.replace("_", " ")}
                   </h5>
                 </div>
-                <div className="col-span-1 px-3">
+                <div className="col-span-2 px-3">
                   <p className="text-[10px] text-center mb-1">
                     Beneficiary Name
                   </p>
-                  <h5 className="text-center font-medium truncate">
+                  <h5 className="text-center font-medium ">
                     {accountName}
                   </h5>
                 </div>
