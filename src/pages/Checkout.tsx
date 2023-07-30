@@ -343,7 +343,7 @@ const Checkout = () => {
                 </div>
                 {isTestEnv && (
                   <div className="py-2 px-8 switch:px-12 bg-test/20 rounded-theme w-fit mx-auto my-3">
-                    <p className="text-[#d3b869] text-sm switch:text-base font-semibold">
+                    <p className="text-[#d5ad35] text-sm switch:text-base font-semibold">
                       You are currently in test mode
                     </p>
                   </div>
