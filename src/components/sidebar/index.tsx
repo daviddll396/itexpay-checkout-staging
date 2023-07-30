@@ -2,6 +2,8 @@
 import { paymentChannels } from "../../data";
 import { ReactComponent as Cancel } from "../../assets/icons/cancel.svg";
 import { useAppSelector } from "src/redux/hooks";
+import DefaultLogo from "../../assets/images/default.png";
+
 import { ReactComponent as CaretRight } from "../../assets/icons/caret-right.svg";
 
 const Sidebar = (props: {
@@ -45,7 +47,7 @@ const Sidebar = (props: {
           <div className=" flex items-center justify-between px-5 py-3">
             <div className="flex items-center ">
               <img
-                src={transaction_data?.merchant_logo}
+                src={transaction_data?.merchant_logo === null ? DefaultLogo : transaction_data?.merchant_logo}
                 alt="logo"
                 className="w-9 h-9 mr-2 rounded-full"
               />
@@ -115,11 +117,10 @@ const Sidebar = (props: {
                         ? undefined
                         : () => handleChangeOption(paymentItem)
                     }
-                    className={`flex items-center text-base py-2 pr-2  ${
-                      active.id === paymentItem.id
-                        ? " border-y border-l rounded-tl-theme rounded-bl-theme font-black "
-                        : " text-white font-semibold flex items-center justify-between"
-                    } ${processing ? "cursor-not-allowed" : "cursor-pointer"}`}
+                    className={`flex items-center text-base py-2 pr-2  ${active.id === paymentItem.id
+                      ? " border-y border-l rounded-tl-theme rounded-bl-theme font-black "
+                      : " text-white font-semibold flex items-center justify-between"
+                      } ${processing ? "cursor-not-allowed" : "cursor-pointer"}`}
                     style={{
                       borderColor:
                         button_color && active.id === paymentItem.id
