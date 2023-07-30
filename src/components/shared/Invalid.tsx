@@ -26,7 +26,7 @@ const Invalid = ({
       /> */}
       <div className="w-4/5 switch:w-4/6 mx-auto flex flex-col items-center  gap-y-8 ">
         <div className="max-w-[128px] max-h-[128px] mb-4">
-          <InvalidIcon className="w-20 h-20" />
+          <InvalidIcon className="w-32 h-32" />
         </div>
         <div className="text-center">
           <h3 className="text-3xl mb-2 font-semibold ">{title}</h3>

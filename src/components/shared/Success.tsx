@@ -18,7 +18,7 @@ const Success = ({ go }: { go?: () => void }) => {
         onClick={onCloseFrame}
       /> */}
       <div className="w-4/5 switch:w-4/6 mx-auto flex flex-col items-center  gap-y-8 ">
-        <div className="max-w-[80px] max-h-[80px] mb-4">
+        <div className="max-w-[115px] max-h-[115px] mb-4">
           <img src={CirceCheck} alt="" className="w-full h-full" />
         </div>
         <div className="text-center">
