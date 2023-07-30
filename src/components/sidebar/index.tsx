@@ -47,7 +47,7 @@ const Sidebar = (props: {
           <div className=" flex items-center justify-between px-5 py-3">
             <div className="flex items-center ">
               <img
-                src={(transaction_data?.merchant_logo === null || transaction_data?.merchant_logo === "") ? DefaultLogo : transaction_data?.merchant_logo}
+                src={(transaction_data?.merchant_logo === null || transaction_data?.merchant_logo === undefined) ? DefaultLogo : transaction_data?.merchant_logo}
 
                 alt="logo"
                 className="w-9 h-9 mr-2 rounded-full"
@@ -92,7 +92,7 @@ const Sidebar = (props: {
         <div className=" flex items-center gap-x-2 mt-5 mb-10 ml-5">
           <img
             // src={transaction_data?.merchant_logo}
-            src={(transaction_data?.merchant_logo === null || transaction_data?.merchant_logo === "") ? DefaultLogo : transaction_data?.merchant_logo}
+            src={(transaction_data?.merchant_logo === null || transaction_data?.merchant_logo === undefined) ? DefaultLogo : transaction_data?.merchant_logo}
             alt="logo"
             className="w-12 h-12 rounded-full"
           />
