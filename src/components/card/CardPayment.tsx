@@ -42,6 +42,7 @@ const CardPayment = () => {
   const { sendEvent, runTransaction, success, openUrl } = useCustomFunctions();
   const [ccNumber, setCcNumber] = useState("");
   const [cvv, setCvv] = useState("");
+  const [authOption, setAuthOption] = useState("3DS");
   const [expiry, setExpiry] = useState("");
   const [cardImg, setCardImg] = useState("");
   const [cardLogoUrl, setCardLogoUrl] = useState("");
@@ -174,7 +175,6 @@ const CardPayment = () => {
       request,
     })
       .then((response: any) => {
-        // console.log(response);
         const { label = null } = response.config.formfields[0];
         if (!label) {
           dispatch(show_error({ message: "Invalid card number" }));
@@ -185,17 +185,25 @@ const CardPayment = () => {
           return;
         }
         // decide this.stage based on response 3ds or pin
-        if (label && label === "3DS") {
+        setAuthOption(label);
+        if (label && ["3DS", 'NOAUTH'].includes(label)) {
           main_charge_card();
-        } else {
+        } else if (label && label === 'PIN') {
           setStage("pin");
+          setLoading(false);
+        } else {
+          dispatch(show_error({ message: "Invalid card number, try a different card" }));
+          setCvv("");
+          setExpiry("");
+          setLoading(false);
+          dispatch(setProcessing(false));
           setLoading(false);
         }
       })
       .catch((error) => {
         let errMsg = error?.response?.data?.message || error?.message;
         console.log({ errMsg });
-        dispatch(show_error({ message: "Invalid card number" }));
+        dispatch(show_error({ message: "Invalid card number, try a different card" }));
         setCvv("");
         setExpiry("");
         setLoading(false);
@@ -245,7 +253,8 @@ const CardPayment = () => {
         fingerprint,
         modalref,
         paymentlinkref,
-        paymentid
+        paymentid,
+        authOption
       );
       if (data === null || data === undefined) return;
       let request = encrypt_data(JSON.stringify(data), encryptpublickey);
@@ -253,9 +262,27 @@ const CardPayment = () => {
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
           if (
+            response.code === "00") {
+            success(response, "success");
+            setStage("card");
+            setCcNumber("");
+            setCvv("");
+            setExpiry("");
+            setPin({
+              one: "",
+              two: "",
+              three: "",
+              four: "",
+            });
+            setLoading(false);
+            dispatch(setProcessing(false));
+          }
+
+
+          if (
             response.code === "09" &&
             response.message ===
-              "Payment option unavailable, kindly try another payment option"
+            "Payment option unavailable, kindly try another payment option"
           ) {
             dispatch(
               show_error({

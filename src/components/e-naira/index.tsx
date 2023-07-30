@@ -260,6 +260,8 @@ const ENaira = () => {
           if (response.code === "00") {
             // runTransaction();
             success(response, "success");
+            setLoading(false);
+            dispatch(setProcessing(false));
             return;
           }
           else if (response.code === "09") {
@@ -267,6 +269,8 @@ const ENaira = () => {
             return;
           } else {
             success(response, "failed");
+            setLoading(false);
+            dispatch(setProcessing(false));
             return;
           }
           // dispatch(
