@@ -102,7 +102,7 @@ const QRPayment = () => {
           })
         );
         if (response.code === "09") {
-          setQrCode(response.transaction.redirecturl);
+          setQrCode(atob(response.transaction.redirecturl));
           setQrCodeAvailable(true);
           setIsLoading(false);
           // runInterval();
