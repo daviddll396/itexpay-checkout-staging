@@ -318,7 +318,7 @@ const Checkout = () => {
                     <div className="p-4 switch:ml-[32%]  switch:pl-5 ">
                       <div className=" mt-2 mb-4 pb-2 border-b border-b-[#B9B9B9] flex items-center justify-between">
                         <div className="max-w-[200px]">
-                          {(activeImgUrl && activeImgUrl != "") &&
+                          {(activeImgUrl && activeImgUrl != "" && !['card', 'account'].includes(selectedOption)) &&
                             <img src={activeImgUrl} alt="" className="w-36" />
                           }
                         </div>
