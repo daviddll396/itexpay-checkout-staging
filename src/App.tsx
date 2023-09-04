@@ -4,6 +4,7 @@ import axios from "axios";
 
 function App() {
   const [globalState, setGlobalState] = useState(null);
+  const [mounted, setMounted] = useState(false);
   // Add a request interceptor
   axios.interceptors.request.use(
     function (config) {
@@ -23,6 +24,7 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setGlobalState(data.ip);
+        setMounted(true);
       })
       .catch((error) => console.log(error));
   }
@@ -41,11 +43,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <div className="font-sans">
-      <Checkout />
-    </div>
-  );
+  return <div className="font-sans">{mounted && <Checkout />}</div>;
 }
 
 export default App;
