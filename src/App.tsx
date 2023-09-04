@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import Checkout from "./pages/Checkout";
-import { Provider } from "react-redux";
-import { store } from "./redux";
+
 import axios from "axios";
 import { useAppSelector, useAppDispatch } from "./redux/hooks";
 import { update_ip } from "./redux/PaymentReducer";
@@ -13,8 +12,6 @@ function App() {
   // Add a request interceptor
   axios.interceptors.request.use(
     function (config) {
-      // const userip = localStorage.getItem("ip") || "";
-      // const { ip } = JSON.parse(userip) || null;
       config.headers["Clientaddress"] = `${ip}`;
       // Do something before request is sent
       return config;
@@ -31,8 +28,6 @@ function App() {
         .then((response) => response.json())
         .then((data) => {
           dispatch(update_ip(data));
-          // setIp(data);
-          // localStorage.setItem("ip", JSON.stringify(data));
         })
         .catch((error) => console.log(error));
     }
@@ -52,9 +47,7 @@ function App() {
 
   return (
     <div className="font-sans">
-      <Provider store={store}>
         <Checkout />
-      </Provider>
     </div>
   );
 }
