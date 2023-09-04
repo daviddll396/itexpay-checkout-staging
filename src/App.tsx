@@ -4,13 +4,16 @@ import axios from "axios";
 import Spinner from "./components/shared/Spinner";
 
 function App() {
-  const [ip, setIp] = useState("");
+  const [ip, setIp] = useState<any>("");
   const [mounted, setMounted] = useState(false);
   // Add a request interceptor
   axios.interceptors.request.use(
     function (config) {
-      alert(ip);
-      config.headers["Clientaddress"] = ip;
+      if (ip?.ip) {
+        config.headers["Clientaddress"] = ip.ip;
+      } else {
+        config.headers["Clientaddress"] = ip;
+      }
       // Do something before request is sent
       return config;
     },
