@@ -15,6 +15,7 @@ export interface InitialState {
   show: boolean;
   threeDsModal: boolean;
   transactionErrorMessage: { message: string } | null;
+  ip: "";
 }
 
 const initialState: InitialState = {
@@ -35,6 +36,7 @@ const initialState: InitialState = {
   show: true,
   threeDsModal: false,
   transactionErrorMessage: null,
+  ip: "",
 };
 
 export const paymentSlice = createSlice({
@@ -100,6 +102,9 @@ export const paymentSlice = createSlice({
     update_custom(state, { payload }) {
       state.customColor = [...payload];
     },
+    update_ip(state, { payload }) {
+      state.ip = payload;
+    },
   },
 });
 
@@ -115,6 +120,6 @@ export const {
   show_error,
   hide_error,
   close_modal,
-  update_custom,
+  update_custom,update_ip
 } = paymentSlice.actions;
 export default paymentSlice.reducer;

@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Checkout from "./pages/Checkout";
 import { Provider } from "react-redux";
 import { store } from "./redux";
 import axios from "axios";
-
+import { useAppSelector, useAppDispatch } from "./redux/hooks";
+import { update_ip } from "./redux/PaymentReducer";
 function App() {
-  const [ip, setIp] = useState("");
+  const dispatch = useAppDispatch();
+  const ip = useAppSelector((state) => state.payment.ip);
+
+  // const [ip, setIp] = useState("");
   // Add a request interceptor
   axios.interceptors.request.use(
     function (config) {
@@ -26,7 +30,8 @@ function App() {
       await fetch("https://api.ipify.org?format=json")
         .then((response) => response.json())
         .then((data) => {
-          setIp(data)
+          dispatch(update_ip(data));
+          // setIp(data);
           // localStorage.setItem("ip", JSON.stringify(data));
         })
         .catch((error) => console.log(error));
@@ -42,6 +47,7 @@ function App() {
     });
 
     getIP();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
