@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Checkout from "./pages/Checkout";
-
 import axios from "axios";
 import Spinner from "./components/shared/Spinner";
 
@@ -10,6 +9,7 @@ function App() {
   // Add a request interceptor
   axios.interceptors.request.use(
     function (config) {
+      alert(ip);
       config.headers["Clientaddress"] = ip;
       // Do something before request is sent
       return config;
@@ -24,7 +24,7 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         // console.log(data)
-        alert(JSON.stringify(data))
+        // alert(JSON.stringify(data))
         setIp(data);
         setMounted(true);
       })
@@ -46,7 +46,14 @@ function App() {
 
   return (
     <div className="font-sans">
-      {mounted ? <Checkout /> : <Spinner lg={true} />}
+      {mounted ? (
+        <>
+          <div>{ip}</div>
+          <Checkout />
+        </>
+      ) : (
+        <Spinner lg={true} />
+      )}
     </div>
   );
 }
