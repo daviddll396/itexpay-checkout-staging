@@ -31,7 +31,7 @@ function App() {
     await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => {
-        dispatch(update_ip(data));
+        dispatch(update_ip(data.ip));
         return data;
       })
       .catch((error) => console.log(error));

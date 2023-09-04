@@ -15,7 +15,7 @@ export interface InitialState {
   show: boolean;
   threeDsModal: boolean;
   transactionErrorMessage: { message: string } | null;
-  ip: "";
+  ip: string;
 }
 
 const initialState: InitialState = {
