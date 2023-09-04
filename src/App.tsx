@@ -11,8 +11,14 @@ function App() {
   // const [ip, setIp] = useState("");
   // Add a request interceptor
   axios.interceptors.request.use(
-    function (config) {
-      config.headers["Clientaddress"] = `${ip}`;
+   async function (config) {
+      if (!ip) {
+        const data = await getIP();
+        config.headers["Clientaddress"] = `${data}`;
+      } else {
+        config.headers["Clientaddress"] = `${ip}`;
+      }
+
       // Do something before request is sent
       return config;
     },
@@ -21,17 +27,17 @@ function App() {
       return Promise.reject(error);
     }
   );
+  async function getIP() {
+    await fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => {
+        dispatch(update_ip(data));
+        return data;
+      })
+      .catch((error) => console.log(error));
+  }
 
   useEffect(() => {
-    async function getIP() {
-      await fetch("https://api.ipify.org?format=json")
-        .then((response) => response.json())
-        .then((data) => {
-          dispatch(update_ip(data));
-        })
-        .catch((error) => console.log(error));
-    }
-
     window.addEventListener("load", () => {
       window.parent.postMessage(
         {
@@ -42,12 +48,12 @@ function App() {
     });
 
     getIP();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="font-sans">
-        <Checkout />
+      <Checkout />
     </div>
   );
 }
