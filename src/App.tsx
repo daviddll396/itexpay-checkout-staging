@@ -9,6 +9,7 @@ function App() {
   // const ip = useAppSelector((state) => state.payment.ip);
 
   const [ip, setIp] = useState("");
+  const [mounted, setMounted] = useState(false);
   // Add a request interceptor
   axios.interceptors.request.use(
     function (config) {
@@ -26,7 +27,7 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setIp(data);
-        // dispatch(update_ip(data));
+        setMounted(true);
       })
       .catch((error) => console.log(error));
   }
@@ -44,11 +45,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <div className="font-sans">
-      <Checkout />
-    </div>
-  );
+  return <div className="font-sans">{mounted && <Checkout />}</div>;
 }
 
 export default App;
