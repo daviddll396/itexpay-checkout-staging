@@ -2,12 +2,9 @@ import { useEffect, useState } from "react";
 import Checkout from "./pages/Checkout";
 
 import axios from "axios";
-// import { useAppSelector, useAppDispatch } from "./redux/hooks";
-// import { update_ip } from "./redux/PaymentReducer";
-function App() {
-  // const dispatch = useAppDispatch();
-  // const ip = useAppSelector((state) => state.payment.ip);
+import Spinner from "./components/shared/Spinner";
 
+function App() {
   const [ip, setIp] = useState("");
   const [mounted, setMounted] = useState(false);
   // Add a request interceptor
@@ -26,7 +23,8 @@ function App() {
     await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
+        // console.log(data)
+        alert(JSON.stringify(data))
         setIp(data);
         setMounted(true);
       })
@@ -46,7 +44,11 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div className="font-sans">{mounted && <Checkout />}</div>;
+  return (
+    <div className="font-sans">
+      {mounted ? <Checkout /> : <Spinner lg={true} />}
+    </div>
+  );
 }
 
 export default App;
