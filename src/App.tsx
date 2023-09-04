@@ -26,6 +26,7 @@ function App() {
     await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         setIp(data);
         setMounted(true);
       })
