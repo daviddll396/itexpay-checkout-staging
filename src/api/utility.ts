@@ -270,7 +270,8 @@ export function create_card_transaction(
   fingerprint: any,
   modalref: any,
   plref: any,
-  paymentid: any
+  paymentid: any,
+  authoption: any,
 ) {
   var exp = split_expiry(card.expiry);
   if (exp === null || exp === undefined) return;
@@ -288,6 +289,7 @@ export function create_card_transaction(
         txref: mref,
         callbackurl: callbackurl,
         redirecturl: redirecturl,
+        authoption: authoption ?? "PIN",
         paymentmethod: "card",
       },
       order: {
@@ -325,7 +327,7 @@ export function create_card_transaction(
       txref: mref,
       callbackurl: callbackurl,
       redirecturl: redirecturl,
-      authoption: "3DS",
+      authoption: authoption ?? "3DS",
       paymentmethod: "card",
     },
     order: {

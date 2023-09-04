@@ -30,7 +30,7 @@ const Invalid = ({
         </div>
         <div className="text-center">
           <h3 className="text-3xl mb-2 font-semibold ">{title}</h3>
-          <p className=" mx-auto text-center text-lg md:text-2xl font-semibold">
+          <p className=" mx-auto text-center text-lg md:text-2xl font-semibold capitalize">
             {description}
           </p>
         </div>

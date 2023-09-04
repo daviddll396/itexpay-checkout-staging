@@ -61,7 +61,7 @@ const ENaira = () => {
     (item: any) => item.name === "button_color"
   );
   const dispatch = useAppDispatch();
-  const { runTransaction } = useCustomFunctions();
+  const { runTransaction, success } = useCustomFunctions();
 
   const [selected, setSelected] = useState<any>(options[0]);
   const [ref, setRef] = useState(validation[0].id);
@@ -258,21 +258,28 @@ const ENaira = () => {
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
           if (response.code === "00") {
-            runTransaction();
+            // runTransaction();
+            success(response, "success");
+            setLoading(false);
+            dispatch(setProcessing(false));
             return;
           }
-          if (response.code === "09") {
+          else if (response.code === "09") {
             runInterval();
             return;
+          } else {
+            success(response, "failed");
+            setLoading(false);
+            dispatch(setProcessing(false));
+            return;
           }
-
-          dispatch(
-            setTransactionErrorMessage({
-              message: response?.data?.message || response?.message,
-            })
-          );
-          setLoading(false);
-          dispatch(setProcessing(false));
+          // dispatch(
+          //   setTransactionErrorMessage({
+          //     message: response?.data?.message || response?.message,
+          //   })
+          // );
+          // setLoading(false);
+          // dispatch(setProcessing(false));
         })
         .catch((error: any) => {
           console.log({ error });
@@ -331,9 +338,8 @@ const ENaira = () => {
                             {({ active }) => (
                               <button
                                 onClick={() => onChangeSelected(option)}
-                                className={`${
-                                  active ? "bg-theme/10 text-text" : "text-text"
-                                } group flex w-full items-center rounded-md px-2 py-2 text-sm capitalize`}
+                                className={`${active ? "bg-theme/10 text-text" : "text-text"
+                                  } group flex w-full items-center rounded-md px-2 py-2 text-sm capitalize`}
                               >
                                 {option.name}
                               </button>
@@ -405,21 +411,18 @@ const ENaira = () => {
                   >
                     {({ active, checked }) => (
                       <li
-                        className={`  bg-white w-full px-6 py-2 shadow-custom_shadow_three my-3 rounded-md text-text  list-none cursor-pointer border ${
-                          checked ? "border-theme" : "border-transparent"
-                        }`}
+                        className={`  bg-white w-full px-6 py-2 shadow-custom_shadow_three my-3 rounded-md text-text  list-none cursor-pointer border ${checked ? "border-theme" : "border-transparent"
+                          }`}
                       >
                         <div className="flex items-center mb-1">
                           <div className="flex items-center">
                             <div
-                              className={`w-4 h-4 rounded-full border-2 border-theme p-0.5  ${
-                                checked ? "bg-theme/10 " : ""
-                              }`}
+                              className={`w-4 h-4 rounded-full border-2 border-theme p-0.5  ${checked ? "bg-theme/10 " : ""
+                                }`}
                             >
                               <div
-                                className={`w-full h-full rounded-full  ${
-                                  checked ? "bg-theme" : ""
-                                }`}
+                                className={`w-full h-full rounded-full  ${checked ? "bg-theme" : ""
+                                  }`}
                               ></div>
                             </div>
                           </div>

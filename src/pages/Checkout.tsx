@@ -318,7 +318,9 @@ const Checkout = () => {
                     <div className="p-4 switch:ml-[32%]  switch:pl-5 ">
                       <div className=" mt-2 mb-4 pb-2 border-b border-b-[#B9B9B9] flex items-center justify-between">
                         <div className="max-w-[200px]">
-                          <img src={activeImgUrl} alt="" className="w-36" />
+                          {(activeImgUrl && activeImgUrl != "" && !['card', 'account'].includes(selectedOption)) &&
+                            <img src={activeImgUrl} alt="" className="w-36" />
+                          }
                         </div>
                         <div>
                           <h2 className="font-extrabold text-lg sm:text-xl text-title">
@@ -343,7 +345,7 @@ const Checkout = () => {
                 </div>
                 {isTestEnv && (
                   <div className="py-2 px-8 switch:px-12 bg-test/20 rounded-theme w-fit mx-auto my-3">
-                    <p className="text-[#d3b869] text-sm switch:text-base font-semibold">
+                    <p className="text-[#d5ad35] text-sm switch:text-base font-semibold">
                       You are currently in test mode
                     </p>
                   </div>
