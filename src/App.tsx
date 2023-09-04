@@ -1,24 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Checkout from "./pages/Checkout";
 
 import axios from "axios";
-import { useAppSelector, useAppDispatch } from "./redux/hooks";
-import { update_ip } from "./redux/PaymentReducer";
+// import { useAppSelector, useAppDispatch } from "./redux/hooks";
+// import { update_ip } from "./redux/PaymentReducer";
 function App() {
-  const dispatch = useAppDispatch();
-  const ip = useAppSelector((state) => state.payment.ip);
+  // const dispatch = useAppDispatch();
+  // const ip = useAppSelector((state) => state.payment.ip);
 
-  // const [ip, setIp] = useState("");
+  const [ip, setIp] = useState("");
   // Add a request interceptor
   axios.interceptors.request.use(
-   async function (config) {
-      if (!ip) {
-        const data = await getIP();
-        config.headers["Clientaddress"] = `${data}`;
-      } else {
-        config.headers["Clientaddress"] = `${ip}`;
-      }
-
+    function (config) {
+      config.headers["Clientaddress"] = ip;
       // Do something before request is sent
       return config;
     },
@@ -31,12 +25,11 @@ function App() {
     await fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => {
-        dispatch(update_ip(data.ip));
-        return data;
+        setIp(data);
+        // dispatch(update_ip(data));
       })
       .catch((error) => console.log(error));
   }
-
   useEffect(() => {
     window.addEventListener("load", () => {
       window.parent.postMessage(
