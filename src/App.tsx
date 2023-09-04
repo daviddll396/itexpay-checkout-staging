@@ -10,9 +10,9 @@ function App() {
   axios.interceptors.request.use(
     function (config) {
       if (ip?.ip) {
-        config.headers["Clientaddress"] = ip.ip;
+        config.headers["Clientaddress"] = `${ip.ip}`;
       } else {
-        config.headers["Clientaddress"] = ip;
+        config.headers["Clientaddress"] = `${ip}`;
       }
       // Do something before request is sent
       return config;
