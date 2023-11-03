@@ -90,7 +90,7 @@ const CardPayment = () => {
     let verve = /^(?:50[067][180]|6500)(?:[0-9]{15})$/;
     let mastercard = new RegExp("^5[1-5][0-9]{14}$");
     let mastercard2 = new RegExp("^2[2-7][0-9]{14}$");
-    let afrigo = new RegExp("^564[0-9]{13}$");
+    let afrigo = new RegExp("^564[0-9]{15}$");
 
     if (visa.test(cardNumber)) {
       setCardImg("visa");
@@ -186,13 +186,15 @@ const CardPayment = () => {
         }
         // decide this.stage based on response 3ds or pin
         setAuthOption(label);
-        if (label && ["3DS", 'NOAUTH'].includes(label)) {
+        if (label && ["3DS", "NOAUTH"].includes(label)) {
           main_charge_card();
-        } else if (label && label === 'PIN') {
+        } else if (label && label === "PIN") {
           setStage("pin");
           setLoading(false);
         } else {
-          dispatch(show_error({ message: "Invalid card number, try a different card" }));
+          dispatch(
+            show_error({ message: "Invalid card number, try a different card" })
+          );
           setCvv("");
           setExpiry("");
           setLoading(false);
@@ -203,7 +205,9 @@ const CardPayment = () => {
       .catch((error) => {
         let errMsg = error?.response?.data?.message || error?.message;
         console.log({ errMsg });
-        dispatch(show_error({ message: "Invalid card number, try a different card" }));
+        dispatch(
+          show_error({ message: "Invalid card number, try a different card" })
+        );
         setCvv("");
         setExpiry("");
         setLoading(false);
@@ -261,8 +265,7 @@ const CardPayment = () => {
 
       charge(transaction_data.paymentid, publickey, request)
         .then((response: any) => {
-          if (
-            response.code === "00") {
+          if (response.code === "00") {
             success(response, "success");
             setStage("card");
             setCcNumber("");
@@ -278,11 +281,10 @@ const CardPayment = () => {
             dispatch(setProcessing(false));
           }
 
-
           if (
             response.code === "09" &&
             response.message ===
-            "Payment option unavailable, kindly try another payment option"
+              "Payment option unavailable, kindly try another payment option"
           ) {
             dispatch(
               show_error({
