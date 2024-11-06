@@ -26,6 +26,7 @@ import { SpinnerInline } from "../shared/Spinner";
 import { create_otp_transaction } from "src/api/utility";
 import { validate_otp } from "src/api";
 import ThreeDSModal from "./3ds-modal";
+import Enroll from "../enroll";
 
 const CardPayment = () => {
   const transaction_data = useAppSelector((state) => state.payment.userPayload);
@@ -284,7 +285,7 @@ const CardPayment = () => {
           if (
             response.code === "09" &&
             response.message ===
-              "Payment option unavailable, kindly try another payment option"
+            "Payment option unavailable, kindly try another payment option"
           ) {
             dispatch(
               show_error({
@@ -316,7 +317,11 @@ const CardPayment = () => {
           });
 
           if (response.code === "09") {
-            setStage("otp");
+            if (response.note !== null && response.note !== undefined && response.note === "OTPENROLL") {
+              setStage("enroll");
+            } else {
+              setStage("otp");
+            }
             setLoading(false);
             return;
           }
@@ -379,6 +384,56 @@ const CardPayment = () => {
     // start polling
     openUrl(server.redirecturl);
     runInterval();
+  };
+  const start_card_otp_enrollment = () => {
+    // console.log(otp);
+    // send otp event
+    sendEvent({ type: "otp", activity: "OTP sent" });
+    const { paymentid, publickey, encryptpublickey } = transaction_data;
+    // evt.preventDefault();
+    dispatch(hide_error());
+    setLoading(true);
+    let data = create_otp_transaction(otp, paymentid);
+    let request = encrypt_data(JSON.stringify(data), encryptpublickey);
+    validate_otp(transaction_data.paymentid, publickey, request)
+      .then((response: any) => {
+        const { code } = response;
+        // if response is palatable, update success state
+        if (code !== "09") {
+          if (code === "00") {
+            success(response, "success");
+          } else {
+            success(response, "failed");
+            setStage("card");
+            setCcNumber("");
+            setCvv("");
+            setExpiry("");
+            setPin({
+              one: "",
+              two: "",
+              three: "",
+              four: "",
+            });
+            setLoading(false);
+            dispatch(setProcessing(false));
+          }
+          setLoading(false);
+          return;
+        }
+      })
+      .catch((error) => {
+        setStage("card");
+        setCvv("");
+        setPin({
+          one: "",
+          two: "",
+          three: "",
+          four: "",
+        });
+        setLoading(false);
+        dispatch(setProcessing(false));
+        console.log(error);
+      });
   };
   // start card otp verification
   const start_card_otp_verification = () => {
@@ -551,6 +606,16 @@ const CardPayment = () => {
             setValue={setOtp}
             onVerifyOTP={start_card_otp_verification}
             buttonText="Pay Now"
+            loading={loading}
+          />
+        )}
+        {stage === "enroll" && (
+          <Enroll
+            message={server.message}
+            value={otp}
+            setValue={setOtp}
+            onVerifyEnroll={start_card_otp_verification}
+            buttonText="Continue"
             loading={loading}
           />
         )}
