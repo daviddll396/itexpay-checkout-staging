@@ -1,4 +1,4 @@
-import { validateOTP } from "src/utils";
+import { validateOTP, validatePhone } from "src/utils";
 import { useAppSelector } from "src/redux/hooks";
 import { ReactComponent as ArrowLeft } from "../../assets/icons/caret-left.svg";
 import { SpinnerInline } from "../shared/Spinner";
@@ -31,7 +31,7 @@ const Enroll = ({
 
   // handle otp value change
   const handleChange = (e: any) => {
-    setValue(validateOTP(e.target.value));
+    setValue(validatePhone(e.target.value));
   };
   // call otp verification endpoint
   const handlePay = () => {
