@@ -419,6 +419,10 @@ const CardPayment = () => {
           }
           setLoading(false);
           return;
+        } else {
+          setStage("otp");
+          setLoading(false);
+          return;
         }
       })
       .catch((error) => {
@@ -614,7 +618,7 @@ const CardPayment = () => {
             message={server.message}
             value={otp}
             setValue={setOtp}
-            onVerifyEnroll={start_card_otp_verification}
+            onVerifyEnroll={start_card_otp_enrollment}
             buttonText="Continue"
             loading={loading}
           />
