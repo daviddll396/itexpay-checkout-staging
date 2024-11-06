@@ -317,7 +317,7 @@ const CardPayment = () => {
           });
 
           if (response.code === "09") {
-            if (response.note !== null && response.note !== undefined && response.note === "OTPENROLL") {
+            if (response.transaction.note !== null && response.transaction.note !== undefined && response.transaction.note === "OTPENROLL") {
               setStage("enroll");
             } else {
               setStage("otp");
