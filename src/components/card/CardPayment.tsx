@@ -91,7 +91,7 @@ const CardPayment = () => {
     let verve = /^(?:50[067][180]|6500)(?:[0-9]{15})$/;
     let mastercard = new RegExp("^5[1-5][0-9]{14}$");
     let mastercard2 = new RegExp("^2[2-7][0-9]{14}$");
-    let afrigo = new RegExp("^564\d{15}$");
+    let afrigo = new RegExp("^564[0-9]{15}$");
 
     if (visa.test(cardNumber)) {
       setCardImg("visa");
