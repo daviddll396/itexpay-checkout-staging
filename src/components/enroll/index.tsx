@@ -58,7 +58,7 @@ const Enroll = ({
           value={value}
           onChange={handleChange}
           autoFocus
-          placeholder="08300000000"
+          placeholder="08030000000"
         />
         <div className="my-8">
           <button
