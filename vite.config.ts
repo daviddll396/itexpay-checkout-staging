@@ -22,4 +22,16 @@ export default defineConfig({
   define: {
     global: "globalThis",
   },
+  server: {
+    port: 5173,
+    host: true,
+    // Handle client-side routing by serving index.html for all routes
+    fs: {
+      allow: [".."],
+    },
+  },
+  preview: {
+    port: 5173,
+    host: true,
+  },
 });

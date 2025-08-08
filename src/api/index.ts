@@ -11,7 +11,8 @@ export function get_payment_details(paymentid: string) {
     paymentid: paymentid,
     amount: 5000,
     currency: "NGN",
-    publickey: "pk_test_mock_key_123456789",
+    publickey:
+      "ITXPUB_STAGING_N9OSLGOKR2WT6KNKMRPHI0TNDZF3FEMCFDUO2PFN-6011000252-04GPRVVTV0CPUVD",
     paymentmethods: ["card", "account", "qr", "enaira", "phone"],
     source: {
       customer: {
