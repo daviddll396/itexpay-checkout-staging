@@ -1,7 +1,8 @@
 import CryptoJS from "crypto-js";
 import AesUtil from "src/utils/aesutil";
+import forge from "node-forge";
 
-window.forge = require("node-forge");
+window.forge = forge;
 
 export function generate_reference(type: any, length: any) {
   return generate_references(type, length);
@@ -271,7 +272,7 @@ export function create_card_transaction(
   modalref: any,
   plref: any,
   paymentid: any,
-  authoption: any,
+  authoption: any
 ) {
   var exp = split_expiry(card.expiry);
   if (exp === null || exp === undefined) return;

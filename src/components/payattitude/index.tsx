@@ -39,13 +39,19 @@ const PayAttitude = () => {
   };
   // to get the transaction ussd code after selecting the bank
   const onGetPhoneAuth = () => {
-    if (!phoneNumber || phoneNumber.length < 11) {
-      setErr("Please input a valid phone number");
-      return;
-    } else {
-      setLoading(true);
-      handleTransaction();
-    }
+    // Show loading immediately for better UX
+    setLoading(true);
+
+    // Use setTimeout to allow UI to update before validation
+    setTimeout(() => {
+      if (!phoneNumber || phoneNumber.length < 11) {
+        setErr("Please input a valid phone number");
+        setLoading(false);
+        return;
+      } else {
+        handleTransaction();
+      }
+    }, 10); // Minimal delay to allow UI update
   };
   // get transaction status at intervals
   const runInterval = () => {
@@ -61,6 +67,7 @@ const PayAttitude = () => {
   };
   const handleTransaction = () => {
     dispatch(setProcessing(true));
+    // Loading is already set to true in onGetPhoneAuth
     const {
       reference,
       redirecturl,
@@ -182,7 +189,11 @@ const PayAttitude = () => {
                 // color: button_color ? button_color.value : "#27AE60",
               }}
             >
-              {paymentMade ? <SpinnerInline white/> : " I have made this payment"}
+              {paymentMade ? (
+                <SpinnerInline white />
+              ) : (
+                " I have made this payment"
+              )}
             </button>
           </div>
         </div>

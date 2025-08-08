@@ -1,6 +1,6 @@
 // import { checkToken } from "../utils/Utils";
 // import authHeader from "./auth-header";
-// let baseurl = process.env.REACT_APP_BACKEND_URL;
+// let baseurl = import.meta.env.VITE_BACKEND_URL;
 // let testUrl =""
 // let liveUrl =""
 import axios from "axios";

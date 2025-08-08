@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-// import { ReactComponent as Shield } from "../../assets/icons/shield.svg";
+// import Shield from "../../assets/icons/shield.svg";
 import { useAppSelector } from "src/redux/hooks";
 
 const ThreeDS = ({

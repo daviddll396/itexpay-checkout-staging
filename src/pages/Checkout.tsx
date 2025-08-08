@@ -252,8 +252,6 @@ const Checkout = () => {
     }
   }, [transaction_data?.paymentid]);
 
-
-
   useEffect(() => {
     dispatch(hide_error());
     onLoad();
@@ -318,9 +316,11 @@ const Checkout = () => {
                     <div className="p-4 switch:ml-[32%]  switch:pl-5 ">
                       <div className=" mt-2 mb-4 pb-2 border-b border-b-[#B9B9B9] flex items-center justify-between">
                         <div className="max-w-[200px]">
-                          {(activeImgUrl && activeImgUrl != "" && !['card', 'account'].includes(selectedOption)) &&
-                            <img src={activeImgUrl} alt="" className="w-36" />
-                          }
+                          {activeImgUrl &&
+                            activeImgUrl != "" &&
+                            !["card", "account"].includes(selectedOption) && (
+                              <img src={activeImgUrl} alt="" className="w-36" />
+                            )}
                         </div>
                         <div>
                           <h2 className="font-extrabold text-lg sm:text-xl text-title">
@@ -333,12 +333,43 @@ const Checkout = () => {
                         </div>
                       </div>
                       <div className="min-h-[300px] flex items-center ">
-                        {selectedOption === "card" && <CardPayment />}
-                        {selectedOption === "qr" && <QRPayment />}
+                        {/* Cache components to prevent re-mounting delays */}
+                        <div
+                          className={`w-full ${
+                            selectedOption === "card" ? "block" : "hidden"
+                          }`}
+                        >
+                          <CardPayment />
+                        </div>
+                        <div
+                          className={`w-full ${
+                            selectedOption === "qr" ? "block" : "hidden"
+                          }`}
+                        >
+                          <QRPayment />
+                        </div>
                         {/* {selectedOption === "ussd" && <USSDPayment />} */}
-                        {selectedOption === "account" && <BankTransfer />}
-                        {selectedOption === "enaira" && <ENaira />}
-                        {selectedOption === "phone" && <PayAttitude />}
+                        <div
+                          className={`w-full ${
+                            selectedOption === "account" ? "block" : "hidden"
+                          }`}
+                        >
+                          <BankTransfer />
+                        </div>
+                        <div
+                          className={`w-full ${
+                            selectedOption === "enaira" ? "block" : "hidden"
+                          }`}
+                        >
+                          <ENaira />
+                        </div>
+                        <div
+                          className={`w-full ${
+                            selectedOption === "phone" ? "block" : "hidden"
+                          }`}
+                        >
+                          <PayAttitude />
+                        </div>
                       </div>
                     </div>
                   </div>

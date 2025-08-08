@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, Fragment, useEffect } from "react";
 import BankLogo from "../../assets/images/merchantlogo.png";
-import { ReactComponent as ArrowLeft } from "../../assets/icons/arrow-left.svg";
-import { ReactComponent as CopyIcon } from "../../assets/icons/copy-icon.svg";
-import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
+import ArrowLeft from "../../assets/icons/arrow-left.svg";
+import CopyIcon from "../../assets/icons/copy-icon.svg";
+import CaretDown from "../../assets/icons/caret-down.svg";
 import { Combobox, Transition } from "@headlessui/react";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import banksData from "src/data/banks.json";
@@ -235,10 +235,7 @@ const USSDPayment = () => {
                     onChange={(event) => setQuery(event.target.value)}
                   />
                   <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                    <CaretDown
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
+                    <img src={CaretDown} alt="" className="h-5 w-5 text-gray-400" />
                   </Combobox.Button>
                 </div>
                 <Transition
@@ -279,10 +276,7 @@ const USSDPayment = () => {
                                     active ? "text-white" : "text-theme"
                                   }`}
                                 >
-                                  <CopyIcon
-                                    className="h-5 w-5"
-                                    aria-hidden="true"
-                                  />
+                                  <img src={CopyIcon} alt="" className="h-5 w-5" />
                                 </span>
                               ) : null}
                             </>
@@ -323,7 +317,9 @@ const USSDPayment = () => {
           </p>
           <div className="bg-theme/10 w-fit mx-auto py-1.5 px-5 rounded-3xl flex items-center gap-x-2 mb-6">
             <p className="text-theme font-extrabold text-2xl">{server?.ussd}</p>
-            <CopyIcon
+            <img
+              src={CopyIcon}
+              alt=""
               className="text-theme cursor-pointer"
               onClick={() => {
                 copy(server?.ussd);

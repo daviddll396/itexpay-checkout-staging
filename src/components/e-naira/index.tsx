@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition, RadioGroup } from "@headlessui/react";
-import { ReactComponent as CaretDown } from "../../assets/icons/caret-down.svg";
+import CaretDown from "../../assets/icons/caret-down.svg";
 import { useAppDispatch, useAppSelector } from "src/redux/hooks";
 import {
   setProcessing,
@@ -129,49 +129,60 @@ const ENaira = () => {
     setValue(val);
   };
   const onNext = () => {
-    const val = selected.id;
-    if (!val) {
-      setErr("Please select a validaton method");
-      return;
-    }
-    // if (!value) {
-    //   setErr("Please input a value for your selected validation method");
-    //   return;
-    // }
-    if (
-      val === "alias" &&
-      (!alias || !alias.startsWith("@" || alias.length < 5))
-    ) {
-      setErr("Please input your alias");
-      return;
-    }
-    if (val === "nuban" && !isValidNuban(nuban)) {
-      // dispatch(show_error({ message: "Please input a valid nuban" }));
-      setErr("Please input a valid nuban");
-      return;
-    }
-    if (val === "phone" && (!phone || phone.length < 11 || phone.length > 13)) {
-      setErr("Please input your phone number");
-      return;
-    }
-    if (val === "email" && !isValidEmail(email)) {
-      setErr("Please input a valid email address");
-      // dispatch(show_error({ message: "Please input a valid email address" }));
-      return;
-    }
-    if (ref === "pin") {
-      setStage("pin");
-      dispatch(setProcessing(true));
-      return;
-    }
-    if (ref === "token") {
-      setStage("token");
-      dispatch(setProcessing(true));
-      return;
-    }
-    dispatch(
-      show_error({ message: "Please select an authentication method!" })
-    );
+    // Show loading immediately for better UX
+    setLoading(true);
+
+    // Use setTimeout to allow UI to update before validation
+    setTimeout(() => {
+      const val = selected.id;
+      if (!val) {
+        setErr("Please select a validaton method");
+        setLoading(false);
+        return;
+      }
+      if (
+        val === "alias" &&
+        (!alias || !alias.startsWith("@" || alias.length < 5))
+      ) {
+        setErr("Please input your alias");
+        setLoading(false);
+        return;
+      }
+      if (val === "nuban" && !isValidNuban(nuban)) {
+        setErr("Please input a valid nuban");
+        setLoading(false);
+        return;
+      }
+      if (
+        val === "phone" &&
+        (!phone || phone.length < 11 || phone.length > 13)
+      ) {
+        setErr("Please input your phone number");
+        setLoading(false);
+        return;
+      }
+      if (val === "email" && !isValidEmail(email)) {
+        setErr("Please input a valid email address");
+        setLoading(false);
+        return;
+      }
+      if (ref === "pin") {
+        setStage("pin");
+        dispatch(setProcessing(true));
+        setLoading(false);
+        return;
+      }
+      if (ref === "token") {
+        setStage("token");
+        dispatch(setProcessing(true));
+        setLoading(false);
+        return;
+      }
+      dispatch(
+        show_error({ message: "Please select an authentication method!" })
+      );
+      setLoading(false);
+    }, 10); // Minimal delay to allow UI update
   };
   const onHandlePayment = () => {
     setPaymentMade(true);
@@ -263,8 +274,7 @@ const ENaira = () => {
             setLoading(false);
             dispatch(setProcessing(false));
             return;
-          }
-          else if (response.code === "09") {
+          } else if (response.code === "09") {
             runInterval();
             return;
           } else {
@@ -316,9 +326,10 @@ const ENaira = () => {
                   <div>
                     <Menu.Button className="inline-flex w-full justify-center  bg-transparent border-r border-r-[#B9B9B9]  pr-3 text-xs md:text-sm font-medium whitespace-nowrap overflow-x-hidden text-text hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                       {selected?.name || "Select method"}
-                      <CaretDown
+                      <img
+                        src={CaretDown}
+                        alt=""
                         className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
-                        aria-hidden="true"
                       />
                     </Menu.Button>
                   </div>
@@ -338,8 +349,9 @@ const ENaira = () => {
                             {({ active }) => (
                               <button
                                 onClick={() => onChangeSelected(option)}
-                                className={`${active ? "bg-theme/10 text-text" : "text-text"
-                                  } group flex w-full items-center rounded-md px-2 py-2 text-sm capitalize`}
+                                className={`${
+                                  active ? "bg-theme/10 text-text" : "text-text"
+                                } group flex w-full items-center rounded-md px-2 py-2 text-sm capitalize`}
                               >
                                 {option.name}
                               </button>
@@ -411,18 +423,21 @@ const ENaira = () => {
                   >
                     {({ active, checked }) => (
                       <li
-                        className={`  bg-white w-full px-6 py-2 shadow-custom_shadow_three my-3 rounded-md text-text  list-none cursor-pointer border ${checked ? "border-theme" : "border-transparent"
-                          }`}
+                        className={`  bg-white w-full px-6 py-2 shadow-custom_shadow_three my-3 rounded-md text-text  list-none cursor-pointer border ${
+                          checked ? "border-theme" : "border-transparent"
+                        }`}
                       >
                         <div className="flex items-center mb-1">
                           <div className="flex items-center">
                             <div
-                              className={`w-4 h-4 rounded-full border-2 border-theme p-0.5  ${checked ? "bg-theme/10 " : ""
-                                }`}
+                              className={`w-4 h-4 rounded-full border-2 border-theme p-0.5  ${
+                                checked ? "bg-theme/10 " : ""
+                              }`}
                             >
                               <div
-                                className={`w-full h-full rounded-full  ${checked ? "bg-theme" : ""
-                                  }`}
+                                className={`w-full h-full rounded-full  ${
+                                  checked ? "bg-theme" : ""
+                                }`}
                               ></div>
                             </div>
                           </div>

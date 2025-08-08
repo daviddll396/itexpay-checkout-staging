@@ -1,6 +1,6 @@
 // import { useState } from "react";
 import { useAppSelector } from "src/redux/hooks";
-import { ReactComponent as ArrowLeft } from "../../assets/icons/caret-left.svg";
+import ArrowLeft from "../../assets/icons/caret-left.svg";
 import { SpinnerInline } from "../shared/Spinner";
 
 type PinProps = {
@@ -76,7 +76,7 @@ const PIN = ({
           onClick={onGoBack}
           className="flex items-center flex-nowrap w-fit gap-x-1 text-[#979797] text-[11px] mb-4 cursor-pointer"
         >
-          <ArrowLeft className="w-4" />{" "}
+          <img src={ArrowLeft} alt="" className="w-4" />{" "}
           <span className="whitespace-nowrap">Go back</span>
         </div>
       )}

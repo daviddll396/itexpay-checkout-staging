@@ -1,10 +1,10 @@
 // import { useState } from "react";
 import { paymentChannels } from "../../data";
-import { ReactComponent as Cancel } from "../../assets/icons/cancel.svg";
+import Cancel from "../../assets/icons/cancel.svg";
 import { useAppSelector } from "src/redux/hooks";
 import DefaultLogo from "../../assets/images/default.png";
 
-import { ReactComponent as CaretRight } from "../../assets/icons/caret-right.svg";
+import CaretRight from "../../assets/icons/caret-right.svg";
 
 const Sidebar = (props: {
   setActive: React.Dispatch<React.SetStateAction<any>>;
@@ -47,8 +47,12 @@ const Sidebar = (props: {
           <div className=" flex items-center justify-between px-5 py-3">
             <div className="flex items-center ">
               <img
-                src={(transaction_data?.merchant_logo === null || transaction_data?.merchant_logo === undefined) ? DefaultLogo : transaction_data?.merchant_logo}
-
+                src={
+                  transaction_data?.merchant_logo === null ||
+                  transaction_data?.merchant_logo === undefined
+                    ? DefaultLogo
+                    : transaction_data?.merchant_logo
+                }
                 alt="logo"
                 className="w-9 h-9 mr-2 rounded-full"
               />
@@ -57,7 +61,7 @@ const Sidebar = (props: {
               </h3>
             </div>
             <div className="flex items-center" onClick={onClose && onClose}>
-              <Cancel className="w-5 h-5" />
+              <img src={Cancel} alt="" className="w-5 h-5" />
               <span className="ml-1 text-xs">Close</span>
             </div>
           </div>
@@ -92,7 +96,12 @@ const Sidebar = (props: {
         <div className=" flex items-center gap-x-2 mt-5 mb-10 ml-5">
           <img
             // src={transaction_data?.merchant_logo}
-            src={(transaction_data?.merchant_logo === null || transaction_data?.merchant_logo === undefined) ? DefaultLogo : transaction_data?.merchant_logo}
+            src={
+              transaction_data?.merchant_logo === null ||
+              transaction_data?.merchant_logo === undefined
+                ? DefaultLogo
+                : transaction_data?.merchant_logo
+            }
             alt="logo"
             className="w-12 h-12 rounded-full"
           />
@@ -119,10 +128,11 @@ const Sidebar = (props: {
                         ? undefined
                         : () => handleChangeOption(paymentItem)
                     }
-                    className={`flex items-center text-base py-2 pr-2  ${active.id === paymentItem.id
-                      ? " border-y border-l rounded-tl-theme rounded-bl-theme font-black "
-                      : " text-white font-semibold flex items-center justify-between"
-                      } ${processing ? "cursor-not-allowed" : "cursor-pointer"}`}
+                    className={`flex items-center text-base py-2 pr-2  ${
+                      active.id === paymentItem.id
+                        ? " border-y border-l rounded-tl-theme rounded-bl-theme font-black "
+                        : " text-white font-semibold flex items-center justify-between"
+                    } ${processing ? "cursor-not-allowed" : "cursor-pointer"}`}
                     style={{
                       borderColor:
                         button_color && active.id === paymentItem.id
@@ -147,12 +157,7 @@ const Sidebar = (props: {
                     <span className="ml-4">{paymentItem.name}</span>
                     {/* <img src={CaretRight} alt="" className="w-4" /> */}
                     {active.id !== paymentItem.id && (
-                      <CaretRight stroke="#FFFFFF99" className="w-4 mr-1" />
-                      // <ReactSVG
-                      //   src={CaretRight}
-                      //   className="w-4 mr-2"
-                      //   stroke={"#FFFFFF99"}
-                      // />
+                      <img src={CaretRight} alt="" className="w-4 mr-1" />
                     )}
                   </li>
                 );

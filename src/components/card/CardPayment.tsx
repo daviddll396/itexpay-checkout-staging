@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { ReactComponent as CardEmptyIcon } from "../../assets/icons/card-empty.svg";
-import { ReactComponent as ExpiryIcon } from "../../assets/icons/expiry.svg";
-import { ReactComponent as CVVIcon } from "../../assets/icons/cvv.svg";
+import CardEmptyIcon from "../../assets/icons/card-empty.svg";
+import ExpiryIcon from "../../assets/icons/expiry.svg";
+import CVVIcon from "../../assets/icons/cvv.svg";
 import {
   formatAndSetCcNumber,
   validateCVVNumber,
@@ -124,31 +124,37 @@ const CardPayment = () => {
     }
   };
   const handleCardDetails = () => {
-    if (!ccNumber || !expiry || !cvv) {
-      alert("Please input all fields");
-      return;
-    }
-    const cardNumberCorrect = /^\d+$/.test(ccNumber.replace(/\s/g, ""));
-    if (!cardNumberCorrect) {
-      //error message
-      // this.$store.commit("show_error", { message: "Invalid card number" });
-      return;
-    }
-    const expiryCorrect = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiry);
-    if (!expiryCorrect) {
-      //error message
-      // this.$store.commit("show_error", { message: "Invalid expiry date" });
-      return;
-    }
-    const cvvCorrect = /^[0-9]{3}$/.test(cvv);
-    if (!cvvCorrect) {
-      //error message
-      // this.$store.commit("show_error", { message: "Invalid CVV" });
+    // Show loading immediately for better UX
+    setLoading(true);
 
-      return;
-    }
-    // handleRedirect();
-    onVerifyCardDetails();
+    // Use setTimeout to allow UI to update before validation
+    setTimeout(() => {
+      if (!ccNumber || !expiry || !cvv) {
+        dispatch(show_error({ message: "Please input all fields" }));
+        setLoading(false);
+        return;
+      }
+      const cardNumberCorrect = /^\d+$/.test(ccNumber.replace(/\s/g, ""));
+      if (!cardNumberCorrect) {
+        dispatch(show_error({ message: "Invalid card number" }));
+        setLoading(false);
+        return;
+      }
+      const expiryCorrect = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiry);
+      if (!expiryCorrect) {
+        dispatch(show_error({ message: "Invalid expiry date" }));
+        setLoading(false);
+        return;
+      }
+      const cvvCorrect = /^[0-9]{3}$/.test(cvv);
+      if (!cvvCorrect) {
+        dispatch(show_error({ message: "Invalid CVV" }));
+        setLoading(false);
+        return;
+      }
+      // If validation passes, proceed with API call
+      onVerifyCardDetails();
+    }, 10); // Minimal delay to allow UI update
   };
   const onVerifyCardDetails = () => {
     dispatch(hide_error());
@@ -285,7 +291,7 @@ const CardPayment = () => {
           if (
             response.code === "09" &&
             response.message ===
-            "Payment option unavailable, kindly try another payment option"
+              "Payment option unavailable, kindly try another payment option"
           ) {
             dispatch(
               show_error({
@@ -317,7 +323,11 @@ const CardPayment = () => {
           });
 
           if (response.code === "09") {
-            if (response.transaction.note !== null && response.transaction.note !== undefined && response.transaction.note === "OTPENROLL") {
+            if (
+              response.transaction.note !== null &&
+              response.transaction.note !== undefined &&
+              response.transaction.note === "OTPENROLL"
+            ) {
               setStage("enroll");
             } else {
               setStage("otp");
@@ -531,7 +541,7 @@ const CardPayment = () => {
                   {cardImg && logo ? (
                     <img src={cardLogoUrl || ""} alt=" " className="icon h-6" />
                   ) : (
-                    <CardEmptyIcon className="icon h-6" stroke="#B9B9B9" />
+                    <img src={CardEmptyIcon} alt="" className="icon h-6" />
                   )}
                   <input
                     className="input_icon w-full"
@@ -544,11 +554,7 @@ const CardPayment = () => {
               <div className="col-span-1">
                 <label className="label">Expiry Date</label>
                 <div className="relative z-[1]">
-                  <ExpiryIcon
-                    className="icon h-6"
-                    stroke={expiry === "" ? "#B9B9B9" : " #041926"}
-                    strokeWidth={0.7}
-                  />
+                  <img src={ExpiryIcon} alt="" className="icon h-6" />
                   <input
                     className="input_icon w-full"
                     placeholder="12/24"
@@ -562,11 +568,7 @@ const CardPayment = () => {
               <div className="col-span-1">
                 <label className="label">CVV</label>
                 <div className="relative z-[1]">
-                  <CVVIcon
-                    className="icon h-6"
-                    stroke={cvv !== "" ? "#041926" : "#B9B9B9"}
-                    strokeWidth={0.7}
-                  />
+                  <img src={CVVIcon} alt="" className="icon h-6" />
                   <input
                     className="input_icon w-full"
                     placeholder="123"

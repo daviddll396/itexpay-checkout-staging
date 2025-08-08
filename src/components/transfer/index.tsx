@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { ReactComponent as CopyIcon } from "../../assets/icons/copy-icon.svg";
+import CopyIcon from "../../assets/icons/copy-icon.svg";
 import useCustomFunctions from "src/hooks/useCustomFunctions";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import { useAppDispatch, useAppSelector } from "src/redux/hooks";
@@ -166,6 +166,7 @@ const BankTransfer = () => {
       });
   };
   useEffect(() => {
+    // Only make API call if we don't have cached response
     if (
       bankTransferResponse.paymentid &&
       bankTransferResponse.paymentid === transaction_data.paymentid
@@ -186,17 +187,29 @@ const BankTransfer = () => {
       setBankAccountAvailable(false);
       dispatch(setTransactionErrorMessage({ message: response.message }));
     } else {
-      get_bank_account();
+      // Add a small delay to prevent blocking UI during payment method switch
+      const timer = setTimeout(() => {
+        get_bank_account();
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+        clearInterval(statusCheck);
+      };
     }
-    return () => {
-      clearInterval(statusCheck);
-    };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="w-full">
-      {isLoading && <SpinnerInline sm />}
+      {isLoading && (
+        <div className="text-center py-8">
+          <SpinnerInline sm />
+          <p className="text-sm text-text/60 mt-2">
+            Loading bank account details...
+          </p>
+        </div>
+      )}
       {!isLoading && !bankAccountAvailable && (
         <div>
           <h3 className="font-semibold text-text/80">
@@ -217,7 +230,9 @@ const BankTransfer = () => {
                 <p className="text-theme font-extrabold text-2xl ">
                   {accountNumber}
                 </p>
-                <CopyIcon
+                <img
+                  src={CopyIcon}
+                  alt=""
                   className="text-theme cursor-pointer"
                   onClick={() => {
                     copy(accountNumber);
@@ -236,9 +251,7 @@ const BankTransfer = () => {
                   <p className="text-[10px] text-center mb-1">
                     Beneficiary Name
                   </p>
-                  <h5 className="text-center font-medium ">
-                    {accountName}
-                  </h5>
+                  <h5 className="text-center font-medium ">{accountName}</h5>
                 </div>
               </div>
               <p className="text-[11px]  mx-auto text-center mb-8">

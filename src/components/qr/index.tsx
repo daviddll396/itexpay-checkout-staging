@@ -129,6 +129,8 @@ const QRPayment = () => {
   useEffect(() => {
     setIsLoading(true);
     dispatch(hide_error());
+
+    // Only make API call if we don't have cached response
     if (
       qrResponse.paymentid &&
       qrResponse.paymentid === transaction_data.paymentid
@@ -145,14 +147,27 @@ const QRPayment = () => {
       setQrCodeAvailable(false);
       setIsLoading(false);
     } else {
-      get_qr_code();
+      // Add a small delay to prevent blocking UI during payment method switch
+      const timer = setTimeout(() => {
+        get_qr_code();
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+        clearInterval(statusCheck);
+      };
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="w-full">
-      {isLoading && <SpinnerInline sm />}
+      {isLoading && (
+        <div className="text-center py-8">
+          <SpinnerInline sm />
+          <p className="text-sm text-text/60 mt-2">Generating QR code...</p>
+        </div>
+      )}
       {!isLoading && !qrCodeAvailable && (
         <div>
           <h3 className="font-semibold text-text/80">

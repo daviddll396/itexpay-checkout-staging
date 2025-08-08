@@ -1,5 +1,5 @@
-import { ReactComponent as Cancel } from "../../assets/icons/cancel2.svg";
-import { ReactComponent as ErrorIcon } from "../../assets/icons/error.svg";
+import Cancel from "../../assets/icons/cancel2.svg";
+import ErrorIcon from "../../assets/icons/error.svg";
 import { hide_error } from "src/redux/PaymentReducer";
 import { Transition } from "@headlessui/react";
 import { useAppDispatch, useAppSelector } from "src/redux/hooks";
@@ -25,11 +25,13 @@ const Toast = () => {
         className="absolute top-0 right-0 switch:top-4 switch:right-4 w-full switch:w-[64.5%] p-3 bg-[#F8D7D9] z-[1000] switch:rounded-tr-theme cursor-pointer"
       >
         <div className="flex items-center gap-x-2">
-          <Cancel
+          <img
+            src={Cancel}
+            alt=""
             className="absolute top-3 right-3 text-[#ff0000b6] w-3 h-3"
             onClick={onClose}
           />
-          <ErrorIcon className=" text-[#ff0000b6] w-6 h-6" onClick={onClose} />
+          <img src={ErrorIcon} alt="" className=" text-[#ff0000b6] w-6 h-6" onClick={onClose} />
           <p className="pr-5 text-[#e80505b6] text-sm font-semibold">
             {error.message}
           </p>
